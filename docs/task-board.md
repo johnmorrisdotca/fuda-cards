@@ -8,7 +8,7 @@ Status values: **Available** (unclaimed), **In progress** (claimed), **Blocked**
 | --- | --- | --- | --- | --- |
 | F01 | Overlapping deck: navigation, swipe and inspection | Available | — | Swipe and keyboard improvements made; browser and phone verification needed. |
 | F02 | Binder pages and configurable grids | Available | — | Grid columns and page controls improved; covers, page turns and browser verification remain. |
-| F03 | Rolodex display | Available | — | Initial stack view needs a distinct rotating file. |
+| F03 | Rolodex display | In progress | Codex phone cloud / codex/f03-rolodex / 2026-10-31 | Build distinct rotating file; shared src/collection-element.ts and styles. |
 | F04 | Convention display case | Available | — | Initial CSS view; actual 3D model and options remain. |
 | F05 | Jukebox carousel | Available | — | Needs distinct browse and focus behavior. |
 | F06 | Random card draw | Review | Codex / work / 2026-10-31 | Name filtering and draw edge cases implemented; browser verification outstanding. |
