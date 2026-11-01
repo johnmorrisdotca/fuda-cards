@@ -19,3 +19,8 @@
 
 - Added `docs/task-board.md` with stable task IDs, ownership and status columns. Added claim, check-in, conflict and stale-claim guidance to `AGENTS.md`.
 - Documentation-only change; no application behavior changed. The board coordinates through Git and is not an atomic lock.
+
+## 2026-10-31 — Overlapping deck increment (F01)
+
+- Claimed F01, corrected touch-end swipe cancellation and added arrow-key navigation with focus restoration to the deck and other stack views.
+- `pnpm test`: TypeScript build and seven tests passed. The tests do not exercise browser touch or keyboard events. Browser and phone verification remain outstanding; task released for further work.
