@@ -30,7 +30,11 @@
   },
   "files": [
     "dist",
-    "README.md"
+    "README.md",
+    "docs/collection-displays.md",
+    "docs/collection-input.md",
+    "docs/framework-integration.md",
+    "assets/README.md"
   ],
   "engines": {
     "node": ">=22"
@@ -49,5 +53,13 @@
   "publishConfig": {
     "access": "public"
   },
-  "packageManager": "pnpm@10.11.0"
+  "packageManager": "pnpm@10.11.0",
+  "homepage": "https://johnmorrisdotca.github.io/fuda-cards/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/johnmorrisdotca/fuda-cards.git"
+  },
+  "bugs": {
+    "url": "https://github.com/johnmorrisdotca/fuda-cards/issues"
+  }
 }

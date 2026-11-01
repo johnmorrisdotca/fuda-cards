@@ -100,3 +100,8 @@
 ## 2026-10-31 — Pages deployment result
 
 - GitHub Actions Pages run 41278795754 for commit `365b0a5` completed successfully and reports `https://johnmorrisdotca.github.io/fuda-cards/` as the deployment URL. The cloud network policy denied requests to that hostname, so public HTTP accessibility was not independently verified.
+
+## 2026-10-31 — npm release preparation (F20)
+
+- Added repository metadata and a GitHub Actions release workflow using npm trusted publishing and provenance, matching the related projects. The workflow runs the full checks and publishes on a matching version tag or manual dispatch.
+- `pnpm check` passed; an npm tarball was installed in a temporary project and its main entry point imported successfully. The registry returned 404 for version lookup and `npm whoami` reported no local npm login. Publication and npm trusted-publisher authorization still require verification.
