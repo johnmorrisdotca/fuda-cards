@@ -3,7 +3,7 @@ document.querySelector('#initial-motion').addEventListener('change',e=>card.togg
 const stage=document.querySelector('#stage'),zoomer=document.querySelector('#zoomer'),view=document.querySelector('#view'),spinSelect=document.querySelector('#card-spin'),speedSelect=document.querySelector('#spin-speed'),directionSelect=document.querySelector('#card-spin-direction'),P=2400;let fit=1,last={yaw:0,tilt:0,zoom:1,panX:0,panY:0};
 function measure(){const w=card.offsetWidth,h=card.offsetHeight,m=16,corner=card.getAttribute('card-spin')==='corner',k=P/(P-(corner?w:w/2)),ex=corner?w*1.1:w/2*k,ey=corner?h*k:h/2*k;fit=Math.min(1,(stage.clientWidth/2-m)/ex,(stage.clientHeight/2-m)/ey);view.setFitScale(fit);draw(last);}
 function draw(s){last=s;zoomer.style.transform=`translate(${s.panX}px,${s.panY}px) scale(${fit*s.zoom})`;card.style.setProperty('--fuda-yaw',s.yaw+'deg');card.style.setProperty('--fuda-tilt',s.tilt+'deg');}
-stage.addEventListener('pointerdown',e=>{if(e.composedPath().some(n=>n.classList?.contains('motion-button')))e.stopPropagation()},true);view.addEventListener('kazoku-viewchange',e=>{draw(e.detail)});new ResizeObserver(measure).observe(stage);
+view.addEventListener('kazoku-viewchange',e=>{draw(e.detail)});new ResizeObserver(measure).observe(stage);
 spinSelect.addEventListener('change',()=>{card.setAttribute('card-spin',spinSelect.value);measure();openFull()});
 function speed(){view.setAttribute('speed',String((directionSelect.value==='reverse'?-1:1)*360/parseFloat(speedSelect.value)))}
 speedSelect.addEventListener('change',speed);directionSelect.addEventListener('change',speed);speed();

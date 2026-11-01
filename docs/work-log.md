@@ -146,3 +146,8 @@
 - `@johnmorrisdotca/kazoku-ui` is now `^0.2.0` (devDependency). The controls have `zoom="1"` (natural size) and the page calls `view.setFitScale(fit)` each time it measures the stage, so the hand-written `view.set({zoom: 1/fit})`, the `opened` flag and the address-zoom check are gone. The studio opens with the card at full size, Fit still shows the whole sweep, and an address `?zoom=2` still wins.
 - The pointer guard for the Animate button stays: 0.2.0's default `ignore` is matched against the event target, which is the `<fuda-card>` host because the button is inside its shadow root, so the click is still lost without the guard (tested: removing it fails the Animate check). Worth telling kazoku-ui to match `e.composedPath()` as well.
 - Checks: `pnpm check` (13 tests) and `pnpm test:e2e` pass in headless Chromium at 1280x800 and 390x844. Same limits: no real phone, Safari or Firefox. F21 stays in Review.
+
+## 2026-11-01 — Card Studio on kazoku-ui 0.2.1, Animate guard removed (F21 follow-up)
+
+- `@johnmorrisdotca/kazoku-ui` is now `^0.2.1` (devDependency). Its `ignore` check now looks through open shadow roots with `event.composedPath()`, so the Animate button inside `<fuda-card>` no longer starts a drag. The `pointerdown` guard on the stage in `index.html` is removed.
+- Checks: `pnpm check` (13 tests) and `pnpm test:e2e` pass in headless Chromium at 1280x800 and 390x844 (Animate still clicks while a drag still turns; opens at full size; Fit; `?zoom=2`). Same limits: no real phone, Safari or Firefox. F21 stays in Review.

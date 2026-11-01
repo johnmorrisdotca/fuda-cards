@@ -9,16 +9,16 @@ importers:
   .:
     devDependencies:
       '@johnmorrisdotca/kazoku-ui':
-        specifier: ^0.2.0
-        version: 0.2.0
+        specifier: ^0.2.1
+        version: 0.2.1
       typescript:
         specifier: 5.9.3
         version: 5.9.3
 
 packages:
 
-  '@johnmorrisdotca/kazoku-ui@0.2.0':
-    resolution: {integrity: sha512-ZVSkUid7GejfwphZkjn8dWexmAnDsJFDbLMj6tqRXcWlAqeijhGgmzY4CWOdKFIm4xGJDMkIaC28mtDiJ96tMA==}
+  '@johnmorrisdotca/kazoku-ui@0.2.1':
+    resolution: {integrity: sha512-GOKieJ+aCMJVP9CwThh1bVNUDFuAmV4Uv41Gdn6PMj8NWdXYD1RQmIrTJPwPpv5AmZWLlJS5qYT11iEBB4pLvg==}
     engines: {node: '>=22'}
 
   typescript@5.9.3:
@@ -28,6 +28,6 @@ packages:
 
 snapshots:
 
-  '@johnmorrisdotca/kazoku-ui@0.2.0': {}
+  '@johnmorrisdotca/kazoku-ui@0.2.1': {}
 
   typescript@5.9.3: {}
