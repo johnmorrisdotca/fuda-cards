@@ -1,6 +1,6 @@
 # Agent workflow
 
-Read `docs/product-context.md`, `docs/demo-personas.md`, `docs/feature-roadmap.md`, `docs/task-board.md`, and `docs/work-log.md` before beginning work. Check Git status and the current GitHub branch before editing; preserve other people's changes and do not force-push.
+Read `docs/coordination.md`, `docs/product-context.md`, `docs/demo-personas.md`, `docs/feature-roadmap.md`, `docs/task-board.md`, and `docs/work-log.md` before beginning work. Check Git status and the current GitHub branch before editing; preserve other people's changes and do not force-push.
 
 For each meaningful increment:
 
