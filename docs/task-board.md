@@ -19,7 +19,7 @@ Status values: **Available** (unclaimed), **In progress** (claimed), **Blocked**
 | F11 | Hako and Uchusen interactive 3D in cards | Available | — | Integrate existing viewers; independently handle card controls. |
 | F12 | Collection input, metadata and validation | In progress | Codex cloud session, 2026-10-31 | JSON support is partial; support complete cards and custom items. |
 | F13 | Pokémon and sports API integrations | Available | — | Verify TCGdex live; research hockey coverage and image access. |
-| F14 | Demo users, collections and persistence | Available | — | Three users exist; verify Hako assets and add collection management. |
+| F14 | Demo users, collections and persistence | In progress | Codex cloud session, 2026-10-31 | Three users exist; verify Hako assets and add collection management. |
 | F15 | Framework integration and documentation | Available | — | Validate plain HTML, React, Angular, Vue and Svelte. |
 | F16 | Browser, mobile, keyboard and accessibility verification | Available | — | Establish repeatable testing for core flows. |
 | F17 | Local/cloud Git workflow and runnable demos | Available | — | Preserve branch history; verify remote changes and both environments. |
