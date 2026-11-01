@@ -11,7 +11,7 @@ Status values: **Available** (unclaimed), **In progress** (claimed), **Blocked**
 | F03 | Rolodex display | Available | — | Initial stack view needs a distinct rotating file. |
 | F04 | Convention display case | Available | — | Initial CSS view; actual 3D model and options remain. |
 | F05 | Jukebox carousel | Available | — | Needs distinct browse and focus behavior. |
-| F06 | Random card draw | Available | — | Add filtering and verify edge cases. |
+| F06 | Random card draw | In progress | Codex / work / 2026-10-31 | Add filtering and verify edge cases. |
 | F07 | Story scroll, gallery wall, flip tower, spotlight carousel | Available | — | Make each a distinct polished view. |
 | F08 | Infinite card atlas | Available | — | Pan/zoom prototype; browser testing and large-collection support. |
 | F09 | Card frames, fronts/backs and realistic materials | Available | — | Research reference families and develop distinctive designs. |
