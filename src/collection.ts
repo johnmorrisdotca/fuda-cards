@@ -30,3 +30,11 @@ export function randomDrawIndex(cards: CollectionCard[], current: number, filter
   const pool = alternatives.length ? alternatives : matches;
   return pool[Math.floor(random() * pool.length)].index;
 }
+
+/** Return the first card index of a wrapped page. */
+export function movePage(index: number, length: number, pageSize: number, delta: number): number {
+  if (length === 0) return 0;
+  const pages = Math.ceil(length / pageSize);
+  const page = Math.floor(index / pageSize);
+  return (((page + delta) % pages + pages) % pages) * pageSize;
+}

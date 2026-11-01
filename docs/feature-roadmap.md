@@ -15,7 +15,7 @@ Status key: [x] implemented at prototype level; [~] partial, requires further wo
 ## Collection display modes
 Each needs genuine distinct presentation, responsive layout, selection and keyboard/touch support, empty and large-collection behavior, and browser tests.
 - [~] Overlapping deck: large centered card, layered cards behind, swipe/arrows and inspect.
-- [~] Binder: configurable grids, sleeves, covers and page turns.
+- [~] Binder: configurable page size and grid columns, with wrapped page controls; sleeves, covers, page turns and browser verification remain.
 - [~] Rolodex: rotating file of index cards.
 - [~] Convention case: angled tiered rows, configurable spacing and overlap, 3D case and full-screen inspection.
 - [~] Jukebox: browse inside a device, bring a selection forward, return to location.
