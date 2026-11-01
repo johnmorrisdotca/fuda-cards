@@ -39,3 +39,9 @@
 
 - Documented the three fictional demo users, their motivations, exact implemented collections, and current integration limitations in `docs/demo-personas.md`. These narratives are design assumptions, not real user data.
 - Documentation-only increment; compared card lists with `demo/users.js`. F14 remains open for asset verification, collection management and persistence work.
+
+## 2026-10-31 — Shared product context and concurrent handoff
+
+- Added `docs/product-context.md` capturing product goals, integrations, display modes, motion, demo users, Git practices and known limitations; `AGENTS.md` now requires reading it and the personas before work.
+- F12 collection metadata increment passed eight tests and was pushed to branch `codex/f12-collection-metadata` (commit `3f7b199`), not merged into main. Main advanced concurrently for an F02 claim, so do not overwrite it; review/rebase or merge the F12 changes and preserve current claims. Branch includes changes in `src/collection-element.ts`, which may overlap F02. Its task status is Review.
+- The product-context and persona work is documentation; no browser verification was performed. F14 remains Available for implementation and verification.
