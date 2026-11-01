@@ -60,3 +60,8 @@
 
 - Claimed F03 and pushed a distinct rotating-file layout to `codex/f03-rolodex`, commit `9dd63ff`. Previous/next and keyboard arrows select a card; the centered card opens inspection. Side cards are decorative.
 - `pnpm test` passed: TypeScript build and nine existing tests. These tests do not exercise this UI. Browser, touch and accessibility verification remain outstanding; the new Rolodex does not yet implement swipe or animated rotation between renders. Branch is not merged into main. Next: browser-test, refine interactions and integrate against latest main.
+
+## 2026-10-31 — F03 browser verification attempt
+
+- Reclaimed F03 and started the local demo. The available cloud browser could not reach the workspace demo: its localhost response reported `Missing or invalid bearer token`. No UI, keyboard, touch, or visual verification was completed. No application changes made in this attempt.
+- Rolodex remains on `codex/f03-rolodex` at `9dd63ff`, not merged. Next agent should run the branch in a browser-accessible environment, test navigation, inspection, mobile and keyboard behavior, then reconcile with current main and integrate. Released F03 for continuation.
