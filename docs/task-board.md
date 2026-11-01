@@ -19,8 +19,8 @@ Status values: **Available** (unclaimed), **In progress** (claimed), **Blocked**
 | F11 | Hako and Uchusen interactive 3D in cards | Available | — | Integrate existing viewers; independently handle card controls. |
 | F12 | Collection input, metadata and validation | Review | Codex cloud session, 2026-10-31 | Metadata merged; custom items, partial validation and browser verification remain. |
 | F13 | Pokémon and sports API integrations | Available | — | Verify TCGdex live; research hockey coverage and image access. |
-| F14 | Demo users, collections and persistence | In progress | Codex / f14-f15 / 2026-10-31 | Collection management and Hako asset checks; demo files and tests. |
-| F15 | Framework integration and documentation | In progress | Codex / f14-f15 / 2026-10-31 | Framework examples and integration checks; docs and examples. |
+| F14 | Demo users, collections and persistence | Review | Codex / f14-f15 / 2026-10-31 | Profile-scoped saves, delete, export and legacy import added; browser and live Hako verification remain. |
+| F15 | Framework integration and documentation | Available | — | Integration examples added; real framework builds and browser validation remain. |
 | F16 | Browser, mobile, keyboard and accessibility verification | Available | — | Establish repeatable testing for core flows. |
 | F17 | Local/cloud Git workflow and runnable demos | Available | — | Preserve branch history; verify remote changes and both environments. |
 | F18 | Whole-card rotation and corner spin | Available | — | Slow, smooth rotation of the entire card like Hako Devices/Uchusen viewers, plus spinning around a card corner (diamond-like). Research existing viewers; support front/back, configurable motion and pause, touch/keyboard and reduced motion; keep card gestures independent of artwork/3D and collection navigation. Coordinate with F09, F10 and F11; verify browser/mobile. |

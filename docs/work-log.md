@@ -70,3 +70,10 @@
 
 - Added available task F18 for slow, smooth whole-card rotation inspired by the Hako Devices and Uchusen projects and a separate corner-pivot, diamond-like spin. The user intends another agent to pick it up. Keep the card rotation distinct from rotating a 3D object inside the card and from collection navigation; coordinate with F09–F11.
 - Requirements recorded only; no rotation implementation or browser verification performed in this increment.
+
+## 2026-10-31 — Demo persistence and framework examples (F14/F15)
+
+- Added browser-local profile-scoped named saves, delete, JSON export, explicit non-overwriting import of legacy shared saves, overwrite confirmation and visible storage errors. Existing legacy data is retained. Added storage unit tests for isolation, deletion, migration, malformed data and quota failures.
+- Added plain HTML, React, Angular, Vue and Svelte integration examples, including property assignment and client-only registration guidance. The examples have not been built in framework projects.
+- `pnpm check` passed (typecheck, build and five test files). A local Chromium attempt timed out; browser, device and framework runtime verification remain outstanding. GitHub Pages Hako image requests were denied by the environment network policy; the Hako source repository was reachable, but live image URLs were not verified.
+- F14 is in Review for browser and asset checks; F15 is released for real framework builds and validation. Work branch: `codex/f14-f15`.

@@ -17,7 +17,7 @@ Requires Node 22+ and pnpm. Run `pnpm install`, `pnpm check`, then `pnpm dev` an
 </fuda-card>
 ```
 
-In a bundler, import `@johnmorrisdotca/fuda-cards/element` once before rendering `<fuda-card>`. Frameworks may require custom-element configuration (for example, Angular's `CUSTOM_ELEMENTS_SCHEMA`). Framework-specific wrappers have not yet been implemented. Package publication is planned; it is not published yet.
+In a bundler, import `@johnmorrisdotca/fuda-cards/element` once before rendering `<fuda-card>`. Frameworks may require custom-element configuration (for example, Angular's `CUSTOM_ELEMENTS_SCHEMA`). Framework-specific wrappers have not yet been implemented; see [framework integration examples](docs/framework-integration.md). Package publication is planned; it is not published yet.
 
 The default slot accepts HTML, including an existing interactive 3D viewer; its owner handles rotation, zoom and model loading. The card has no drag-to-flip handler, leaving pointer interaction to that viewer. Control the card's reverse independently by adding or removing the `flipped` attribute. The demo provides a flip button. Attributes: `title`, `category`, `subtitle`, `description`, `number`, `rarity`, `variant` (`classic`, `sport`, `cosmic`), `finish` (`foil`, `matte`) and `flipped` (boolean). Set the element width to scale it. The main package entry exports the TypeScript options and available variants and finishes without registering the custom element.
 
@@ -56,6 +56,8 @@ Run `pnpm dev` and open `/demo/collections-component.html`. Import `@johnmorrisd
 ```
 
 These are early display prototypes: the case and rotating displays use CSS perspective rather than fully modeled 3D devices; the atlas is a draggable, zoomable plane rather than an unbounded or virtualized canvas. The demo can save and load named collections in the current browser using localStorage; this is not account-based sync or a backup. Configurable case geometry, integrated 3D content, and full browser and accessibility testing remain to be completed. Atlas supports drag, a zoom slider, and a basic two-finger pinch; touch behaviour still needs browser testing.
+
+Saved demo collections are scoped to the selected profile. Use “Import older saved collections” to copy pre-profile saves without overwriting same-named collections; the originals remain intact. The demo supports JSON export and deletion, and storage stays local to this browser.
 
 The collection component demo includes three fictional demo users—Alex, Sam, and Riley—with different example collections. Select a user to switch the displayed cards. These are local demo profiles, not accounts; the existing named-collection save/load remains local to the browser and separate from the demo profiles.
 
