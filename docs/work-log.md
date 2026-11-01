@@ -14,3 +14,8 @@
 
 - Added `AGENTS.md` to direct future agents to the roadmap and handoff log, require appropriate verification, and commit and push each meaningful increment safely.
 - Documentation-only change; no application behavior changed. The prior increment's build and seven tests passed; browser verification remains outstanding.
+
+## 2026-10-31 — Shared task board
+
+- Added `docs/task-board.md` with stable task IDs, ownership and status columns. Added claim, check-in, conflict and stale-claim guidance to `AGENTS.md`.
+- Documentation-only change; no application behavior changed. The board coordinates through Git and is not an atomic lock.
