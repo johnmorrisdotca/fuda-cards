@@ -45,3 +45,8 @@
 - Added `docs/product-context.md` capturing product goals, integrations, display modes, motion, demo users, Git practices and known limitations; `AGENTS.md` now requires reading it and the personas before work.
 - F12 collection metadata increment passed eight tests and was pushed to branch `codex/f12-collection-metadata` (commit `3f7b199`), not merged into main. Main advanced concurrently for an F02 claim, so do not overwrite it; review/rebase or merge the F12 changes and preserve current claims. Branch includes changes in `src/collection-element.ts`, which may overlap F02. Its task status is Review.
 - The product-context and persona work is documentation; no browser verification was performed. F14 remains Available for implementation and verification.
+
+## 2026-10-31 — Merge collection metadata (F12)
+
+- Reconciled metadata support with concurrent binder paging and random-draw work; preserved other task claims and the product context.
+- In an isolated merged copy, `pnpm test` passed the TypeScript build and nine tests. Browser, touch, live API and 3D verification remain outstanding. F12 remains in Review.

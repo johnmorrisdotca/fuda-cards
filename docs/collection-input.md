@@ -1,6 +1,6 @@
 # Collection input
 
-Fuda should display real collections as well as cards generated from other projects. These interfaces are planned; they have not yet been implemented.
+Fuda should display real collections as well as cards generated from other projects. The collection viewer accepts a JSON array or an object containing a cards array. The broader integration features below remain planned.
 
 ## Sources
 
@@ -10,7 +10,7 @@ Fuda should display real collections as well as cards generated from other proje
 
 ## Card data
 
-A proposed interchange format, subject to implementation and review:
+An example supported collection format:
 
 ```json
 {
@@ -19,12 +19,9 @@ A proposed interchange format, subject to implementation and review:
   "cards": [
     {
       "id": "starship-v3",
-      "title": "Starship Block 3",
-      "category": "Rocket",
-      "description": "A reusable launch vehicle.",
-      "frontImage": "https://example.com/starship-front.jpg",
+      "name": "Starship Block 3",
+      "image": "https://example.com/starship-front.jpg",
       "backImage": "https://example.com/starship-back.jpg",
-      "frame": "classic",
       "metadata": { "year": 2026, "number": "001" }
     }
   ]
@@ -38,3 +35,4 @@ A proposed interchange format, subject to implementation and review:
 - Each collection presentation (binder, case, jukebox, rotating index, random viewer) consumes the same normalized collection and can expose filtering and selection to the host.
 
 No accounts, collection storage, third-party integrations, importers, or synchronization are implemented yet. Avoid requiring accounts or uploading a collection to Fuda merely to display it.
+

@@ -3,7 +3,7 @@ export class FudaCollection extends HTMLElement {
   private root = this.attachShadow({mode:'open'}); private data: CollectionCard[]=[]; private index=0; private zoom=1; private pageSize=9; private selected: CollectionCard | null=null; private back=false; private drawFilter="";
   static get observedAttributes(){return ['view','page-size','columns']}
   set cards(value: CollectionCard[]){this.data=parseCollection(value);this.index=Math.min(this.index,Math.max(0,this.data.length-1));this.render()}
-  get cards(){return this.data.map(c=>({...c}))}
+  get cards(){return this.data.map(c=>({...c, ...(c.metadata ? {metadata:{...c.metadata}} : {})}))}
   connectedCallback(){this.render()}
   attributeChangedCallback(){this.pageSize=Math.min(100,Math.max(1,Math.floor(Number(this.getAttribute('page-size'))||9)));this.index=0;this.render()}
   private get view(): CollectionView {let v=this.getAttribute('view');return collectionViews.some(x=>x.id===v)?v as CollectionView:'deck'}
@@ -24,3 +24,4 @@ export class FudaCollection extends HTMLElement {
   }
 }
 if(!customElements.get('fuda-collection'))customElements.define('fuda-collection',FudaCollection);
+
