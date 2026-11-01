@@ -65,3 +65,8 @@
 
 - Reclaimed F03 and started the local demo. The available cloud browser could not reach the workspace demo: its localhost response reported `Missing or invalid bearer token`. No UI, keyboard, touch, or visual verification was completed. No application changes made in this attempt.
 - Rolodex remains on `codex/f03-rolodex` at `9dd63ff`, not merged. Next agent should run the branch in a browser-accessible environment, test navigation, inspection, mobile and keyboard behavior, then reconcile with current main and integrate. Released F03 for continuation.
+
+## 2026-10-31 — Whole-card rotation request (F18)
+
+- Added available task F18 for slow, smooth whole-card rotation inspired by the Hako Devices and Uchusen projects and a separate corner-pivot, diamond-like spin. The user intends another agent to pick it up. Keep the card rotation distinct from rotating a 3D object inside the card and from collection navigation; coordinate with F09–F11.
+- Requirements recorded only; no rotation implementation or browser verification performed in this increment.
