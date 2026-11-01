@@ -26,6 +26,7 @@ Status values: **Available** (unclaimed), **In progress** (claimed), **Blocked**
 | F18 | Whole-card rotation and corner spin | Done | Codex / codex/f18-card-rotation / 2026-10-31 | Center and corner spin, independent flip, pause, speed, direction and reduced motion verified in Chromium and mobile emulation. |
 | F19 | Public demo site and GitHub Pages | Done | Codex / codex/f19-pages-demo / 2026-10-31 | Pages workflow succeeded; built site tested in Chromium. Public URL blocked by cloud network policy. |
 | F20 | Publish npm package | Done | Codex / codex/f20-npm-release / 2026-10-31 | Version 0.1.0 manually published, installed and verified. Trusted publishing remains to configure for future releases. |
-| F21 | Bug: bottom-corner 360° card spin | Review | MacBook (machine2) / fix/f21-corner-spin / 2026-11-01 | Fixed: 3D turn on a fixed bottom-left corner, card at half size inside its box; e2e test added (`pnpm test:e2e`). Verified in headless Chromium desktop and mobile emulation only; needs a real phone check. See work log. |
+| F21 | Bug: bottom-corner 360° card spin | In progress | MacBook (machine2) / fix/f21-rework / 2026-11-01 | Rework: full-size card turning about the stage centre, with zoom, Fit and pan from @johnmorrisdotca/kazoku-ui. Prior fix 8aa1798. |
+| F22 | Zoom in/out and Fit in every display view | Available | — | John 2026-11-01: always support zoom so a card can be seen fully. Use @johnmorrisdotca/kazoku-ui view controls. Check the deck, binder, rolodex, case, jukebox, atlas and the rest. |
 
 Add or split tasks as work becomes concrete. Keep IDs stable and preserve the work log when reorganizing.
