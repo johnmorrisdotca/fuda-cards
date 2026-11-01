@@ -90,3 +90,9 @@
 
 - Added separate card-level center (3D vertical-axis) and upper-left corner (2D) continuous spins, configurable duration and direction, pause/resume without resetting, and reduced-motion behavior. Rotation wraps the existing independent flip and artwork rather than consuming their input. Card Studio exposes accessible controls; README includes embedding and review steps.
 - Researched Hako Devices and Uchusen viewers: each uses a configurable slow 180-second default turn. `pnpm check` passed. Chromium desktop and mobile emulation exercised center and corner motion, pause/resume, keyboard activation, reverse, flip, touch activation, independent interactive artwork, and reduced-motion suppression. Actual physical devices and screen readers were not tested.
+
+## 2026-10-31 — Public demo site (F19)
+
+- Added a repeatable static site build and GitHub Pages workflow, using the deployment pattern from Uchusen and Hako. Card Studio now links to the collection viewer and Pokémon binder; the collection viewer links back. The site builder protects a pre-existing unmarked site directory.
+- `pnpm check` passed, and `pnpm site` succeeded twice. Chromium checked the generated site under a subdirectory: card controls, collection navigation and binder fallback rendered. External TCGdex/Hako responses were not checked in that browser run.
+- GitHub Pages deployment, repository settings and public access still require verification. The environment denied the GitHub API request; no Pages configuration or deployment result was confirmed.

@@ -40,7 +40,8 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "pnpm build && node --test test/*.test.mjs",
     "check": "pnpm typecheck && pnpm build && pnpm test",
-    "dev": "pnpm build && node scripts/dev.mjs"
+    "dev": "pnpm build && node scripts/dev.mjs",
+    "site": "pnpm build && node scripts/site.mjs"
   },
   "devDependencies": {
     "typescript": "5.9.3"

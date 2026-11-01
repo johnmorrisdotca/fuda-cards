@@ -4,6 +4,10 @@ Reusable collectible card frames for caller-provided images and interactive 3D v
 
 This is an early prototype: classic, sport and cosmic are exploratory CSS designs, not yet historically researched recreations or photorealistic materials. The demo uses a still from Uchusen Rockets; see [assets/README.md](assets/README.md) for its model credit.
 
+## Demos
+
+The Card Studio and the collection and Pokémon binder demos are built together for GitHub Pages. From the studio, follow the collection links to explore them. Run `pnpm site` to build the static site in `site/`; serve that directory to review it. The Pages workflow runs the checks and deploys the site on pushes to `main`.
+
 ## Development
 
 Requires Node 22+ and pnpm. Run `pnpm install`, `pnpm check`, then `pnpm dev` and open http://localhost:8000. `pnpm build` emits JavaScript and TypeScript declarations to `dist/`.

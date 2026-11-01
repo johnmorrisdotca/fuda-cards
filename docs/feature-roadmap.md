@@ -38,6 +38,6 @@ Each needs genuine distinct presentation, responsive layout, selection and keybo
 
 ## Delivery and quality
 - [~] pnpm/TypeScript build and unit tests; add interaction tests and verify desktop/mobile browsers, keyboard and accessibility.
-- [ ] Reliable preview/deployment and documented embeddable examples for sites; no automatic publication implied.
+- [~] Static demo site and GitHub Pages workflow configured; deployment and public access must be verified.
 - [ ] Large-collection performance, lazy loading, network errors, security, image and model attribution.
 - [ ] Reconcile local/cloud Git history and push work to the shared GitHub repository without overwriting changes. Log each substantial change and verification in `docs/work-log.md`.
