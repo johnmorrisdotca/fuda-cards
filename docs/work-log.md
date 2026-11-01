@@ -110,3 +110,8 @@
 
 - Pushed `v0.1.0` at commit `711c518`, triggering release run 41279090144. Its publish step failed; the public job page reports exit code 1 but the detailed step log was unavailable without authentication. Registry lookup still returned 404 for `@johnmorrisdotca/fuda-cards@0.1.0`. No local npm publisher login is configured.
 - Next: the npm scope owner should review the failed publish-step log and authorize the `johnmorrisdotca/fuda-cards` repository, workflow `.github/workflows/release.yml` (workflow filename `release.yml`) as a trusted publisher for `@johnmorrisdotca/fuda-cards`, including pending publisher setup for a new package if needed. Then rerun the failed GitHub Actions job and verify `npm view` and an installation. Do not place tokens in the repository or chat.
+
+## 2026-10-31 — npm package published (F20)
+
+- The owner published `@johnmorrisdotca/fuda-cards@0.1.0` from tag `v0.1.0`. After npm processing completed, a clean npm registry install succeeded and the main and collection entry points imported successfully.
+- The initial automated publish failed. npm trusted-publisher authorization for `release.yml` has not been verified; configure and test it separately before relying on automated future releases.
