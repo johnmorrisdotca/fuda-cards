@@ -29,3 +29,13 @@
 
 - Added case-insensitive name filtering in random view, with disabled draw for no matches and repeat avoidance when alternatives exist. A single match remains drawable.
 - `pnpm check` passed (typecheck, build, and all four test files), including deterministic empty, single-match, filter, and selection cases. Browser and mobile interaction checks were not performed; verify them before marking the task Done.
+
+## 2026-10-31 — Binder grid increment (F02)
+
+- Added configurable grid columns for binder and case, page-number announcements, and focus restoration for previous/next controls; empty navigation is disabled. Page size is normalized to a whole number.
+- `pnpm check` passed, including pagination tests for empty, partial, single and wrapping pages. Browser, keyboard, mobile and visual behavior were not verified. Covers, sleeves and page-turn animations remain; F02 is released for continuation.
+
+## 2026-10-31 — Collection input increment (F12)
+
+- Accepted array or object-with-cards JSON and preserved validated set, year, number, edition, condition, grade, quantity and notes; copied nested metadata in the component getter. Corrected the documented JSON example.
+- `pnpm test`: TypeScript build and eight tests passed, including valid metadata and invalid input. UI display/editing, arbitrary metadata, custom 3D content, partial import handling, and browser testing are outstanding. F12 released for continued work.

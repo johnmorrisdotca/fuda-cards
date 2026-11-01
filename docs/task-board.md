@@ -7,7 +7,7 @@ Status values: **Available** (unclaimed), **In progress** (claimed), **Blocked**
 | ID | Task | Status | Owner / session | Notes |
 | --- | --- | --- | --- | --- |
 | F01 | Overlapping deck: navigation, swipe and inspection | Available | — | Swipe and keyboard improvements made; browser and phone verification needed. |
-| F02 | Binder pages and configurable grids | In progress | Codex / work / 2026-10-31 | Page wrap partially improved; covers and page turns remain. |
+| F02 | Binder pages and configurable grids | Available | — | Grid columns and page controls improved; covers, page turns and browser verification remain. |
 | F03 | Rolodex display | Available | — | Initial stack view needs a distinct rotating file. |
 | F04 | Convention display case | Available | — | Initial CSS view; actual 3D model and options remain. |
 | F05 | Jukebox carousel | Available | — | Needs distinct browse and focus behavior. |
@@ -17,7 +17,7 @@ Status values: **Available** (unclaimed), **In progress** (claimed), **Blocked**
 | F09 | Card frames, fronts/backs and realistic materials | Available | — | Research reference families and develop distinctive designs. |
 | F10 | Image focus, pan and motion controls | Available | — | Prototype needs interaction and reduced-motion verification. |
 | F11 | Hako and Uchusen interactive 3D in cards | Available | — | Integrate existing viewers; independently handle card controls. |
-| F12 | Collection input, metadata and validation | In progress | Codex cloud session, 2026-10-31 | JSON support is partial; support complete cards and custom items. |
+| F12 | Collection input, metadata and validation | Available | — | Array/object JSON and typed collector metadata added; custom items, richer validation and browser testing remain. |
 | F13 | Pokémon and sports API integrations | Available | — | Verify TCGdex live; research hockey coverage and image access. |
 | F14 | Demo users, collections and persistence | Available | — | Three users exist; verify Hako assets and add collection management. |
 | F15 | Framework integration and documentation | Available | — | Validate plain HTML, React, Angular, Vue and Svelte. |
