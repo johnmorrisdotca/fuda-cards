@@ -19,7 +19,7 @@ const sizes = [['desktop', { width: 1280, height: 800 }], ['mobile', { width: 39
 test('corner spin keeps the corner at the stage centre, full size, with zoom', { skip: !chromium && 'Playwright not installed' }, async () => {
   const browser = await chromium.launch({ executablePath: process.env.PLAYWRIGHT_CHROMIUM });
   const server = createServer(async (req, res) => {
-    const path = req.url === '/' ? '/index.html' : req.url.split('?')[0];
+    const url = req.url.split('?')[0], path = url === '/' ? '/index.html' : url;
     try { res.writeHead(200, { 'Content-Type': types[extname(path)] ?? 'text/plain' }).end(await readFile(resolve(root, '.' + path))); }
     catch { res.writeHead(404).end(); }
   }).listen(8071, '127.0.0.1');
@@ -50,6 +50,10 @@ test('corner spin keeps the corner at the stage centre, full size, with zoom', {
         view.set({ yaw: 0 });
         return { off, overflow, faces: [...faces], width: host.offsetWidth, height: host.offsetHeight };
       });
+      const opening = await p.evaluate(() => ({ zoom: document.querySelector('#view').state.zoom, width: document.querySelector('#card').getBoundingClientRect().width }));
+      assert.ok(opening.zoom > 1, `${name}: the studio must not open at Fit (zoom ${opening.zoom})`);
+      assert.ok(Math.abs(opening.width - 300) <= 1, `${name}: the card must open at full size, not ${opening.width}px wide`);
+      await p.getByRole('button', { name: 'Fit' }).click();
       const fit = await sweep();
       assert.ok(Math.max(...fit.off) <= 1, `${name}: the corner is ${Math.max(...fit.off)}px from the stage centre`);
       assert.equal(fit.width, 300, `${name}: the card must stay full size`);
@@ -85,6 +89,13 @@ test('corner spin keeps the corner at the stage centre, full size, with zoom', {
       await p.getByRole('button', { name: 'Zoom in' }).click();
       assert.equal(await p.evaluate(() => document.querySelector('#view').state.turning), true, `${name}: a control stopped the turn`);
       await p.close();
+
+      const a = await browser.newPage({ viewport: size });
+      await a.goto('http://127.0.0.1:8071/?zoom=2');
+      await a.waitForFunction(() => document.querySelector('#view').state);
+      await a.selectOption('#card-spin', 'corner');
+      assert.equal(await a.evaluate(() => document.querySelector('#view').state.zoom), 2, `${name}: an address zoom must win over the default`);
+      await a.close();
 
       const q = await browser.newPage({ viewport: size, reducedMotion: 'reduce' });
       await q.goto('http://127.0.0.1:8071/');

@@ -41,7 +41,7 @@ To drive the turn from your own controls instead of the built-in animation, add 
 </fuda-card>
 ```
 
-To review, run `pnpm install` and `pnpm dev`, then open the Card Studio. Under **Card rotation**, choose **Rotate around center** or **Spin around bottom corner**. The view controls under the card turn and tip it (Angle, Tilt), start **Auto-turn**, and zoom with **−**, **2×**, **+** and **Fit** (Ctrl or Command with the wheel, or a pinch, also zoom; zoomed in, a drag or the arrows move the view). **Fit** shows the whole sweep and the corner stays at the middle of the stage at every zoom. Choose **Fast** to see a full turn in eight seconds, and try the direction control and **Flip card**. Auto-turn does not start by itself when your operating system or browser asks for reduced motion. The spin is decorative; use the separate flip control to choose the face.
+To review, run `pnpm install` and `pnpm dev`, then open the Card Studio. Under **Card rotation**, choose **Rotate around center** or **Spin around bottom corner**. The view controls under the card turn and tip it (Angle, Tilt), start **Auto-turn**, and zoom with **−**, **2×**, **+** and **Fit** (Ctrl or Command with the wheel, or a pinch, also zoom; zoomed in, a drag or the arrows move the view). The Card Studio opens at full card size; **Fit** is one press away and shows the whole sweep, and the corner stays at the middle of the stage at every zoom. Choose **Fast** to see a full turn in eight seconds, and try the direction control and **Flip card**. Auto-turn does not start by itself when your operating system or browser asks for reduced motion. The spin is decorative; use the separate flip control to choose the face.
 
 ### Moving artwork
 
