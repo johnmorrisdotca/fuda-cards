@@ -9,3 +9,8 @@
 - The demo users and TCGdex adapter are in `demo/`. Riley's Hako remote artwork URLs have not been checked live. The Hako images are currently full-image records, not live Hako elements inside Fuda frames.
 - This continuation corrected binder/case page wrap and attempted to suppress click after swipes. Those interactions have not been verified in a browser. Do not assume swipe suppression is reliable until tested; rendering replaces the old stage during touch end.
 - Feature checklist and status are in `docs/feature-roadmap.md`. Update this log with date, changes, tests, limitations, and current Git state at each handoff.
+
+## 2026-10-31 — Agent workflow
+
+- Added `AGENTS.md` to direct future agents to the roadmap and handoff log, require appropriate verification, and commit and push each meaningful increment safely.
+- Documentation-only change; no application behavior changed. The prior increment's build and seven tests passed; browser verification remains outstanding.
