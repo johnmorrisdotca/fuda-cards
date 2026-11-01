@@ -55,3 +55,8 @@
 
 - Added `docs/coordination.md` and made it required reading in `AGENTS.md`: isolated branches, pushed claims, incremental updates, shared-file conflict handling, latest-head checks, safe integration, verification, and durable handoffs.
 - Documentation-only update. Prior metadata merge commit `84f954f` preserved concurrent F02/F06 work and passed nine tests in an isolated verification copy; browser verification remains outstanding.
+
+## 2026-10-31 — Rolodex layout (F03)
+
+- Claimed F03 and pushed a distinct rotating-file layout to `codex/f03-rolodex`, commit `9dd63ff`. Previous/next and keyboard arrows select a card; the centered card opens inspection. Side cards are decorative.
+- `pnpm test` passed: TypeScript build and nine existing tests. These tests do not exercise this UI. Browser, touch and accessibility verification remain outstanding; the new Rolodex does not yet implement swipe or animated rotation between renders. Branch is not merged into main. Next: browser-test, refine interactions and integrate against latest main.
