@@ -25,4 +25,6 @@ Status values: **Available** (unclaimed), **In progress** (claimed), **Blocked**
 | F17 | Local/cloud Git workflow and runnable demos | Available | — | Preserve branch history; verify remote changes and both environments. |
 | F18 | Whole-card rotation and corner spin | Done | Codex / codex/f18-card-rotation / 2026-10-31 | Center and corner spin, independent flip, pause, speed, direction and reduced motion verified in Chromium and mobile emulation. |
 
+| F19 | Public demo site and GitHub Pages | In progress | Codex / codex/f19-pages-demo / 2026-10-31 | Build and publish demo site, following Hako and Uchusen; scripts, workflow, README and demos. |
+
 Add or split tasks as work becomes concrete. Keep IDs stable and preserve the work log when reorganizing.
