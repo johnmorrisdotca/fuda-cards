@@ -27,6 +27,6 @@ Status values: **Available** (unclaimed), **In progress** (claimed), **Blocked**
 
 | F19 | Public demo site and GitHub Pages | Done | Codex / codex/f19-pages-demo / 2026-10-31 | Pages workflow succeeded; built site tested in Chromium. Public URL blocked by cloud network policy. |
 
-| F20 | Publish npm package | In progress | Codex / codex/f20-npm-release / 2026-10-31 | Validate and publish package 0.1.0; package metadata, release workflow and README. |
+| F20 | Publish npm package | Blocked | Codex / codex/f20-npm-release / 2026-10-31 | Release publish step failed; npm publisher authorization and detailed job logs need owner review. |
 
 Add or split tasks as work becomes concrete. Keep IDs stable and preserve the work log when reorganizing.

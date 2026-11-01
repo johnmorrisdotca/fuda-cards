@@ -105,3 +105,8 @@
 
 - Added repository metadata and a GitHub Actions release workflow using npm trusted publishing and provenance, matching the related projects. The workflow runs the full checks and publishes on a matching version tag or manual dispatch.
 - `pnpm check` passed; an npm tarball was installed in a temporary project and its main entry point imported successfully. The registry returned 404 for version lookup and `npm whoami` reported no local npm login. Publication and npm trusted-publisher authorization still require verification.
+
+## 2026-10-31 — npm publication blocked (F20)
+
+- Pushed `v0.1.0` at commit `711c518`, triggering release run 41279090144. Its publish step failed; the public job page reports exit code 1 but the detailed step log was unavailable without authentication. Registry lookup still returned 404 for `@johnmorrisdotca/fuda-cards@0.1.0`. No local npm publisher login is configured.
+- Next: the npm scope owner should review the failed publish-step log and authorize the `johnmorrisdotca/fuda-cards` repository, workflow `.github/workflows/release.yml` (workflow filename `release.yml`) as a trusted publisher for `@johnmorrisdotca/fuda-cards`, including pending publisher setup for a new package if needed. Then rerun the failed GitHub Actions job and verify `npm view` and an installation. Do not place tokens in the repository or chat.
