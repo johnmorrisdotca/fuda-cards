@@ -24,3 +24,8 @@
 
 - Claimed F01, corrected touch-end swipe cancellation and added arrow-key navigation with focus restoration to the deck and other stack views.
 - `pnpm test`: TypeScript build and seven tests passed. The tests do not exercise browser touch or keyboard events. Browser and phone verification remain outstanding; task released for further work.
+
+## 2026-10-31 — Random draw filtering (F06)
+
+- Added case-insensitive name filtering in random view, with disabled draw for no matches and repeat avoidance when alternatives exist. A single match remains drawable.
+- `pnpm check` passed (typecheck, build, and all four test files), including deterministic empty, single-match, filter, and selection cases. Browser and mobile interaction checks were not performed; verify them before marking the task Done.

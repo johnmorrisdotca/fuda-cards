@@ -19,7 +19,7 @@ Each needs genuine distinct presentation, responsive layout, selection and keybo
 - [~] Rolodex: rotating file of index cards.
 - [~] Convention case: angled tiered rows, configurable spacing and overlap, 3D case and full-screen inspection.
 - [~] Jukebox: browse inside a device, bring a selection forward, return to location.
-- [~] Random draw: sample from collection or current filters and handle empty/single-card cases.
+- [~] Random draw: filter by name and sample matching cards; empty and single-match logic tested. Browser interaction verification remains.
 - [~] Vertical story scroll.
 - [~] Sliding gallery wall.
 - [~] Flip tower.

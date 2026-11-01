@@ -20,3 +20,13 @@ export function parseCollection(value: unknown): CollectionCard[] {
     return {id,name:c.name,image:c.image, ...(c.backImage ? {backImage:c.backImage as string} : {})};
   });
 }
+
+/** Choose a matching card, avoiding the current card when another match exists. */
+export function randomDrawIndex(cards: CollectionCard[], current: number, filter: string, random = Math.random): number | null {
+  const query = filter.trim().toLocaleLowerCase();
+  const matches = cards.map((card, index) => ({card, index})).filter(({card}) => card.name.toLocaleLowerCase().includes(query));
+  if (!matches.length) return null;
+  const alternatives = matches.filter(({index}) => index !== current);
+  const pool = alternatives.length ? alternatives : matches;
+  return pool[Math.floor(random() * pool.length)].index;
+}

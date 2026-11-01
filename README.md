@@ -43,7 +43,7 @@ Open `demo/tcgdex.html` through the local server to browse the Pokémon Base Set
 
 ## Collection viewer
 
-Run `pnpm dev` and open `/demo/collections-component.html`. Import `@johnmorrisdotca/fuda-cards/collection-element` to register the element, then set its `cards` property to an array of `{ id, name, image, backImage? }`. Image URLs are loaded by the viewer's browser. `id` is optional on input (the position is used if omitted); IDs must be unique. Set `view` to `deck`, `rolodex`, `binder`, `case`, `jukebox`, `random`, `story`, `wall`, `tower`, `spotlight`, or `atlas`. Set `page-size` for the binder and case (1–100).
+Run `pnpm dev` and open `/demo/collections-component.html`. Import `@johnmorrisdotca/fuda-cards/collection-element` to register the element, then set its `cards` property to an array of `{ id, name, image, backImage? }`. Image URLs are loaded by the viewer's browser. `id` is optional on input (the position is used if omitted); IDs must be unique. Set `view` to `deck`, `rolodex`, `binder`, `case`, `jukebox`, `random`, `story`, `wall`, `tower`, `spotlight`, or `atlas`. Set `page-size` for the binder and case (1–100). In random view, filter card names to limit the draw; the draw button is disabled when no cards match.
 
 ```html
 <fuda-collection view="deck"></fuda-collection>
