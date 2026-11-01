@@ -24,9 +24,8 @@ Status values: **Available** (unclaimed), **In progress** (claimed), **Blocked**
 | F16 | Browser, mobile, keyboard and accessibility verification | Available | — | Establish repeatable testing for core flows. |
 | F17 | Local/cloud Git workflow and runnable demos | Available | — | Preserve branch history; verify remote changes and both environments. |
 | F18 | Whole-card rotation and corner spin | Done | Codex / codex/f18-card-rotation / 2026-10-31 | Center and corner spin, independent flip, pause, speed, direction and reduced motion verified in Chromium and mobile emulation. |
-
 | F19 | Public demo site and GitHub Pages | Done | Codex / codex/f19-pages-demo / 2026-10-31 | Pages workflow succeeded; built site tested in Chromium. Public URL blocked by cloud network policy. |
-
 | F20 | Publish npm package | Done | Codex / codex/f20-npm-release / 2026-10-31 | Version 0.1.0 manually published, installed and verified. Trusted publishing remains to configure for future releases. |
+| F21 | Bug: bottom-corner 360° card spin | Available | — | Corner spin currently rotates flat around the upper-left and moves off the stage. Spin the whole card in a circle around a stationary bottom corner, like an ice skater; verify the intended 3D motion, front/back, controls, reduced motion and desktop/mobile bounds. See work log. |
 
 Add or split tasks as work becomes concrete. Keep IDs stable and preserve the work log when reorganizing.

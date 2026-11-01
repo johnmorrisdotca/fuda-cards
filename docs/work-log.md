@@ -115,3 +115,8 @@
 
 - The owner published `@johnmorrisdotca/fuda-cards@0.1.0` from tag `v0.1.0`. After npm processing completed, a clean npm registry install succeeded and the main and collection entry points imported successfully.
 - The initial automated publish failed. npm trusted-publisher authorization for `release.yml` has not been verified; configure and test it separately before relying on automated future releases.
+
+## 2026-10-31 — Bottom-corner spin bug (F21)
+
+- User reports that the published “Spin around corner” motion is wrong: the card should spin a full 360° in a circle on a bottom corner, like an ice skater. The screenshot shows the current card turned sideways and drifting outside the preview area. The existing implementation rotates in the plane of the screen around its upper-left corner; it does not match the requested motion.
+- Follow-up: implement and visually verify the intended bottom-corner spin, keeping the pivot stable and the card visible; verify the rotation in three dimensions and show both faces as appropriate. Preserve independent flip and artwork interactions, speed, direction, pause/resume, and reduced-motion behavior. Check desktop and mobile layouts with a real visual review. No implementation change or new verification was performed in this ticket-creation update.
