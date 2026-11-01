@@ -34,3 +34,8 @@
 
 - Added configurable grid columns for binder and case, page-number announcements, and focus restoration for previous/next controls; empty navigation is disabled. Page size is normalized to a whole number.
 - `pnpm check` passed, including pagination tests for empty, partial, single and wrapping pages. Browser, keyboard, mobile and visual behavior were not verified. Covers, sleeves and page-turn animations remain; F02 is released for continuation.
+
+## 2026-10-31 — Demo personas (F14)
+
+- Documented the three fictional demo users, their motivations, exact implemented collections, and current integration limitations in `docs/demo-personas.md`. These narratives are design assumptions, not real user data.
+- Documentation-only increment; compared card lists with `demo/users.js`. F14 remains open for asset verification, collection management and persistence work.
