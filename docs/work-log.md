@@ -85,3 +85,8 @@
 - Built and ran equivalent plain HTML, React 19.3, Angular 19.2, Vue 3.5 and Svelte 4.2 integrations in headless Chromium 138, checking assigned card data and rendered card elements. Server-side rendering and other framework versions were not tested.
 - Exercised the demo in Chromium: profile switching, saved collection isolation, save/load/delete, JSON import, exported file contents and legacy import. Verified all six test files pass with `pnpm test`; typecheck and build passed with `pnpm check`. No phone or touch testing was performed.
 - F14 and F15 completed for their stated scopes. Cross-device sync and live 3D viewer integration are separate unimplemented capabilities.
+
+## 2026-10-31 — Whole-card rotation (F18)
+
+- Added separate card-level center (3D vertical-axis) and upper-left corner (2D) continuous spins, configurable duration and direction, pause/resume without resetting, and reduced-motion behavior. Rotation wraps the existing independent flip and artwork rather than consuming their input. Card Studio exposes accessible controls; README includes embedding and review steps.
+- Researched Hako Devices and Uchusen viewers: each uses a configurable slow 180-second default turn. `pnpm check` passed. Chromium desktop and mobile emulation exercised center and corner motion, pause/resume, keyboard activation, reverse, flip, touch activation, independent interactive artwork, and reduced-motion suppression. Actual physical devices and screen readers were not tested.

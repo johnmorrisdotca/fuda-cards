@@ -15,6 +15,9 @@ export interface CardOptions {
   playing?: boolean;
   panDirection?: 'down' | 'up';
   panLoop?: 'alternate' | 'restart';
+  cardSpin?: 'center' | 'corner';
+  cardSpinDirection?: 'normal' | 'reverse';
+  cardSpinPaused?: boolean;
 }
 export const cardVariants: readonly CardVariant[] = ['classic', 'sport', 'cosmic'];
 export const cardFinishes: readonly CardFinish[] = ['foil', 'matte'];

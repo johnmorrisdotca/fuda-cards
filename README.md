@@ -25,6 +25,18 @@ The default slot accepts HTML, including an existing interactive 3D viewer; its 
 
 Collection presentation prototypes are available as a reusable `<fuda-collection>` component. See the [collection demo](demo/collections-component.html) and [collection display notes](docs/collection-displays.md).
 
+### Whole-card rotation
+
+Set `card-spin="center"` for a slow 3D turn around the card’s vertical center, or `card-spin="corner"` for a flat spin around its upper-left corner. Both rotate the entire card, including either face and its content. The default is one turn every 180 seconds; set `--fuda-card-spin-duration` to a positive CSS duration such as `30s`. Set `card-spin-direction="reverse"` to reverse the rotation. Add `card-spin-paused` to pause at the current angle, and remove it to resume. Remove `card-spin` to stop and reset the rotation. These attributes are independent of the artwork `motion` and `playing` attributes and the card’s `flipped` state. Reduced-motion preferences disable the rotation and the flip transition.
+
+```html
+<fuda-card title="Explorer" card-spin="center" style="--fuda-card-spin-duration: 30s">
+  <img src="rocket.jpg" alt="Explorer rocket">
+</fuda-card>
+```
+
+To review, run `pnpm install` and `pnpm dev`, then open the Card Studio. Under **Card rotation**, choose **Rotate around center** or **Spin around corner**; choose **Fast** to see a full turn in eight seconds. Use **Pause card rotation** and **Flip card** to check both faces, then resume. Try the rotation direction and image-motion controls independently. Set your operating system or browser to reduced motion and confirm the card stays still. The center and corner spins are decorative; use the separate flip control to choose the face.
+
 ### Moving artwork
 
 Set `motion="pan"` on a card containing a slotted `<img>` to enable an Animate button on a tall image. By default the card starts on a still, cropped view; add the boolean `playing` attribute to start with motion. Tapping Animate starts the pan, and tapping Stop returns to the still. A host can add or remove `playing` to control the state. Set `--fuda-focus-x` and `--fuda-focus-y` (for example `50%` and `20%`) to choose the focal point. Cards without the pan option show a still, fully visible image. `pan-direction="up"` starts at the bottom; the default is down. The image travels back and forth by default; set `pan-loop="restart"` to repeat in one direction. Set the CSS custom property `--fuda-pan-duration` (for example, `16s`) to control the duration of each pass. If the image is not taller than the window after filling its width, there may be no vertical distance to pan. Reduced-motion preferences disable the animation and preserve the focused still. This option applies to images; moving a 3D camera is a separate future integration owned by the viewer.
