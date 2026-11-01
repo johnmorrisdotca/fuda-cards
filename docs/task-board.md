@@ -23,6 +23,6 @@ Status values: **Available** (unclaimed), **In progress** (claimed), **Blocked**
 | F15 | Framework integration and documentation | Done | Codex / f14-f15 / 2026-10-31 | HTML, React 19, Angular 19, Vue 3 and Svelte 4 integrations verified in Chromium. |
 | F16 | Browser, mobile, keyboard and accessibility verification | Available | — | Establish repeatable testing for core flows. |
 | F17 | Local/cloud Git workflow and runnable demos | Available | — | Preserve branch history; verify remote changes and both environments. |
-| F18 | Whole-card rotation and corner spin | Available | — | Slow, smooth rotation of the entire card like Hako Devices/Uchusen viewers, plus spinning around a card corner (diamond-like). Research existing viewers; support front/back, configurable motion and pause, touch/keyboard and reduced motion; keep card gestures independent of artwork/3D and collection navigation. Coordinate with F09, F10 and F11; verify browser/mobile. |
+| F18 | Whole-card rotation and corner spin | In progress | Codex / codex/f18-card-rotation / 2026-10-31 | Card element motion and independent controls; overlaps F09–F11 in src/element.ts and demo. |
 
 Add or split tasks as work becomes concrete. Keep IDs stable and preserve the work log when reorganizing.
