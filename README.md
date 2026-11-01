@@ -31,7 +31,7 @@ Collection presentation prototypes are available as a reusable `<fuda-collection
 
 ### Whole-card rotation
 
-Set `card-spin="center"` for a slow 3D turn around the card’s vertical center, or `card-spin="corner"` for a flat spin around its upper-left corner. Both rotate the entire card, including either face and its content. The default is one turn every 180 seconds; set `--fuda-card-spin-duration` to a positive CSS duration such as `30s`. Set `card-spin-direction="reverse"` to reverse the rotation. Add `card-spin-paused` to pause at the current angle, and remove it to resume. Remove `card-spin` to stop and reset the rotation. These attributes are independent of the artwork `motion` and `playing` attributes and the card’s `flipped` state. Reduced-motion preferences disable the rotation and the flip transition.
+Set `card-spin="center"` for a slow 3D turn around the card’s vertical center, or `card-spin="corner"` for a 3D spin like an ice skater: the card turns a full 360° around the vertical axis through its bottom-left corner, which stays still, and shows its back half way round. The corner spin draws the card at half size with that corner at the bottom center of the element, so the whole sweep stays inside the element’s box. Both rotate the entire card, including either face and its content. The default is one turn every 180 seconds; set `--fuda-card-spin-duration` to a positive CSS duration such as `30s`. Set `card-spin-direction="reverse"` to reverse the rotation. Add `card-spin-paused` to pause at the current angle, and remove it to resume. Remove `card-spin` to stop and reset the rotation. These attributes are independent of the artwork `motion` and `playing` attributes and the card’s `flipped` state. Reduced-motion preferences disable the rotation and the flip transition.
 
 ```html
 <fuda-card title="Explorer" card-spin="center" style="--fuda-card-spin-duration: 30s">
@@ -39,7 +39,7 @@ Set `card-spin="center"` for a slow 3D turn around the card’s vertical center,
 </fuda-card>
 ```
 
-To review, run `pnpm install` and `pnpm dev`, then open the Card Studio. Under **Card rotation**, choose **Rotate around center** or **Spin around corner**; choose **Fast** to see a full turn in eight seconds. Use **Pause card rotation** and **Flip card** to check both faces, then resume. Try the rotation direction and image-motion controls independently. Set your operating system or browser to reduced motion and confirm the card stays still. The center and corner spins are decorative; use the separate flip control to choose the face.
+To review, run `pnpm install` and `pnpm dev`, then open the Card Studio. Under **Card rotation**, choose **Rotate around center** or **Spin around bottom corner**; choose **Fast** to see a full turn in eight seconds. Use **Pause card rotation** and **Flip card** to check both faces, then resume. Try the rotation direction and image-motion controls independently. Set your operating system or browser to reduced motion and confirm the card stays still. The center and corner spins are decorative; use the separate flip control to choose the face.
 
 ### Moving artwork
 

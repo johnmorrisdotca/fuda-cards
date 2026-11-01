@@ -44,6 +44,7 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "pnpm build && node --test test/*.test.mjs",
     "check": "pnpm typecheck && pnpm build && pnpm test",
+    "test:e2e": "pnpm build && node --test test/e2e/*.e2e.mjs",
     "dev": "pnpm build && node scripts/dev.mjs",
     "site": "pnpm build && node scripts/site.mjs"
   },

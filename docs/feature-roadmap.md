@@ -5,7 +5,7 @@ Status key: [x] implemented at prototype level; [~] partial, requires further wo
 ## Core cards and embedding
 - [~] Framework-independent TypeScript web components and package exports; examples documented and equivalent integrations tested in Chromium with plain HTML, React 19, Angular 19, Vue 3 and Svelte 4.
 - [~] Custom frame with title, category, description, number, rarity and artwork slot; responsive sizing and accessibility.
-- [~] Card front/back and dedicated flip control; separate configurable whole-card center rotation and corner spin, pause, direction and reduced motion. The corner spin is incorrect: F21 tracks the requested bottom-corner 360° spin. Broader card keyboard and focus behavior remains to be validated.
+- [~] Card front/back and dedicated flip control; separate configurable whole-card center rotation and corner spin, pause, direction and reduced motion. The corner spin is a 3D turn on a fixed bottom-left corner (F21, headless Chromium only; not yet checked on a real phone). Broader card keyboard and focus behavior remains to be validated.
 - [~] Full-card images supplied by collection owner or provider, plus optional reverse.
 - [~] Focused image preview, configurable pan direction, duration, looping, auto-start or tap-to-animate, reduced motion. Verify browser behavior and handle non-image content.
 - [ ] Integrate Hako Devices and Uchusen Rockets live 3D viewers inside custom card artwork; drag rotation, zoom and independent flip/motion controls; fallbacks and credits.
