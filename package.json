@@ -1,0 +1,52 @@
+{
+  "name": "@johnmorrisdotca/fuda-cards",
+  "version": "0.1.0",
+  "description": "Fuda Cards: collectible card frames for images and interactive 3D content.",
+  "type": "module",
+  "sideEffects": [
+    "./dist/element.js",
+    "./dist/collection-element.js"
+  ],
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./element": {
+      "types": "./dist/element.d.ts",
+      "import": "./dist/element.js"
+    },
+    "./package.json": "./package.json",
+    "./collection": {
+      "types": "./dist/collection.d.ts",
+      "import": "./dist/collection.js"
+    },
+    "./collection-element": {
+      "types": "./dist/collection-element.d.ts",
+      "import": "./dist/collection-element.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "pnpm build && node --test test/*.test.mjs",
+    "check": "pnpm typecheck && pnpm build && pnpm test",
+    "dev": "pnpm build && node scripts/dev.mjs"
+  },
+  "devDependencies": {
+    "typescript": "5.9.3"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "packageManager": "pnpm@10.11.0"
+}
