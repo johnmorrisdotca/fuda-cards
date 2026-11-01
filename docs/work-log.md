@@ -50,3 +50,8 @@
 
 - Reconciled metadata support with concurrent binder paging and random-draw work; preserved other task claims and the product context.
 - In an isolated merged copy, `pnpm test` passed the TypeScript build and nine tests. Browser, touch, live API and 3D verification remain outstanding. F12 remains in Review.
+
+## 2026-10-31 — Concurrent-agent coordination
+
+- Added `docs/coordination.md` and made it required reading in `AGENTS.md`: isolated branches, pushed claims, incremental updates, shared-file conflict handling, latest-head checks, safe integration, verification, and durable handoffs.
+- Documentation-only update. Prior metadata merge commit `84f954f` preserved concurrent F02/F06 work and passed nine tests in an isolated verification copy; browser verification remains outstanding.
