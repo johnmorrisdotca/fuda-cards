@@ -96,3 +96,7 @@
 - Added a repeatable static site build and GitHub Pages workflow, using the deployment pattern from Uchusen and Hako. Card Studio now links to the collection viewer and Pokémon binder; the collection viewer links back. The site builder protects a pre-existing unmarked site directory.
 - `pnpm check` passed, and `pnpm site` succeeded twice. Chromium checked the generated site under a subdirectory: card controls, collection navigation and binder fallback rendered. External TCGdex/Hako responses were not checked in that browser run.
 - GitHub Pages deployment, repository settings and public access still require verification. The environment denied the GitHub API request; no Pages configuration or deployment result was confirmed.
+
+## 2026-10-31 — Pages deployment result
+
+- GitHub Actions Pages run 41278795754 for commit `365b0a5` completed successfully and reports `https://johnmorrisdotca.github.io/fuda-cards/` as the deployment URL. The cloud network policy denied requests to that hostname, so public HTTP accessibility was not independently verified.

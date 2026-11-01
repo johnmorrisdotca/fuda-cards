@@ -6,7 +6,7 @@ This is an early prototype: classic, sport and cosmic are exploratory CSS design
 
 ## Demos
 
-The Card Studio and the collection and Pokémon binder demos are built together for GitHub Pages. From the studio, follow the collection links to explore them. Run `pnpm site` to build the static site in `site/`; serve that directory to review it. The Pages workflow runs the checks and deploys the site on pushes to `main`.
+[Open the Fuda Cards demos](https://johnmorrisdotca.github.io/fuda-cards/). The Card Studio and the collection and Pokémon binder demos are built together for GitHub Pages. From the studio, follow the collection links to explore them. Run `pnpm site` to build the static site in `site/`; serve that directory to review it. The Pages workflow runs the checks and deploys the site on pushes to `main`.
 
 ## Development
 

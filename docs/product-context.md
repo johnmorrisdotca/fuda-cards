@@ -17,7 +17,7 @@ A host may supply a collection through JSON, a JavaScript object/array, or data 
 - `@johnmorrisdotca/uchusen-rockets`: rocket drawings and 3D viewers. The local demo uses a still of Starship Block 3; the model credit is in `assets/README.md`. A still is not an interactive viewer.
 - Uniforms and other collections can provide subjects later. Avoid embedding a particular external library or 3D engine as a core requirement.
 
-The user expects reusable library packages and demos suitable for embedding on websites; a GitHub Pages workflow now builds the demos; verify deployment and public access. Package release is not yet established.
+The user expects reusable library packages and demos suitable for embedding on websites; a GitHub Pages workflow builds and deploys the demos; public access has not been verified from the restricted cloud environment. Package release is not yet established.
 
 ## Card presentation and motion
 

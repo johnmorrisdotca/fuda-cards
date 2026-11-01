@@ -25,6 +25,6 @@ Status values: **Available** (unclaimed), **In progress** (claimed), **Blocked**
 | F17 | Local/cloud Git workflow and runnable demos | Available | — | Preserve branch history; verify remote changes and both environments. |
 | F18 | Whole-card rotation and corner spin | Done | Codex / codex/f18-card-rotation / 2026-10-31 | Center and corner spin, independent flip, pause, speed, direction and reduced motion verified in Chromium and mobile emulation. |
 
-| F19 | Public demo site and GitHub Pages | Review | Codex / codex/f19-pages-demo / 2026-10-31 | Static build and workflow added; public deployment and Pages settings need verification. |
+| F19 | Public demo site and GitHub Pages | Done | Codex / codex/f19-pages-demo / 2026-10-31 | Pages workflow succeeded; built site tested in Chromium. Public URL blocked by cloud network policy. |
 
 Add or split tasks as work becomes concrete. Keep IDs stable and preserve the work log when reorganizing.
