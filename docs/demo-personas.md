@@ -18,11 +18,11 @@ Sam's useful scenarios: compare layouts, draw a random card, search the collecti
 
 Riley enjoys old video game consoles and gaming. He wants to celebrate the hardware in his collection as collectible cards and explore the devices. His **Retro gaming consoles** collection currently references Hako Devices drawings of Game Boy (DMG-01), Game Boy Advance (AGB-001), Nintendo 64, PlayStation 2 (fat), and Nintendo DS (NTR-001).
 
-Riley's useful scenarios: browse a stacked deck, inspect hardware, place an interactive Hako device inside a Fuda card, and rotate it. The current demo uses remote drawing URLs; their browser availability and the live 3D integration have not been verified or completed.
+Riley's useful scenarios: browse a stacked deck, inspect hardware, place an interactive Hako device inside a Fuda card, and rotate it. The current demo uses remote drawing URLs; the published package SVG URLs returned successful image responses; live 3D integration is not yet implemented.
 
 ## Data and boundaries
 
 - All three are demo profiles, not authentication or saved user accounts.
 - The demo's saved collections are browser-local and do not sync across devices.
-- Pokémon images are referenced from TCGdex and Hako drawings from the Hako Devices site; verify availability and applicable source terms when deploying.
+- Pokémon images are referenced from TCGdex and Hako drawings from the versioned Hako Devices npm package via jsDelivr; verify availability and applicable source terms when deploying.
 - Check `docs/task-board.md` before working on users or persistence, and record meaningful changes in `docs/work-log.md`.

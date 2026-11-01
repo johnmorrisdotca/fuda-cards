@@ -3,7 +3,7 @@
 Status key: [x] implemented at prototype level; [~] partial, requires further work or verification; [ ] not implemented. Do not interpret a checked item as production-ready without browser verification. See `docs/work-log.md` for changes and handoff.
 
 ## Core cards and embedding
-- [~] Framework-independent TypeScript web components and package exports; examples documented for plain HTML, React, Angular, Vue and Svelte; framework builds and browser verification remain.
+- [~] Framework-independent TypeScript web components and package exports; examples documented and equivalent integrations tested in Chromium with plain HTML, React 19, Angular 19, Vue 3 and Svelte 4.
 - [~] Custom frame with title, category, description, number, rarity and artwork slot; responsive sizing and accessibility.
 - [~] Card front/back, dedicated flip control, correct keyboard and focus behavior.
 - [~] Full-card images supplied by collection owner or provider, plus optional reverse.
@@ -29,8 +29,8 @@ Each needs genuine distinct presentation, responsive layout, selection and keybo
 
 ## Collection data and users
 - [~] JSON imports and host-supplied card records, front/back images, validation, useful errors.
-- [~] Three fictional demo users: two Pokémon collectors and a retro gaming Hako collector; verify remote Hako image URLs and views.
-- [~] Named collections saved per demo profile locally, with delete, JSON import/export, legacy import, and storage errors reported; browser verification remains. Cross-device sync requires a chosen backend and is not implemented.
+- [~] Three fictional demo users: two Pokémon collectors and a retro gaming Hako collector; five published Hako SVG URLs returned successful image responses.
+- [~] Named collections saved per demo profile locally, with delete, JSON import/export, legacy import, and storage errors reported; core flows exercised in Chromium. Cross-device sync requires a chosen backend and is not implemented.
 - [~] Pokémon TCGdex set example using API-provided full-card images; verify live API behavior, missing images, source usage rules and back images.
 - [ ] Define provider adapters and source attribution for additional TCG and sports-card APIs; research actual hockey coverage and image availability.
 - [ ] Search, filters, sorting, collection editing, quantity/condition/grade and optional metadata.

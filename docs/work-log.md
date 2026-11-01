@@ -77,3 +77,11 @@
 - Added plain HTML, React, Angular, Vue and Svelte integration examples, including property assignment and client-only registration guidance. The examples have not been built in framework projects.
 - `pnpm check` passed (typecheck, build and five test files). A local Chromium attempt timed out; browser, device and framework runtime verification remain outstanding. GitHub Pages Hako image requests were denied by the environment network policy; the Hako source repository was reachable, but live image URLs were not verified.
 - F14 is in Review for browser and asset checks; F15 is released for real framework builds and validation. Work branch: `codex/f14-f15`.
+
+## 2026-10-31 — Complete F14/F15 verification
+
+- Replaced the unverified GitHub Pages artwork references with the versioned Hako Devices 0.5.0 package SVGs via jsDelivr; all five returned HTTP 200 with SVG content type. This verifies file availability, not a live 3D viewer.
+- Fixed a collection `view` getter collision that caused React 19 to fail when assigning the `view` attribute. Added a regression test.
+- Built and ran equivalent plain HTML, React 19.3, Angular 19.2, Vue 3.5 and Svelte 4.2 integrations in headless Chromium 138, checking assigned card data and rendered card elements. Server-side rendering and other framework versions were not tested.
+- Exercised the demo in Chromium: profile switching, saved collection isolation, save/load/delete, JSON import, exported file contents and legacy import. Verified all six test files pass with `pnpm test`; typecheck and build passed with `pnpm check`. No phone or touch testing was performed.
+- F14 and F15 completed for their stated scopes. Cross-device sync and live 3D viewer integration are separate unimplemented capabilities.

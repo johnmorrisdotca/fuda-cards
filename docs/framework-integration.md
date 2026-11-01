@@ -1,6 +1,6 @@
 # Framework integration
 
-Build with `pnpm build`, then install or link the package in the host application. The package is not published yet. Import each element's registration entry once in browser code. `cards` is a JavaScript **property**, not an HTML attribute: assign an array of `{ id, name, image, backImage? }` objects. Image URLs are supplied by the host. The examples below illustrate integration; framework-specific builds and browser behavior have not yet been verified.
+Build with `pnpm build`, then install or link the package in the host application. The package is not published yet. Import each element's registration entry once in browser code. `cards` is a JavaScript **property**, not an HTML attribute: assign an array of `{ id, name, image, backImage? }` objects. Image URLs are supplied by the host. Equivalent integrations were bundled and exercised in Chromium using React 19, Angular 19, Vue 3 and Svelte 4; check your framework version and server-rendering setup.
 
 ## Plain HTML
 
