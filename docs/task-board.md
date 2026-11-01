@@ -23,5 +23,6 @@ Status values: **Available** (unclaimed), **In progress** (claimed), **Blocked**
 | F15 | Framework integration and documentation | Available | — | Validate plain HTML, React, Angular, Vue and Svelte. |
 | F16 | Browser, mobile, keyboard and accessibility verification | Available | — | Establish repeatable testing for core flows. |
 | F17 | Local/cloud Git workflow and runnable demos | Available | — | Preserve branch history; verify remote changes and both environments. |
+| F18 | Whole-card rotation and corner spin | Available | — | Slow, smooth rotation of the entire card like Hako Devices/Uchusen viewers, plus spinning around a card corner (diamond-like). Research existing viewers; support front/back, configurable motion and pause, touch/keyboard and reduced motion; keep card gestures independent of artwork/3D and collection navigation. Coordinate with F09, F10 and F11; verify browser/mobile. |
 
 Add or split tasks as work becomes concrete. Keep IDs stable and preserve the work log when reorganizing.
