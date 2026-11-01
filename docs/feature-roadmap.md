@@ -1,0 +1,43 @@
+# Fuda feature roadmap
+
+Status key: [x] implemented at prototype level; [~] partial, requires further work or verification; [ ] not implemented. Do not interpret a checked item as production-ready without browser verification. See `docs/work-log.md` for changes and handoff.
+
+## Core cards and embedding
+- [~] Framework-independent TypeScript web components and package exports; verify plain HTML, React, Angular, Vue and Svelte integrations and document examples.
+- [~] Custom frame with title, category, description, number, rarity and artwork slot; responsive sizing and accessibility.
+- [~] Card front/back, dedicated flip control, correct keyboard and focus behavior.
+- [~] Full-card images supplied by collection owner or provider, plus optional reverse.
+- [~] Focused image preview, configurable pan direction, duration, looping, auto-start or tap-to-animate, reduced motion. Verify browser behavior and handle non-image content.
+- [ ] Integrate Hako Devices and Uchusen Rockets live 3D viewers inside custom card artwork; drag rotation, zoom and independent flip/motion controls; fallbacks and credits.
+- [ ] Research recognizable trading card families and individual examples over the past century; build distinct card front/back designs, metadata layouts and physical finishes (paper, foil, holographic and ageing).
+- [ ] Configurable visual presentation, card dimensions, colour and finishes; keyboard, touch and reduced-motion support.
+
+## Collection display modes
+Each needs genuine distinct presentation, responsive layout, selection and keyboard/touch support, empty and large-collection behavior, and browser tests.
+- [~] Overlapping deck: large centered card, layered cards behind, swipe/arrows and inspect.
+- [~] Binder: configurable grids, sleeves, covers and page turns.
+- [~] Rolodex: rotating file of index cards.
+- [~] Convention case: angled tiered rows, configurable spacing and overlap, 3D case and full-screen inspection.
+- [~] Jukebox: browse inside a device, bring a selection forward, return to location.
+- [~] Random draw: sample from collection or current filters and handle empty/single-card cases.
+- [~] Vertical story scroll.
+- [~] Sliding gallery wall.
+- [~] Flip tower.
+- [~] Spotlight carousel.
+- [~] Card atlas: infinite-feeling plane, pan, pinch/scroll zoom and selection; virtualize large collections.
+- [ ] Preserve position and independent controls across selection, flipping, and 3D interaction.
+
+## Collection data and users
+- [~] JSON imports and host-supplied card records, front/back images, validation, useful errors.
+- [~] Three fictional demo users: two Pokémon collectors and a retro gaming Hako collector; verify remote Hako image URLs and views.
+- [~] Named collections saved locally in demo; add collection management, isolation, import/export, and persistence error handling. Cross-device sync requires a chosen backend and is not implemented.
+- [~] Pokémon TCGdex set example using API-provided full-card images; verify live API behavior, missing images, source usage rules and back images.
+- [ ] Define provider adapters and source attribution for additional TCG and sports-card APIs; research actual hockey coverage and image availability.
+- [ ] Search, filters, sorting, collection editing, quantity/condition/grade and optional metadata.
+- [ ] Model custom-framed items and complete scanned cards in a common typed collection model without requiring a specific 3D engine.
+
+## Delivery and quality
+- [~] pnpm/TypeScript build and unit tests; add interaction tests and verify desktop/mobile browsers, keyboard and accessibility.
+- [ ] Reliable preview/deployment and documented embeddable examples for sites; no automatic publication implied.
+- [ ] Large-collection performance, lazy loading, network errors, security, image and model attribution.
+- [ ] Reconcile local/cloud Git history and push work to the shared GitHub repository without overwriting changes. Log each substantial change and verification in `docs/work-log.md`.

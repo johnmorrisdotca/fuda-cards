@@ -58,3 +58,5 @@ Run `pnpm dev` and open `/demo/collections-component.html`. Import `@johnmorrisd
 These are early display prototypes: the case and rotating displays use CSS perspective rather than fully modeled 3D devices; the atlas is a draggable, zoomable plane rather than an unbounded or virtualized canvas. The demo can save and load named collections in the current browser using localStorage; this is not account-based sync or a backup. Configurable case geometry, integrated 3D content, and full browser and accessibility testing remain to be completed. Atlas supports drag, a zoom slider, and a basic two-finger pinch; touch behaviour still needs browser testing.
 
 The collection component demo includes three fictional demo users—Alex, Sam, and Riley—with different example collections. Select a user to switch the displayed cards. These are local demo profiles, not accounts; the existing named-collection save/load remains local to the browser and separate from the demo profiles.
+
+Development priorities and handoff notes: [feature roadmap](docs/feature-roadmap.md) · [work log](docs/work-log.md).
