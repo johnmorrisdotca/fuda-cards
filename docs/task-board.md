@@ -6,7 +6,7 @@ Status values: **Available** (unclaimed), **In progress** (claimed), **Blocked**
 
 | ID | Task | Status | Owner / session | Notes |
 | --- | --- | --- | --- | --- |
-| F01 | Overlapping deck: navigation, swipe and inspection | Available | — | Existing prototype; browser and phone verification needed. |
+| F01 | Overlapping deck: navigation, swipe and inspection | In progress | Codex cloud session, 2026-10-31 | Existing prototype; browser and phone verification needed. |
 | F02 | Binder pages and configurable grids | Available | — | Page wrap partially improved; covers and page turns remain. |
 | F03 | Rolodex display | Available | — | Initial stack view needs a distinct rotating file. |
 | F04 | Convention display case | Available | — | Initial CSS view; actual 3D model and options remain. |
