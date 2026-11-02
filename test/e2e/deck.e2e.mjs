@@ -69,7 +69,7 @@ test('a card lands still facing up or turned over sideways, as chosen, never on 
   const browser = await chromium.launch({ executablePath: process.env.PLAYWRIGHT_CHROMIUM }), server = serve(PORT);
   try {
     const { context, p } = await open(browser, sizes[0][1]);
-    assert.deepEqual(await p.locator('fuda-collection').locator('.opts [data-value]').evaluateAll((l) => l.map((b) => b.dataset.value)), ['face-up', 'face-down', 'closed', 'open'], 'two landings (and the fan choice): no Upside down');
+    assert.deepEqual(await p.locator('fuda-collection').locator('.opts [data-value]').evaluateAll((l) => l.map((b) => b.dataset.value)), ['face-up', 'face-down', 'closed', 'open', 'on', 'off', 'slow', 'normal', 'quick'], 'two landings (then the fan, animate and speed choices): no Upside down');
     assert.equal(await p.locator('fuda-collection').getByText('Upside down').count(), 0, 'no Upside down button');
     let up = await piles(p), before = up.discardCount;
     await p.getByRole('button', { name: 'Next →' }).click();
@@ -154,7 +154,7 @@ test('the fan opens to show most of each card and closes back to the deck it sta
   try {
     for (const [name, size] of sizes) {
       const { context, p } = await open(browser, size, '?view=fan');
-      const cards = () => shadow(p, `return [...root.querySelectorAll('.fan .card')].map((c) => { const r = c.getBoundingClientRect(); return { x: Math.round(r.x * 10) / 10, y: Math.round(r.y * 10) / 10, w: r.width, h: r.height, t: getComputedStyle(c).transform }; })`);
+      const cards = () => shadow(p, `return [...root.querySelectorAll('.deck-pile .card')].map((c) => { const r = c.getBoundingClientRect(); return { x: Math.round(r.x * 10) / 10, y: Math.round(r.y * 10) / 10, w: r.width, h: r.height, t: getComputedStyle(c).transform }; })`);
       await p.waitForTimeout(600);
       const closed = await cards();
       assert.equal(closed.length, 10, `${name}: a fan of ten (of 25)`);
@@ -177,7 +177,7 @@ test('the fan opens to show most of each card and closes back to the deck it sta
       await context.close();
     }
     const linked = await open(browser, sizes[0][1], '?view=fan&fan=open');
-    assert.equal(await shadow(linked.p, `return root.querySelector('.v.fan').classList.contains('open')`), true, 'a link to an open fan opens it');
+    assert.equal(await shadow(linked.p, `return root.querySelector('.v.fan-open.fanonly')!==null`), true, 'a link to an open fan opens it');
     await linked.context.close();
   } finally { await browser.close(); server.close(); }
 });
