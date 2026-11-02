@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.0 - 2026-11-02
+
+- Changed: the Animate button over the art is icon-only and quieter. A small play or pause mark (26 px) in the corner of the art at half strength, full strength on hover, focus or while it is on; the hit target stays 48 px square, the accessible name is "Animate the picture" with `aria-pressed`. The "Animate" and "Stop" text is gone.
+- New: `autoplay="focus"` (and `autoplay?: 'focus'` in `CardOptions`). The card in focus (under the mouse, holding keyboard focus, or last tapped) animates its art; only one card is in focus at a time, so the others stay still. The button pauses it. Never starts with reduced motion. The Card Studio has an Autoplay choice.
+- New: a card that is moving carries a read-only `moving` attribute.
+
 ## 0.2.1 - 2026-11-02
 
 - Fix: a reloaded page no longer shows the whole picture (for the Card Studio, the full rocket) before it moves into the card. Until the script defined `<fuda-card>`, the browser drew the slotted `<img>` at its natural size. Now a card keeps its art invisible until it has a size on screen and every slotted image has loaded, then fades it in (no fade with `prefers-reduced-motion`).
