@@ -106,3 +106,49 @@ test('corner spin keeps the corner at the stage centre, full size, with zoom', {
     }
   } finally { await browser.close(); server.close(); }
 });
+
+// The nearest thing to a phone here: Chromium's mobile mode with real touch events, at a phone's pixel ratio. Not a real phone.
+test('corner spin by touch, in mobile mode: a drag turns the card about the corner, the page stays, a pinch zooms', { skip: !chromium && 'Playwright not installed' }, async () => {
+  const browser = await launch();
+  const server = createServer(async (req, res) => {
+    const url = req.url.split('?')[0], path = url === '/' ? '/index.html' : url;
+    try { const body = await readFile(resolve(root, '.' + path)); res.writeHead(200, { 'Content-Type': types[extname(path)] ?? 'text/plain' }).end(body); }
+    catch { res.writeHead(404).end(); }
+  }).listen(PORT, '127.0.0.1');
+  try {
+    const context = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 3, isMobile: true, hasTouch: true });
+    const p = await context.newPage();
+    await p.goto(`http://127.0.0.1:${PORT}/`);
+    await p.waitForFunction(() => customElements.get('fuda-card') && customElements.get('kazoku-view-controls') && document.querySelector('#view').state);
+    await choose(p, 'card-spin', 'corner');
+    await p.locator('#view').getByRole('button', { name: 'Fit', exact: true }).tap();
+    const corner = () => p.evaluate(() => {
+      const stage = document.querySelector('#stage'), host = document.querySelector('#card'), card = host.shadowRoot.querySelector('.card'), probe = document.createElement('div');
+      probe.style.cssText = 'position:absolute;left:0;bottom:0;width:0;height:0'; card.append(probe);
+      const box = stage.getBoundingClientRect(), pt = probe.getBoundingClientRect(); probe.remove();
+      return { off: Math.hypot(pt.left - box.left - box.width / 2, pt.top - box.top - box.height / 2), yaw: document.querySelector('#view').state.yaw, zoom: document.querySelector('#view').state.zoom, scroll: scrollY };
+    });
+    const box = await p.locator('#stage').boundingBox(), cx = box.x + box.width / 2, cy = box.y + box.height / 2;
+    const cdp = await context.newCDPSession(p);
+    const touch = (type, points) => cdp.send('Input.dispatchTouchEvent', { type, touchPoints: points });
+    const shots = process.env.FUDA_SHOTS;
+    const before = await corner();
+    await touch('touchStart', [{ x: cx - 80, y: cy }]);
+    for (let x = -60; x <= 80; x += 20) { await touch('touchMove', [{ x: cx + x, y: cy }]); await p.waitForTimeout(20); }
+    await touch('touchEnd', []);
+    await p.waitForTimeout(200);
+    const dragged = await corner();
+    assert.ok(Math.abs(dragged.yaw - before.yaw) > 10, `a drag should turn the card (${before.yaw} to ${dragged.yaw})`);
+    assert.ok(dragged.off <= 1, `the corner stays at the stage centre, ${dragged.off} px off`);
+    assert.equal(dragged.scroll, before.scroll, 'a sideways drag on the card does not scroll the page');
+    if (shots) await p.screenshot({ path: `${shots}/corner-spin-touch-turned.png` });
+    await touch('touchStart', [{ x: cx - 40, y: cy, id: 0 }, { x: cx + 40, y: cy, id: 1 }]);
+    for (let d = 50; d <= 110; d += 15) { await touch('touchMove', [{ x: cx - d, y: cy, id: 0 }, { x: cx + d, y: cy, id: 1 }]); await p.waitForTimeout(20); }
+    await touch('touchEnd', []);
+    await p.waitForTimeout(200);
+    const pinched = await corner();
+    assert.ok(pinched.zoom > before.zoom * 1.3, `a pinch should zoom (${before.zoom} to ${pinched.zoom})`);
+    await context.close();
+  } finally { await browser.close(); server.close(); }
+});
+

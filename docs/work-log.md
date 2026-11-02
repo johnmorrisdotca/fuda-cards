@@ -294,3 +294,8 @@
 - A frame's card boxes are read before and after its screenshot, so a card a script moves in between is not counted as a fault.
 - Limits: headless Chromium in software; a throttled network through CDP, not a real one; WebKit does not run off CI. No real phone.
 
+## 2026-11-02 - Corner spin and the e2e tickets (MODULES-40, MODULES-98), Mac Studio / night
+
+- MODULES-40 (F21): looked for a remaining fault on kazoku-ui 0.10 and found none in a browser here: the sweep, full size at opening, Fit, zoom, reduced motion and Animate all pass, and a new test drives it by touch in Chromium's mobile mode. What the ticket still asks for, a real phone, cannot be done here. It stays open for that check.
+- MODULES-98: the four failures were fixed on main (0.9.1). Two more causes were found here: Chromium's build decides whether `img.getAnimations()` lists the pan (the test now asks the shadow root too) and which browser a run got depended on another repo's Playwright (now pinned at 1.64.0). Tests also waited fixed times that fail at load 25 and up (piles, stack).
+
