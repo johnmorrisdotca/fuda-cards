@@ -1,30 +1,39 @@
 // Browser test: run with `pnpm test:e2e` (needs Playwright; skipped when missing).
 import { test } from 'node:test';
 import { strict as assert } from 'node:assert';
-import { createServer } from 'node:http';
-import { createRequire } from 'node:module';
-import { readFile } from 'node:fs/promises';
-import { resolve, extname } from 'node:path';
+import { chromium, webkit, serve, sizes } from './support.mjs';
 
-const root = resolve(import.meta.dirname, '../..');
-const types = { '.html': 'text/html', '.js': 'text/javascript', '.jpg': 'image/jpeg' };
-let chromium;
-try {
-  const require = createRequire(process.env.PLAYWRIGHT_FROM ?? import.meta.url);
-  ({ chromium } = require('playwright'));
-} catch {}
+/** True when a screenshot shows a translateZ child where the layout puts it (depth is painted), false when the engine paints it flat. */
+async function engineDrawsDepth(p) {
+  const at = await p.evaluate(async () => {
+    const probe = document.createElement('div');
+    probe.id = 'depth-probe';
+    probe.style.cssText = 'position:fixed;left:0;top:0;width:100px;height:100px;perspective:600px;z-index:9;background:#fff';
+    probe.innerHTML = '<div style="position:absolute;inset:0;transform-style:preserve-3d;transform:rotateY(60deg)"><i style="position:absolute;left:40px;top:40px;width:20px;height:20px;background:#f00;transform:translateZ(150px)"></i></div>';
+    document.body.append(probe);
+    await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+    const r = probe.querySelector('i').getBoundingClientRect();
+    return { x: r.x + r.width / 2, y: r.y + r.height / 2 };
+  });
+  const png = await p.screenshot({ clip: { x: 0, y: 0, width: Math.max(120, Math.ceil(at.x) + 40), height: 120 }, animations: 'disabled' });
+  const red = await p.evaluate(async ({ b64, at }) => {
+    const img = new Image(); img.src = 'data:image/png;base64,' + b64; await img.decode();
+    const c = document.createElement('canvas'); c.width = img.width; c.height = img.height;
+    const g = c.getContext('2d'); g.drawImage(img, 0, 0);
+    const [r, gr, b] = g.getImageData(Math.round(at.x), Math.round(at.y), 1, 1).data;
+    return r > 200 && gr < 80 && b < 80;
+  }, { b64: png.toString('base64'), at });
+  await p.evaluate(() => document.querySelector('#depth-probe').remove());
+  return red;
+}
 
-const sizes = [['desktop', { width: 1280, height: 800 }], ['mobile', { width: 390, height: 844 }]];
-
-test('a turned card shows its back, not the mirrored front, and has a true-scale edge', { skip: !chromium && 'Playwright not installed' }, async () => {
-  const browser = await chromium.launch({ executablePath: process.env.PLAYWRIGHT_CHROMIUM });
-  const server = createServer(async (req, res) => {
-    const url = req.url.split('?')[0], path = url === '/' ? '/index.html' : url;
-    try { res.writeHead(200, { 'Content-Type': types[extname(path)] ?? 'text/plain' }).end(await readFile(resolve(root, '.' + path))); }
-    catch { res.writeHead(404).end(); }
-  }).listen(8072, '127.0.0.1');
+// WebKit's screenshots (Playwright's, at least) draw preserve-3d flat and ignore backface-visibility, so the pixel checks of the edge only run where the engine paints depth; every other check runs in both engines.
+for (const [engine, type] of [['chromium', chromium], ['webkit', webkit]]) test(`${engine}: a turned card shows its front or its back, never the mirrored one, and has a true-scale edge`, { skip: !type && 'Playwright not installed' }, async () => {
+  const browser = await type.launch({ executablePath: engine === 'chromium' ? process.env.PLAYWRIGHT_CHROMIUM : undefined });
+  const server = serve(8072);
   try {
-    for (const [name, size] of sizes) {
+    for (const [sizeName, size] of sizes) {
+      const name = `${engine} ${sizeName}`;
       const p = await browser.newPage({ viewport: size, deviceScaleFactor: 2 });
       await p.goto('http://127.0.0.1:8072/');
       await p.waitForFunction(() => customElements.get('fuda-card') && customElements.get('kazoku-view-controls') && document.querySelector('#view').state);
@@ -38,6 +47,22 @@ test('a turned card shows its back, not the mirrored front, and has a true-scale
         return p.screenshot({ clip: await box(), animations: 'disabled' });
       };
       await p.evaluate(() => document.querySelector('#card').setAttribute('card-spin', 'center'));
+
+      const paints3d = await engineDrawsDepth(p);
+      const facing = (yaw) => p.evaluate(() => { const c = document.querySelector('#card'), r = c.getBoundingClientRect(); return c.shadowRoot.elementsFromPoint(r.x + r.width / 2, r.y + r.height / 2).map((e) => e.className); });
+      const visible = (sel) => p.evaluate((sel) => getComputedStyle(document.querySelector('#card').shadowRoot.querySelector(sel)).visibility !== 'hidden', sel);
+
+      // The front is shown from -80 to 80 degrees: nothing of the back is drawn, so hiding it changes no pixel, and the front is not hidden.
+      for (const yaw of [0, 35, 80, 280, 350]) {
+        await turn(yaw);
+        assert.equal(await visible('.front'), true, `${name} ${yaw}: the front is hidden`);
+        assert.equal(await visible('.back'), false, `${name} ${yaw}: the back is shown over the front`);
+        const hit = await facing(yaw);
+        assert.ok(hit.includes('face front'), `${name} ${yaw}: the front is not hit (${hit})`);
+        const withBack = await shot(''), noBack = await shot('.back{display:none}');
+        assert.ok(withBack.equals(noBack), `${name} ${yaw}: the back is drawn over the front`);
+      }
+      await p.evaluate(() => document.querySelector('#card').shadowRoot.querySelector('#test-hide')?.remove());
 
       // The back is shown from 100 to 260 degrees: nothing of the front is drawn, so hiding it changes no pixel.
       for (const yaw of [100, 140, 180, 220, 260]) {
@@ -85,6 +110,7 @@ test('a turned card shows its back, not the mirrored front, and has a true-scale
         return { width: side.width, height: side.height, x: side.x, y: side.y };
       });
       assert.ok(on.width > 0, `${name}: the edge has no width at 90 degrees`);
+      if (!paints3d) { await p.close(); continue; }
       const withEdge = await shot(''), without = await shot('.edge{display:none}');
       assert.ok(!withEdge.equals(without), `${name}: the edge draws nothing at 90 degrees`);
       const covered = await p.evaluate(async ({ b64, y, height, clip }) => {
