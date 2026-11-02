@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>fuda-card:where(:not(:defined)){display:inline-block;width:300px;aspect-ratio:2.5/3.5;overflow:hidden;visibility:hidden}fuda-collection:where(:not(:defined)){display:block;min-height:calc(var(--fuda-stage-height,clamp(300px,calc(100svh - 440px),620px)) + 200px)}</style>
+<title>Fuda vintage cards</title>
+<style>
+main{max-width:1100px;margin:auto;padding:1rem}
+h1{font-size:1.4rem;margin:.2rem 0}
+.top{margin:.3rem 0 .8rem;color:var(--fc-muted)}
+.top a{display:inline-flex;align-items:center;min-height:48px}
+fuda-collection{--fuda-stage-height:clamp(260px,calc(100svh - 620px),620px)}
+@media(min-width:700px){fuda-collection{--fuda-stage-height:clamp(300px,calc(100svh - 520px),620px)}}
+@media(max-width:600px){.long{display:none}.top{margin:.1rem 0 .4rem}}
+.tools{display:grid;gap:1rem;margin-top:1.2rem}
+#about,.credits{margin:0;color:var(--fc-muted)}
+.credits{font-size:.85rem}
+</style>
+</head>
+<body>
+<main>
+<h1>Fuda vintage cards</h1>
+<p class="top"><a href="../index.html">← Card studio</a> · Real cards from 1909 to 1911, pictures that are in the public domain. <span class="long">Browse them in any display: flip them off the deck, fan them out.</span></p>
+<fuda-collection address></fuda-collection>
+<section class="tools" aria-label="Collection">
+  <label class="demo-field">Collection<select id="which" aria-label="Collection"><option value="hockey">Hockey, 1910 to 1911 (36 cards)</option><option value="baseball">Baseball, 1909 to 1911 (24 cards)</option></select></label>
+  <p id="about"></p>
+  <p class="credits" id="credits"></p>
+  <p class="credits">The pictures are loaded from their public sources when this page opens; Fuda does not host or ship them. Each card was checked one at a time: Wikimedia Commons says "Public domain" on every hockey file used, and the Met marks every baseball object <code>isPublicDomain</code>. Neighbouring baseball cards the Met does not mark were left out. The cards show the clubs and makers of their day, as printed; the package carries none of them.</p>
+</section>
+</main>
+<script type="importmap">{"imports":{"@johnmorrisdotca/kazoku-ui/view-controls/define":"../node_modules/@johnmorrisdotca/kazoku-ui/dist/view-controls/define.js"}}</script>
+<script type="module">
+import '../dist/collection-element.js';
+import {hockeyCards,hockeySource} from './vintage-hockey.js';
+import {baseballCards,baseballSource} from './vintage-baseball.js';
+import {setupPage,choiceFromSelect,keepInAddress} from './ui.js';
+setupPage();
+const viewer=document.querySelector('fuda-collection'),which=document.querySelector('#which');
+const sets={hockey:{cards:hockeyCards,source:hockeySource,about:'Hockey cards of 1910 to 1911 from Canadian tobacco companies. One has its back.'},baseball:{cards:baseballCards,source:baseballSource,about:'Baseball cards of the T206 White Border series, 1909 to 1911.'}};
+function show(){const set=sets[which.value];viewer.cards=set.cards;document.querySelector('#about').textContent=`${set.about} ${set.cards.length} cards.`;const c=document.querySelector('#credits');c.replaceChildren('Source: ');const a=document.createElement('a');a.href=set.source.url;a.textContent=set.source.title;c.append(a,`. Licence: ${set.source.licence}. Checked ${set.source.checked}.`)}
+which.addEventListener('change',show);
+choiceFromSelect(which,{layout:'row',label:'Collection'});
+keepInAddress(['which']);
+show();
+</script>
+</body>
+</html>
