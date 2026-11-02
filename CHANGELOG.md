@@ -1,9 +1,5 @@
 # Changelog
 
-## 0.9.2 - 2026-11-02
-
-- Fixed (MODULES-176): **the last card put back from the deck's pile flies too.** With one card on the pile, Previous drew the empty pile as a dashed slot and `playFlip` returned at once for want of a `.discard-pile`, so the card jumped back with no flight. The flight needs only the moving card and the distance between the piles, so it no longer asks for a pile at the other end; the card flies from where the pile was (the slot) to the deck, turning back if it landed turned over.
-- New test (`test/e2e/flip.e2e.mjs`, "the last card put back from the pile"): the same twelve-moment pixel check, started from one card on the pile. On 0.9.1 it fails (no card in the air: `moving: 0`); on 0.9.2 it passes.
 ## Unreleased
 
 - Tests (MODULES-40): the corner spin by touch in Chromium's mobile mode, at ratio 3 with real touch events: a drag turns the card about its corner, the corner stays at the stage centre, the page does not scroll, a pinch zooms. It found no fault.
@@ -13,6 +9,11 @@
 - Changed (MODULES-170): **kazoku-ui 0.10** (from 0.2.1). An automatic turn asks for no frame while the view is out of sight or the tab hidden (`test/e2e/view-bar.e2e.mjs` counts 0 requests and 0 callbacks in both, one frame at a time while seen). The bar has **one zoom number, the true one** (`1.3×`, `2.4×`; a press goes back to Fit), in sight on a desk and a phone in the Studio and the collections: the old `2×` was a preset that read like a number. The speed shows beside Auto-turn while the view turns. The bar is now the family's basic level: angle, Auto-turn, the zoom and Fit; **More** adds tilt, Front and the arrow pad, and the reader's choice is remembered. A double press on the view still goes to 2 times.
 - Tests: `playwright` 1.64.0 is a pinned development dependency, so the browser tests no longer depend on another repo's copy (Chromium 147 from 1.59.1 failed binder and wear here). Tests wait for a move to end rather than a fixed time (they failed at machine load 25 and up).
 - Tests: **every browser of the tests is headless and draws in software** (`test/e2e/support.mjs`, after a kernel panic in a Mac's GPU driver raised from Chrome's GPU process on 2026-11-02). `launch()` is the one way a test starts Chromium (`--use-gl=angle --use-angle=swiftshader --enable-unsafe-swiftshader`), it reads the WebGL renderer and refuses to go on unless that says SwiftShader, and no browser lives over 5 minutes. WebKit has no software switch, so its one test (no-reveal) runs only with `CI` set and is skipped on a Mac. `pnpm test:e2e` is now `scripts/e2e.mjs`: one file at a time, one worker, 20 minutes a file, stopped by process id at 3 GB; it refuses to start when one of its ports is taken (`FUDA_E2E_PORT_SHIFT=20` moves a second session's). `test/e2e-safety.test.mjs` fails when a file starts a browser any other way.
+
+## 0.9.2 - 2026-11-02
+
+- Fixed (MODULES-176): **the last card put back from the deck's pile flies too.** With one card on the pile, Previous drew the empty pile as a dashed slot and `playFlip` returned at once for want of a `.discard-pile`, so the card jumped back with no flight. The flight needs only the moving card and the distance between the piles, so it no longer asks for a pile at the other end; the card flies from where the pile was (the slot) to the deck, turning back if it landed turned over.
+- New test (`test/e2e/flip.e2e.mjs`, "the last card put back from the pile"): the same twelve-moment pixel check, started from one card on the pile. On 0.9.1 it fails (no card in the air: `moving: 0`); on 0.9.2 it passes.
 
 ## 0.9.1 - 2026-11-02
 
