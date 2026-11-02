@@ -1,10 +1,5 @@
 # Changelog
 
-## 0.2.2 - 2026-11-02
-
-- Fix: in WebKit (Safari, every iPhone browser) the Card Studio drew the card's mirrored back instead of the front. WebKit's drawing of the card's 3D faces ignores `backface-visibility` and, in Playwright's screenshots, paints `preserve-3d` flat, so the back (turned half a turn inside the card) was painted over the front. The card now also hides the face that points away from the viewer itself: three tiny corner markers show where the card lands on screen, and the front or the back is hidden by which way it faces, checked every frame while the card is on screen. Nothing changes where `backface-visibility` already worked (Chromium); the edge, the thickness and the art reveal are untouched.
-- Tests: the card back test now runs in Chromium and WebKit with the same checks (front at 0, 35, 80, 280 and 350 degrees with nothing of the back drawn; back at 100 to 260). The pixel checks of the edge at 90 degrees run only in an engine whose screenshots paint depth (WebKit's do not; its edge is checked by layout).
-
 ## 0.2.1 - 2026-11-02
 
 - Fix: a reloaded page no longer shows the whole picture (for the Card Studio, the full rocket) before it moves into the card. Until the script defined `<fuda-card>`, the browser drew the slotted `<img>` at its natural size. Now a card keeps its art invisible until it has a size on screen and every slotted image has loaded, then fades it in (no fade with `prefers-reduced-motion`).
