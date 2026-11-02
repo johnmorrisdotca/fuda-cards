@@ -12,7 +12,7 @@ test('the README documents the one CSS line that keeps an unready card hidden', 
 });
 
 test('every demo page that uses a fuda element carries the line in its head before any script', async () => {
-  for (const page of ['index.html', 'demo/collections.html', 'demo/collections-component.html']) {
+  for (const page of ['index.html', 'demo/collections.html', 'demo/collections-component.html', 'demo/live-3d.html']) {
     const html = await read(page), head = html.slice(0, html.indexOf('</head>'));
     assert.ok(head.includes(line), `${page} lacks the no-flash line in its head`);
     assert.ok(!html.slice(0, html.indexOf(line)).includes('<script'), `${page}: the line must come before every script`);

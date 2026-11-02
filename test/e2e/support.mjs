@@ -62,10 +62,10 @@ export const portShift = Number(process.env.FUDA_E2E_PORT_SHIFT) || 0;
 
 export const sizes = [['desktop', { width: 1280, height: 800 }], ['mobile', { width: 390, height: 844 }]];
 
-export function serve(port) {
+export function serve(port, dir = root) {
   return createServer(async (req, res) => {
     const url = req.url.split('?')[0], path = url === '/' ? '/index.html' : url;
-    try { res.writeHead(200, { 'Content-Type': types[extname(path)] ?? 'text/plain' }).end(await readFile(resolve(root, '.' + path))); }
+    try { const body = await readFile(resolve(dir, '.' + path)); res.writeHead(200, { 'Content-Type': types[extname(path)] ?? 'text/plain' }).end(body); }
     catch { res.writeHead(404).end(); }
   }).listen(port, '127.0.0.1');
 }

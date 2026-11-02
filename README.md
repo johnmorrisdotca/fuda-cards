@@ -50,6 +50,19 @@ The card has thickness, drawn to scale at the 63 mm wide card size: set `thickne
 <fuda-card title="Relic" thickness="1.5"></fuda-card>
 ```
 
+### Live 3D in a card
+
+A card can hold a live 3D item (a rocket, a device) that turns while the card is in focus. **Only one card is ever live, on one WebGL context for the whole page; every other card is a picture, and a page of pictures loads no 3D code at all.** `three` is yours (an optional peer dependency) and loads at the first focus:
+
+```js
+import { createLiveCards } from '@johnmorrisdotca/fuda-cards/live-3d';
+
+const live = createLiveCards({ load: () => import('three') });
+live.add(card, { key: 'cube', build({ three, assets, width, height }) { /* scene, camera, object: docs/live-3d.md */ } }, { still: card.querySelector('img') });
+```
+
+On a `<fuda-collection>`: `collection.live = { cards: live, item: (card) => itemFor(card) }`. Budgets, the focus rules and what cannot be proved in a test are in [docs/live-3d.md](docs/live-3d.md); try it in `demo/live-3d.html`.
+
 ### Materials and stacks
 
 `material="<id>"` gives a card the thickness and edge colour of a material, each thickness read from a maker or a standard and cited: card stock at 11, 13 and 16 pt, a plastic bank-size card (0.76 mm), thick trading cards from 35 to 180 pt, a 175 pt booklet card, anodised aluminium (0.8 mm) and stainless steel (0.5 mm). `thickness` still overrides it. [docs/materials.md](docs/materials.md) lists every material, its thickness, its source and what the source says, and what was left out because it could not be sourced (a patch or relic card, for one).

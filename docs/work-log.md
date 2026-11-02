@@ -280,3 +280,11 @@
 - Decision: the Studio stays on the basic bar (the family's default); `controls="advanced"` was not set anywhere.
 - Limits: headless Chromium in software; no real phone, Safari or Firefox.
 
+## 2026-11-02 - Live 3D in cards (MODULES-55), Mac Studio / night
+
+- New `src/live-3d.ts`, the focus policy over kazoku-ui 0.10's shared renderer (`/renderer`, `/testing`), `docs/live-3d.md`, `demo/live-3d.html`, `collection.live`. Nothing of the renderer was copied. The renderer's module is imported dynamically, so a page of pictures has none of it.
+- A frozen card shows its last angle by giving the renderer an item whose `key` carries the angle (per 5 degrees): the renderer's own still is then made at that angle. It costs a render and, for a moment, the card shows its previous picture. Filed for kazoku-ui: a still taken from the live frame at `blur()`.
+- `test/e2e/live-3d.e2e.mjs`: see the CHANGELOG for the numbers. A broken build is a module served with one line changed. The test that builds the site found `SkeletonUtils.js` missing from it. The canvas budget first proved nothing: a flex row kept the card at 1200 px and the broken build read the same 3.85 MP as the good one; the card is now `flex:none` and the broken build reads 33 MP.
+- The runner's memory stop fired once, at 3.18 GB (sum of RSS of the process tree), when a server error left browsers open in a failing run. It stopped the file by process id as designed. The cause in `serve()` (a 200 written before the read) is fixed. Peak since: 1.75 GB.
+- Limits: software GL only, so no real GPU frame time, memory or driver behaviour is measured. A hidden tab is simulated by overriding `visibilityState`. No real phone or Safari. MODULES-35 (controls on the live card, real integration of the packages' viewers) is not started.
+

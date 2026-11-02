@@ -12,6 +12,7 @@ Status key: [x] implemented at prototype level; [~] partial, requires further wo
 - [~] No flash before the card is ready: an undefined `<fuda-card>` and its picture stay hidden with the card's box reserved (one CSS line in the head, README); once defined, the art fades in only after the card is laid out and its images have loaded (0.2.1; headless Chromium desk and phone, e2e `no-reveal`; WebKit cannot draw the front yet).
 - [~] Full-card images supplied by collection owner or provider, plus optional reverse.
 - [~] Focused image preview, configurable pan direction, duration, looping, auto-start, tap-to-animate and `autoplay="focus"` (the card in focus only; icon-only 48 px button; 0.3.0), reduced motion. Verify browser behavior and handle non-image content.
+- [~] Live 3D in cards, one card at a time on one context (MODULES-55): `live-3d` module, budgets enforced, `demo/live-3d.html` (headless Chromium in software only; no real GPU, phone or Safari yet).
 - [ ] Integrate Hako Devices and Uchusen Rockets live 3D viewers inside custom card artwork; drag rotation, zoom and independent flip/motion controls; fallbacks and credits.
 - [ ] Research recognizable trading card families and individual examples over the past century; build distinct card front/back designs, metadata layouts and physical finishes (paper, foil, holographic and ageing).
 - [ ] Configurable visual presentation, card dimensions, colour and finishes; keyboard, touch and reduced-motion support.

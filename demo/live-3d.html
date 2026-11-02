@@ -1,0 +1,26 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Fuda Cards: live 3D in cards</title>
+<style>fuda-card:where(:not(:defined)){display:inline-block;width:300px;aspect-ratio:2.5/3.5;overflow:hidden;visibility:hidden}fuda-collection:where(:not(:defined)){display:block;min-height:calc(var(--fuda-stage-height,clamp(300px,calc(100svh - 440px),620px)) + 380px)}</style>
+<link rel="stylesheet" href="ui.css">
+<style>
+body{margin:0;background:#10151e;color:#eef1f6;font:1rem system-ui}main{max-width:1200px;margin:auto;padding:1rem}
+h1{margin:.2rem 0;font-size:1.5rem}p{max-width:62ch;color:#b8c0cc;margin:.3rem 0 .8rem}a{color:#9cc2ff}
+.row{display:flex;flex-wrap:wrap;gap:1rem;justify-content:center;margin:0 0 1rem}.row fuda-card{width:min(240px,44vw)}
+.stats{font:600 .85rem ui-monospace,monospace;color:#b8c0cc;margin:.3rem 0 .8rem;min-height:1.3em}
+fuda-collection img{background:#1a2230}
+</style></head><body><main>
+<p><a href="../index.html">← Card studio</a></p>
+<h1>Live 3D in cards</h1>
+<p id="intro">Fifty cards and one WebGL context. Rest the pointer on a card, tap it or move to it with the keyboard: it turns in 3D. Every other card is a picture and costs nothing. No 3D code loads until a card is first in focus.</p>
+<div class="row" id="framed"></div>
+<div class="stats" id="stats" aria-live="off"></div>
+<fuda-collection id="binder" view="binder" address></fuda-collection>
+<p><small>The rockets come from <a href="https://github.com/johnmorrisdotca/uchusen-rockets">uchusen-rockets</a> (its own MIT drawings and meshes).</small></p>
+</main>
+<script type="importmap">{"imports":{
+  "@johnmorrisdotca/kazoku-ui/view-controls/define":"../node_modules/@johnmorrisdotca/kazoku-ui/dist/view-controls/define.js",
+  "@johnmorrisdotca/kazoku-ui/renderer":"../node_modules/@johnmorrisdotca/kazoku-ui/dist/renderer/index.js",
+  "three":"../node_modules/three/build/three.module.js",
+  "three/addons/":"../node_modules/three/examples/jsm/"
+}}</script>
+<script type="module" src="live-3d.js"></script>
+</body></html>

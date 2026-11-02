@@ -22,5 +22,12 @@ for (const path of ['index.html', 'rocket.svg', 'assets', 'demo', 'dist']) {
   await cp(join(root, path), join(site, path), {recursive: true});
 }
 await cp(join(root, 'node_modules/@johnmorrisdotca/kazoku-ui/dist'), join(site, 'node_modules/@johnmorrisdotca/kazoku-ui/dist'), {recursive: true});
+// What demo/live-3d.html loads on demand: three.js and the rockets it shows, and nothing else of those packages.
+for (const file of ['three/build/three.module.js', 'three/build/three.core.js', 'three/examples/jsm/loaders/GLTFLoader.js', 'three/examples/jsm/utils/BufferGeometryUtils.js', 'three/examples/jsm/utils/SkeletonUtils.js']) {
+  await cp(join(root, 'node_modules', file), join(site, 'node_modules', file));
+}
+for (const rocket of ['starship-v3', 'starship-v2', 'starship-v1', 'falcon-9-block-5', 'falcon-9-ft', 'falcon-heavy-falcon-heavy', 'dragon-dragon-2-capsule', 'dragon-dragon-1-capsule']) {
+  for (const ending of ['.glb', '.painted.svg']) await cp(join(root, 'node_modules/@johnmorrisdotca/uchusen-rockets/dist/assets', rocket + ending), join(site, 'node_modules/@johnmorrisdotca/uchusen-rockets/dist/assets', rocket + ending));
+}
 await writeFile(join(site, '.nojekyll'), '');
 console.log('site/ is ready');

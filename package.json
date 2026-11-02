@@ -19,6 +19,10 @@
       "import": "./dist/element.js"
     },
     "./package.json": "./package.json",
+    "./live-3d": {
+      "types": "./dist/live-3d.d.ts",
+      "import": "./dist/live-3d.js"
+    },
     "./collection": {
       "types": "./dist/collection.d.ts",
       "import": "./dist/collection.js"
@@ -34,6 +38,7 @@
     "docs/collection-displays.md",
     "docs/collection-input.md",
     "docs/framework-integration.md",
+    "docs/live-3d.md",
     "docs/materials.md",
     "docs/wear.md",
     "assets/README.md"
@@ -47,11 +52,20 @@
     "test": "pnpm build && node --test test/*.test.mjs",
     "check": "pnpm typecheck && pnpm build && pnpm test",
     "test:e2e": "pnpm build && node scripts/e2e.mjs",
+    "test:freeze": "pnpm build && node scripts/e2e.mjs live-3d",
     "dev": "pnpm build && node scripts/dev.mjs",
     "site": "pnpm build && node scripts/site.mjs"
   },
   "dependencies": {
     "@johnmorrisdotca/kazoku-ui": "^0.10.0"
+  },
+  "peerDependencies": {
+    "three": ">=0.160.0"
+  },
+  "peerDependenciesMeta": {
+    "three": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@johnmorrisdotca/uchusen-rockets": "0.2.2",

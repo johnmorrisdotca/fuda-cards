@@ -4,6 +4,7 @@ import {deckLandings, fanBounds, fanLayout, fanShift, flight, normalizeLanding, 
 import {zoomView, type ZoomView} from './zoom.js';
 import {createChoice, CHOICE_CSS, CHOICE_VARS, type ChoiceHandle} from './choice.js';
 import {stackLayout} from './stack.js';
+import type {LiveCards, LiveItem} from './live-3d.js';
 
 const STYLE=`<style>
 :host{display:block;${CHOICE_VARS.dark};color:var(--fc-text);font:16px system-ui}@media(prefers-color-scheme:light){:host(:not([theme="dark"])){${CHOICE_VARS.light}}}:host([theme="light"]){${CHOICE_VARS.light}}:host([theme="dark"]){${CHOICE_VARS.dark}}
@@ -59,17 +60,26 @@ const icon=(view:CollectionView)=>`<svg viewBox="0 0 34 22" aria-hidden="true">$
 const ADDRESS_KEYS=['view','fan','land','animate','speed','binder','cover','sheet','pockets'] as const;
 const NAMES:Record<string,string>={land:'deck-land'};
 
+/** Live 3D in a collection's cards: the shared cards from `createLiveCards` and the 3D item of a card, if it has one. See docs/live-3d.md. */
+export interface CollectionLive {cards: LiveCards<never>; item(card: CollectionCard): LiveItem<never> | undefined}
+
 export class FudaCollection extends HTMLElement {
   private root = this.attachShadow({mode:'open'}); private data: CollectionCard[]=[]; private index=0; private pageSize=9; private selected: CollectionCard | null=null; private back=false; private drawFilter=""; private zoom: ZoomView | null=null;
   private tiles?: ChoiceHandle; private landing?: ChoiceHandle; private fanChoice?: ChoiceHandle; private animateChoice?: ChoiceHandle; private speedChoice?: ChoiceHandle; private binderChoices: Record<string,ChoiceHandle>={}; private turn: {from:number;to:number}|null=null; private flip: 'off' | 'back' | null=null; private addressTimer=0;
   private fanPlaces: FanPlace[]=[];
+  private liveSetup: CollectionLive | null=null; private liveOff: Array<()=>void>=[];
   static get observedAttributes(){return ['view','page-size','columns','fan','fan-size','deck-land','deck-messiness','deck-seed','theme','animate','speed','binder','cover','sheet','pockets']}
   set cards(value: CollectionCard[]){this.data=parseCollection(value);this.index=Math.min(this.index,Math.max(0,this.data.length-1));this.flip=null;this.render()}
   get cards(){return this.data.map(c=>({...c, ...(c.metadata ? {metadata:{...c.metadata}} : {})}))}
+  /** Live 3D: the card in focus turns in 3D on the page's one WebGL context, and every other card stays its picture. Nothing 3D loads until a card is focused. */
+  set live(value: CollectionLive | null){this.liveSetup=value;this.render()}
+  get live(){return this.liveSetup}
+  /** The cards are drawn again on every move, so their live views are made again too: the pictures stay in the shared cache. */
+  private attachLive(v:HTMLElement){for(const off of this.liveOff)off();this.liveOff=[];const setup=this.liveSetup;if(!setup)return;for(const el of Array.from(v.querySelectorAll<HTMLElement>('.card[data-i]:not(.ghost)'))){const c=this.data[Number(el.dataset.i)],item=c&&setup.item(c);if(!item)continue;const still=el.querySelector('img')??undefined;this.liveOff.push(setup.cards.add(el,item,still?{still}:{}))}}
   /** The card on top of the deck, or the first card of the page or fan (counting from 0). */
   get position(){return this.index}
   connectedCallback(){if(this.hasAttribute('address'))this.readAddress();this.render()}
-  disconnectedCallback(){clearTimeout(this.addressTimer)}
+  disconnectedCallback(){clearTimeout(this.addressTimer);for(const off of this.liveOff)off();this.liveOff=[]}
   attributeChangedCallback(name: string){
     this.pageSize=Math.min(100,Math.max(1,Math.floor(Number(this.getAttribute('page-size'))||9)));
     if(name==='fan'&&this.setFan())return;
@@ -295,6 +305,7 @@ export class FudaCollection extends HTMLElement {
     else if(view==='wall'||view==='story'){v.classList.add(view);this.data.forEach((c,k)=>v.append(this.image(c,k)))}
     else if(view==='atlas'){v.classList.add('atlas');let plane=document.createElement('div');plane.className='plane';this.data.forEach((c,k)=>plane.append(this.image(c,k)));v.append(plane)}
     else{v.classList.add('stack',view);let count=Math.min(3,this.data.length);for(let d=count-1;d>=0;d--){const at=(this.index+d)%this.data.length;let c=this.data[at],el=this.image(c,at);let offset=view==='rolodex'?d*42:view==='spotlight'?d*70:d*14;let rotation=view==='rolodex'?d*12:d*5;el.style.transform=`translateX(calc(-50% + ${offset}px)) rotate(${rotation}deg) scale(${1-d*.08})`;el.style.opacity=String(1-d*.2);v.append(el)}}
+    this.attachLive(v);
     this.zoom!.refresh(reset);
     if(this.flip&&this.piled&&t.on&&this.data.length>1)this.playFlip(this.flip,v,Math.round(t.ms*1.15));
     this.flip=null;
