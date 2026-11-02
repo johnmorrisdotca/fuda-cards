@@ -66,10 +66,18 @@ To review, run `pnpm install` and `pnpm dev`, then open the Card Studio. Under *
 
 ### Moving artwork
 
-Set `motion="pan"` on a card containing a slotted `<img>` to enable an Animate button on a tall image. By default the card starts on a still, cropped view; add the boolean `playing` attribute to start with motion. Tapping Animate starts the pan, and tapping Stop returns to the still. A host can add or remove `playing` to control the state. Set `--fuda-focus-x` and `--fuda-focus-y` (for example `50%` and `20%`) to choose the focal point. Cards without the pan option show a still, fully visible image. `pan-direction="up"` starts at the bottom; the default is down. The image travels back and forth by default; set `pan-loop="restart"` to repeat in one direction. Set the CSS custom property `--fuda-pan-duration` (for example, `16s`) to control the duration of each pass. If the image is not taller than the window after filling its width, there may be no vertical distance to pan. Reduced-motion preferences disable the animation and preserve the focused still. This option applies to images; moving a 3D camera is a separate future integration owned by the viewer.
+Set `motion="pan"` on a card containing a slotted `<img>` to enable the Animate button on a tall image. The button is a small play or pause mark in the corner of the art, drawn at half strength until you point at it or focus it; its hit target is 48 px square, its accessible name is "Animate the picture" and `aria-pressed` says whether the art is moving. By default the card starts on a still, cropped view; add the boolean `playing` attribute to start with motion. Tapping the button starts the pan, and tapping it again returns to the still. A host can add or remove `playing` to control the state. While the art moves the card also carries a `moving` attribute for styling (read-only: set `playing` or `autoplay` instead). Set `--fuda-focus-x` and `--fuda-focus-y` (for example `50%` and `20%`) to choose the focal point. Cards without the pan option show a still, fully visible image. `pan-direction="up"` starts at the bottom; the default is down. The image travels back and forth by default; set `pan-loop="restart"` to repeat in one direction. Set the CSS custom property `--fuda-pan-duration` (for example, `16s`) to control the duration of each pass. If the image is not taller than the window after filling its width, there may be no vertical distance to pan. Reduced-motion preferences disable the animation and preserve the focused still. This option applies to images; moving a 3D camera is a separate future integration owned by the viewer.
 
 ```html
 <fuda-card title="Starship" motion="pan" pan-direction="down" style="--fuda-pan-duration: 16s">
+  <img src="starship.jpg" alt="Starship">
+</fuda-card>
+```
+
+**Autoplay when the card is in focus.** Add `autoplay="focus"` and the card moves its art by itself while it is the card in focus, with no tap on the button. One card is in focus at a time: the card under the mouse, the card that holds keyboard focus (Tab to its button), or, on a touch screen, the card you last tapped. When focus moves to another card, or the pointer leaves, or you tap or click somewhere else, the first card returns to its still, so in a row or a grid only one card ever moves. The button stays: press it to pause the focused card (it starts again the next time the card takes focus), and on a touch screen the first tap on it starts the card. `autoplay="focus"` never starts with `prefers-reduced-motion: reduce`. It does not set `playing`, so a host that sets `playing` still decides for itself. The Card Studio has an **Autoplay** choice.
+
+```html
+<fuda-card title="Starship" motion="pan" autoplay="focus">
   <img src="starship.jpg" alt="Starship">
 </fuda-card>
 ```

@@ -180,3 +180,11 @@
 - Limits: the headless WebKit run only films the page after load (its screenshots wait), and WebKit draws the card's back mirrored instead of the front (also in 0.2.0), so WebKit proves little; filed as its own ticket. No real phone. A page without the CSS line can still show the raw picture until its script runs (documented). If the script never runs, the card stays blank.
 - Also: `release.yml` calls kazoku-ui `reusable-release.yml@v0.7.3`; `AGENTS.md` from the kazoku-ui template.
 
+
+## 2026-11-02 - Quiet Animate button and autoplay on focus (MODULES-53), MacBook (machine2) subagent / feat/quiet-animate
+
+- John: the Animate button over the art was ugly. Now an icon-only play or pause mark (26 px, half strength until hovered or focused) inside a 48 px square hit target, `aria-label="Animate the picture"` with `aria-pressed`; no text.
+- New `autoplay="focus"`: the card in focus (pointer over it, keyboard focus inside it, or last tapped) animates its art. One module-level `focusedCard`, so only one card is in focus; a pointerdown anywhere else, or focus moving to another card, stops it. The button pauses the focused card (kept until focus leaves); on touch the first tap on a still card's button starts it (the pointerdown records whether the card was focused, because focus lands on the button before the click). Never autoplays with `prefers-reduced-motion: reduce`. It does not set `playing`.
+- Cause found on the way: toggling a class on `.art` did not always restyle the slotted `<img>` in Chromium (a card kept its animation after it lost focus), so the element reflects the state as a read-only `moving` attribute on the host and the CSS uses `:host([motion="pan"][moving])`.
+- Tests: `test/e2e/autoplay.e2e.mjs` (+ `fixtures/autoplay.html`, three cards) at 1280x800 and 390x844: button size, name, no text, quiet; hover, keyboard and touch focus move the motion between cards; pause by button; reduced motion starts nothing. `pnpm check` 16 pass, `pnpm test:e2e` 13 pass (WebKit not installed here).
+- Limits: headless Chromium only; the phone is viewport emulation with synthetic touch; no Safari or Firefox. `<fuda-collection>` draws images, not `<fuda-card>`, so autoplay does not apply there.

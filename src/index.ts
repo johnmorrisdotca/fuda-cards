@@ -15,6 +15,8 @@ export interface CardOptions {
   flipped?: boolean;
   motion?: 'still' | 'pan';
   playing?: boolean;
+  /** `focus`: the card in focus animates its art (needs `motion: 'pan'`); never with reduced motion. */
+  autoplay?: 'focus';
   panDirection?: 'down' | 'up';
   panLoop?: 'alternate' | 'restart';
   cardSpin?: 'center' | 'corner';
