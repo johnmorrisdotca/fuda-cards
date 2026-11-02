@@ -1,6 +1,11 @@
 # Changelog
 
-## Unreleased
+## 0.5.0 - 2026-11-02
+
+- New: `wear`, cards that are not perfect. Presets `mint`, `near-mint`, `lightly-played`, `moderately-played`, `heavily-played` and `damaged` (plain grading terms, sourced in `docs/wear.md`) draw soft, rounded, chipped and folded corners, edge whitening, creases, scratches, specks, staining, yellowing and an off-centre print. `wear-seed` fixes where the marks lie, so a card is the same every time; `wear-corners`, `wear-edges`, `wear-surface` and `wear-creases` (0 to 1) change one kind; `wear="0.5"` sets all. `perfect`, no attribute or an unknown name draws nothing.
+- A perfect card is unchanged: the same markup and the same pixels as 0.4.0, and the wear code (`dist/wear.js`, 16.9 KB, 5.4 KB gzipped) is a separate module that `<fuda-card>` loads only when a card asks for wear. `element.js` grew by 1.8 KB (0.5 KB gzipped).
+- New exports: `wearPresets`, `wearPreset`, `wearLevels`, `wearLayout`, `wearOutline`, `wearOverlaySvg` and the `wear*` options. The Card Studio has Wear and Wear seed choices.
+- Changed: the repo's dev and test servers moved to ports 8100 to 8199 (tests only).
 
 
 ## 0.4.0 - 2026-11-02
