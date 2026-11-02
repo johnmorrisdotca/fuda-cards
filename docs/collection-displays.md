@@ -20,10 +20,30 @@ Every view has the shared view controls (`@johnmorrisdotca/kazoku-ui`) on the vi
 - Changing the card, the page or the view type is separate from zoom: paging keeps the zoom and the position, zooming keeps the page, and choosing another view type starts that view at its opening size.
 - The controls sit under the view. Keep what is above the viewer short so they are on the first screen; `--fuda-stage-height` sets the view's height.
 
+## Real-life audit (0.8.0)
+
+Every display and option against how real cards are kept and handled: **real**, **fine as a demo idea** (no real counterpart, but it helps a reader see or reach cards on a screen) or **wrong** (fixed or removed).
+
+Displays
+- Overlapping Deck: real (a deck on a table; a card comes off it). Kept; Random Draw: real (draw a card from a shuffled deck). Kept. Fan of Cards: real (a hand). Kept.
+- Binder Pages: real (nine-pocket sheets in a ring or zip binder), the old drawing was **wrong** (a flat tilted grid with no pockets, holes or binder). Rebuilt in 0.8.0.
+- Convention Display Case: real (cards on risers behind glass), the old drawing was weak (tilted pictures on a gradient). Kept, with a wooden frame, a glass lid and a ledge under each card; still a demo, not a full riser model.
+- Rolodex: a real rotary card file, but ours is three cards leaning like a hand, not a wheel. Fine as a demo idea; kept.
+- Sliding Gallery Wall: real (cards hung in a row on a wall). Spotlight Carousel: a lit stand with neighbours, fine as a demo idea. Vertical Story Scroll: no physical counterpart (a phone feed of cards), fine as a demo idea and useful on a phone.
+- Infinite Card Atlas: "infinite" was **wrong** (the collection is finite); the real thing is all the cards laid out on a table. Kept and renamed **Card Table** (`view="atlas"` unchanged).
+- Jukebox Carousel and Flip Tower: **wrong**. A jukebox plays records, not cards; nothing real is a "flip tower"; both drew exactly the deck's pile of three cards. Removed from the demo and the buttons; `view="jukebox"` and `view="tower"` still open the deck (`collectionViewAliases`).
+
+Options
+- Fan open and closed, a card taken off still facing up or turned over (sideways), deck messiness and seed, binder ring or zip, plain covers, clear or black sheets, 4, 9 or 12 pockets, material, thickness, stack counts, wear, foil or matt finish: **real**.
+- "Upside down" landing: **wrong** (nobody turns a card half way round in its plane); removed in 0.6.1, the value `upside-down` still means turned over.
+- Animate, Speed, zoom, Fit, move, the address, Image motion (a slow pan over a tall picture) and Autoplay: no real counterpart, **fine as demo ideas**.
+- Card rotation (a turntable) and its speed and direction: real for a display stand; spin around the bottom corner: no real counterpart, kept because John asked for it, **fine as a demo idea**.
+- Card style (classic, silver sport, cosmic violet): fine as frames, not a real product.
+
 ## Binder and booklet
 
-- Configurable page grids, such as 3 columns by 4 rows or 4 by 4, and responsive alternatives for small screens.
-- An optional binder or booklet presentation with covers, pages, sleeves, and opening and page-turning animations; a simple grid remains available.
+- Done in 0.8.0: `view="binder"` is a ring or zip binder open on two facing sheets of 4, 9 (the default, three by three) or 12 clear plastic pockets, on a clear or black sheet with a punched-hole strip against the rings, a plain cover colour, and a sideways page turn about the spine that bends the leaf and shows its back pockets. The older `page-size` and `columns` still set the grid.
+- Not done: booklet and album (side-loading) pages, a binder with more than one section.
 - Multiple named collections or binders, with their own cards, ordering, and optional titles and covers.
 - Page controls that work with keyboard and touch, with a reduced-motion alternative.
 - Present each card's front and back, and preserve interaction with any 3D viewer in the card window. Page turning, card flipping, and rotating an object must be distinct actions.
