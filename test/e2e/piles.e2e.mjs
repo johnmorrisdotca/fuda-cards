@@ -4,7 +4,7 @@
 import { test } from 'node:test';
 import { strict as assert } from 'node:assert';
 import { readFile } from 'node:fs/promises';
-import { chromium, launch, portShift, serve, sizes, offline } from './support.mjs';
+import { chromium, launch, portShift, quiet, serve, sizes, offline } from './support.mjs';
 
 const PORT = 8114 + portShift, origin = `http://127.0.0.1:${PORT}`;
 const ready = (p) => p.waitForFunction(() => { const r = document.querySelector('fuda-collection')?.shadowRoot; return customElements.get('kazoku-view-controls') && r?.querySelector('kazoku-view-controls')?.state && r.querySelector('.card img'); });
@@ -22,7 +22,7 @@ const choice = (p, value) => p.locator('fuda-collection').locator(`.opts [data-v
 // Where every card of the deck pile is: its own transform and origin (exact) and its box on screen.
 const deckCards = (p) => shadow(p, `const o = root.querySelector('.stage').getBoundingClientRect(); return [...root.querySelectorAll('.deck-pile .card')].map((c) => { const r = c.getBoundingClientRect(), s = getComputedStyle(c); return { i: c.dataset.i, t: s.transform, o: s.transformOrigin, x: r.x - o.x, y: r.y - o.y, w: r.width, h: r.height }; })`);
 const stageBox = (p) => shadow(p, `const r = root.querySelector('.stage').getBoundingClientRect(); return { x: r.x, y: r.y, right: r.right, bottom: r.bottom }`);
-const settle = (p, ms = 1700) => p.waitForTimeout(ms);
+const settle = (p, ms = 1700) => quiet(p, ms);
 const same = (a, b, message) => { assert.equal(a.length, b.length, message); a.forEach((c, k) => { assert.deepEqual([c.i, c.t, c.o], [b[k].i, b[k].t, b[k].o], `${message}: card ${k}`); for (const key of ['x', 'y', 'w', 'h']) assert.ok(Math.abs(c[key] - b[k][key]) < 0.6, `${message}: card ${k} ${key} ${c[key]} vs ${b[k][key]}`); }); };
 const PILES = ['deck', 'random'];
 
@@ -219,28 +219,28 @@ test('<fuda-card stack>: the top card comes off onto a pile at its side, still f
     await p.waitForTimeout(80);
     s = await info();
     assert.equal(s.flyer && s.animations > 0, true, 'the card flies, it does not jump');
-    await p.waitForTimeout(1000);
+    await quiet(p, 1000);
     s = await info();
     assert.deepEqual([s.held, s.taken, s.flyer, s.land], [9, '1', false, 'face-up'], 'it lands on the pile still facing up');
     await p.evaluate(() => document.getElementById('c').setAttribute('deck-land', 'face-down'));
-    await click('off'); await p.waitForTimeout(1000);
+    await click('off'); await quiet(p, 1000);
     s = await info();
     assert.deepEqual([s.held, s.land], [8, 'face-down'], 'the next lands turned over');
     const m = await p.evaluate(() => new DOMMatrix(getComputedStyle(document.getElementById('c').shadowRoot.querySelector('.discard .card')).transform));
     assert.ok(Math.abs(m.a + 1) < 0.01 && Math.abs(m.b) < 0.01 && Math.abs(m.d - 1) < 0.01, 'turned over sideways about its vertical axis, never upside down');
     // Quick double press, a turn and a fan in the middle of it all.
     await click('off'); await click('off');
-    await p.waitForTimeout(1300);
+    await quiet(p, 1300);
     assert.equal((await info()).held, 6, 'two quick presses took two cards');
     await p.evaluate(() => { const c = document.getElementById('c'); c.setAttribute('fan', 'open'); c.setAttribute('card-view', ''); c.style.setProperty('--fuda-yaw', '30deg'); });
-    await p.waitForTimeout(900);
+    await quiet(p, 900);
     assert.equal(await p.evaluate(() => document.getElementById('c').shadowRoot.querySelectorAll('.rotation > .card > .stills > .still:not(.far)').length), 5, 'the fan holds the six cards that are left');
-    await click('off'); await p.waitForTimeout(1000);
+    await click('off'); await quiet(p, 1000);
     assert.equal((await info()).held, 5, 'a card comes off an open fan');
     await p.evaluate(() => document.getElementById('c').removeAttribute('fan'));
-    await p.waitForTimeout(900);
+    await quiet(p, 900);
     for (let k = 0; k < 6; k++) { await click('back'); await p.waitForTimeout(150); }
-    await p.waitForTimeout(1100);
+    await quiet(p, 1100);
     s = await info();
     assert.deepEqual([s.held, s.taken, s.discard], [10, null, null], 'Previous brings every card back');
     await p.evaluate(() => { const c = document.getElementById('c'); c.style.removeProperty('--fuda-yaw'); c.removeAttribute('card-view'); c.setAttribute('deck-land', 'face-up'); });

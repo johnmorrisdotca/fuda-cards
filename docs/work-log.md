@@ -271,3 +271,12 @@
 - Result: 39 of 39 browser tests pass, `pnpm check` passes. One run hit EADDRINUSE on 8112, a port another session was using (card-back test); it passes alone.
 - Tried and dropped: refreshing Fit on every picture load (it moved the rolodex's cards in the piles Animate test) and a second Fit pass for perspective (the deck stopped closing back to the same place). Neither was needed once the story's height was stable.
 - Limits: headless Chromium only; the machine was at load 60 to 70 during the runs.
+
+## 2026-11-02 - kazoku-ui 0.10 (MODULES-170), Mac Studio / night
+
+- Raised `@johnmorrisdotca/kazoku-ui` to ^0.10.0. Read its changelog from 0.3 to 0.10. What reached this repo: the `2×` button is gone (`data-b="two"`, corner-spin test now uses a double press and reads the readout), Tilt, Front and the arrow pad are under More (objects and zoom tests), the readout's name also holds the word Fit (corner-spin uses `exact`). `zoom.ts` needed no change; `controller.startZoom` is still there.
+- New `test/e2e/view-bar.e2e.mjs`: the number is on the first screen and uncovered, equals the state through the buttons, a set and Fit, in the Studio, the collections and vintage, desk and phone; the card really is that many times its Fit width; out of sight and in a hidden tab an automatic turn makes 0 frame requests and 0 callbacks, on the Studio and on a collection (a hidden tab is simulated by overriding `visibilityState`).
+- Test fixes that were not about kazoku-ui: `moving()` in the autoplay tests asks the shadow root too and leaves transitions out; piles and stack wait for rest instead of a fixed time; Playwright pinned at 1.64.0 because the 1.59.1 copy (Chromium 147) failed binder and wear.
+- Decision: the Studio stays on the basic bar (the family's default); `controls="advanced"` was not set anywhere.
+- Limits: headless Chromium in software; no real phone, Safari or Firefox.
+

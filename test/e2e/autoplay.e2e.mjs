@@ -4,8 +4,8 @@ import { strict as assert } from 'node:assert';
 import { chromium, launch, portShift, serve, sizes } from './support.mjs';
 
 const PORT = 8116 + portShift;
-// A running pan is the card's art with the pan animation on it. The animation comes from the card's shadow styles (::slotted), and Chromium 147 hands it back as a plain Animation with no `animationName`, so the name is read from the computed style.
-const moving = (page) => page.evaluate(() => Object.fromEntries([...document.querySelectorAll('fuda-card')].map((c) => { const img = c.querySelector('img'); return [c.id, getComputedStyle(img).animationName.split(', ').includes('fuda-pan') ? img.getAnimations().filter((a) => a.playState === 'running').length : 0]; })));
+// A running pan is the card's art with the pan animation on it. The animation comes from the card's shadow styles (::slotted), and Chromium 147 hands it back as a plain Animation with no `animationName`; Chromium builds differ in whether the image's or only the shadow root's getAnimations lists it, so both are asked and the name is read from the computed style.
+const moving = (page) => page.evaluate(() => Object.fromEntries([...document.querySelectorAll('fuda-card')].map((c) => { const img = c.querySelector('img'); const all = new Set([...img.getAnimations(), ...c.shadowRoot.getAnimations()]); return [c.id, getComputedStyle(img).animationName.split(', ').includes('fuda-pan') ? [...all].filter((a) => a.effect?.target === img && a.playState === 'running' && !(a instanceof CSSTransition)).length : 0]; })));
 const open = async (browser, size, extra = {}) => {
   const context = await browser.newContext({ viewport: size, ...extra }), page = await context.newPage();
   await page.goto(`http://127.0.0.1:${PORT}/test/e2e/fixtures/autoplay.html`);

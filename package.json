@@ -51,9 +51,12 @@
     "site": "pnpm build && node scripts/site.mjs"
   },
   "dependencies": {
-    "@johnmorrisdotca/kazoku-ui": "^0.2.1"
+    "@johnmorrisdotca/kazoku-ui": "^0.10.0"
   },
   "devDependencies": {
+    "@johnmorrisdotca/uchusen-rockets": "0.2.2",
+    "playwright": "1.64.0",
+    "three": "0.186.1",
     "typescript": "5.9.3"
   },
   "publishConfig": {

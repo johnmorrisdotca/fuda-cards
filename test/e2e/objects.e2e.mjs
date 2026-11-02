@@ -66,6 +66,7 @@ test('a card is as before: the same address turns it, and the controls are there
     assert.equal(await turned(p), false, 'the fan starts square');
     await shadow(p, `root.querySelector('kazoku-view-controls').set({yaw: -81, tilt: -2}); return 0`); await p.waitForTimeout(300);
     assert.equal(await turned(p), true, 'a collection of cards turns to -81 degrees');
+    await shadow(p, `root.querySelector('kazoku-view-controls').setAttribute('controls', 'advanced'); return 0`); // Tilt is under More since kazoku-ui 0.8
     for (const word of ['Angle', 'Tilt', 'Auto-turn']) assert.ok(await visible(p, word) > 0, `${word} is offered`);
     assert.equal(await shadow(p, `return root.querySelectorAll('.card.flat').length`), 0, 'no card is flat');
     assert.ok(await shadow(p, `return root.querySelectorAll('.face.back').length`) > 1, 'cards have backs');
@@ -81,6 +82,7 @@ test('a mixed collection: the cards turn, the objects stay square to the reader 
     await p.waitForTimeout(500);
     await shadow(p, `root.querySelector('kazoku-view-controls').set({yaw: 60}); return 0`); await p.waitForTimeout(300);
     assert.equal(await turned(p), true, 'the view turns: there are cards in it');
+    await shadow(p, `root.querySelector('kazoku-view-controls').setAttribute('controls', 'advanced'); return 0`); // Tilt is under More since kazoku-ui 0.8
     for (const word of ['Angle', 'Tilt', 'Auto-turn']) assert.ok(await visible(p, word) > 0, `${word} is offered`);
     const width = (p2) => shadow(p2, `return root.querySelector('.deck-pile .card.top .face.front').getBoundingClientRect().width`);
     const setYaw = (yaw) => shadow(p, `root.querySelector('kazoku-view-controls').set({yaw: arg}); return 0`, yaw).then(() => p.waitForTimeout(200));

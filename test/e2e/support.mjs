@@ -5,7 +5,7 @@ import { readFile } from 'node:fs/promises';
 import { resolve, extname } from 'node:path';
 
 export const root = resolve(import.meta.dirname, '../..');
-const types = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.jpg': 'image/jpeg', '.svg': 'image/svg+xml' };
+const types = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.jpg': 'image/jpeg', '.svg': 'image/svg+xml', '.glb': 'model/gltf-binary' };
 export let chromium, webkit;
 try {
   const require = createRequire(process.env.PLAYWRIGHT_FROM ?? import.meta.url);
@@ -75,6 +75,16 @@ export const cardSvg = (label) => {
   const n = Number(String(label).replace(/\D/g, '')) || 0, hue = hues[n % hues.length];
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 245 337" width="245" height="337"><rect width="245" height="337" rx="12" fill="hsl(${hue} 60% 30%)"/><rect x="12" y="12" width="221" height="313" rx="8" fill="none" stroke="hsl(${hue} 80% 75%)" stroke-width="4"/><circle cx="122" cy="140" r="60" fill="hsl(${hue} 70% 60%)"/><text x="122" y="285" font-size="34" text-anchor="middle" fill="#fff" font-family="sans-serif">${label}</text></svg>`;
 };
+
+/** Wait at least `ms`, then until nothing animates in the page or its shadow roots (at most 15 s more, then go on: the test's own check says what is still running). On a busy machine a fixed wait ends in the middle of a move. */
+export async function quiet(page, ms = 0) {
+  if (ms) await page.waitForTimeout(ms);
+  await page.waitForFunction(() => {
+    const roots = [document], running = (root) => root.getAnimations().some((a) => a.playState === 'running' && a.effect?.getComputedTiming().iterations !== Infinity);
+    for (const root of roots) for (const el of root.querySelectorAll('*')) if (el.shadowRoot) roots.push(el.shadowRoot);
+    return !roots.some(running);
+  }, null, { timeout: 15000 }).catch(() => {});
+}
 
 /** Answer every outside request from the page with local stand-ins, so the tests need no network. */
 export async function offline(page) {

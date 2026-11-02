@@ -84,11 +84,14 @@ test('a 52-card stack at rest requests no frames', { skip: !chromium && 'Playwri
       let frames = 0;
       cdp.on('Page.screencastFrame', (frame) => { frames++; cdp.send('Page.screencastFrameAck', { sessionId: frame.sessionId }).catch(() => {}); });
       await cdp.send('Page.startScreencast', { format: 'jpeg', quality: 30, everyNthFrame: 1 });
-      await page.waitForTimeout(800);
+      // On a busy machine the first paints come late: rest means a whole second with no new frame.
+      for (let seen = -1, end = Date.now() + 8000; seen !== frames && Date.now() < end;) { seen = frames; await page.waitForTimeout(1000); }
       const settled = frames, raf0 = await page.evaluate(() => window.__raf);
-      await page.waitForTimeout(2000);
+      // A stray frame from a busy machine is not drawing: rest is proved by a whole window of two seconds with no frame, and three chances to see one.
+      let settled2 = settled;
+      for (let i = 0; i < 3; i++) { settled2 = frames; await page.waitForTimeout(2000); if (frames === settled2) break; }
       const idle = await page.evaluate(() => ({ raf: window.__raf, animations: document.getAnimations().length, cards: [...document.querySelectorAll('fuda-card')].map((c) => c.shadowRoot.getAnimations?.().length ?? 0) }));
-      assert.equal(frames - settled, 0, `${name}: ${frames - settled} frames were drawn at rest`);
+      assert.equal(frames - settled2, 0, `${name}: ${frames - settled2} frames were drawn at rest`);
       assert.equal(idle.raf - raf0, 0, `${name}: ${idle.raf - raf0} animation frames were requested at rest`);
       assert.equal(idle.animations, 0, `${name}: ${idle.animations} animations are running at rest`);
       assert.ok(await page.evaluate(() => document.getElementById('s').shadowRoot.querySelectorAll('.still').length) > 0);

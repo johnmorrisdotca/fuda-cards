@@ -9,18 +9,57 @@ importers:
   .:
     dependencies:
       '@johnmorrisdotca/kazoku-ui':
-        specifier: ^0.2.1
-        version: 0.2.1
+        specifier: ^0.10.0
+        version: 0.10.0(three@0.186.1)
     devDependencies:
+      '@johnmorrisdotca/uchusen-rockets':
+        specifier: 0.2.2
+        version: 0.2.2(three@0.186.1)
+      playwright:
+        specifier: 1.64.0
+        version: 1.64.0
+      three:
+        specifier: 0.186.1
+        version: 0.186.1
       typescript:
         specifier: 5.9.3
         version: 5.9.3
 
 packages:
 
-  '@johnmorrisdotca/kazoku-ui@0.2.1':
-    resolution: {integrity: sha512-GOKieJ+aCMJVP9CwThh1bVNUDFuAmV4Uv41Gdn6PMj8NWdXYD1RQmIrTJPwPpv5AmZWLlJS5qYT11iEBB4pLvg==}
+  '@johnmorrisdotca/kazoku-ui@0.10.0':
+    resolution: {integrity: sha512-FlPfB98tFxB9nvsovyCoHjXwgL9sG3ZOg2upb6//XTygu11I6dmNHvYkOaiXplzMbRLou3B7Al4St66F4Cxw6A==}
     engines: {node: '>=22'}
+    peerDependencies:
+      three: '>=0.160.0'
+    peerDependenciesMeta:
+      three:
+        optional: true
+
+  '@johnmorrisdotca/uchusen-rockets@0.2.2':
+    resolution: {integrity: sha512-H8yq80wJu48IXJI2ETRFN2Nkbom8/fotJGN6WXX4wbfGEa5JItalRj6R3lxFZ9jw9dCp7V1WW9hVxv3DjH2OpA==}
+    engines: {node: '>=22'}
+    peerDependencies:
+      react: '>=18'
+      three: '>=0.170.0'
+    peerDependenciesMeta:
+      react:
+        optional: true
+      three:
+        optional: true
+
+  playwright-core@1.64.0:
+    resolution: {integrity: sha512-T9r+MZkTECl2+oUcZ26YgZzTrYidTsIhYYkJix+6iDOymOb1FB2RLLSOxRGnZGv5DStt+aduIVbt+E8WygXYpg==}
+    engines: {node: '>=20'}
+    hasBin: true
+
+  playwright@1.64.0:
+    resolution: {integrity: sha512-kVzTnYFYEyQ9RGzBjNCd2+yEqWmVbxl3AHPynv3qQ6JTjv4a+kwRcnqQwIpuP3NnrnIrE/Q6wWAIAvMfIE2/Yg==}
+    engines: {node: '>=20'}
+    hasBin: true
+
+  three@0.186.1:
+    resolution: {integrity: sha512-blFeqb49wRCSGUGj7gtpfnSGHy2lwDk94RhUmS1c/hTby70kvChbWpkJ4Pm1390LqzzvTmzgXKHPEafJwCb8jA==}
 
   typescript@5.9.3:
     resolution: {integrity: sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw==}
@@ -29,6 +68,20 @@ packages:
 
 snapshots:
 
-  '@johnmorrisdotca/kazoku-ui@0.2.1': {}
+  '@johnmorrisdotca/kazoku-ui@0.10.0(three@0.186.1)':
+    optionalDependencies:
+      three: 0.186.1
+
+  '@johnmorrisdotca/uchusen-rockets@0.2.2(three@0.186.1)':
+    optionalDependencies:
+      three: 0.186.1
+
+  playwright-core@1.64.0: {}
+
+  playwright@1.64.0:
+    dependencies:
+      playwright-core: 1.64.0
+
+  three@0.186.1: {}
 
   typescript@5.9.3: {}

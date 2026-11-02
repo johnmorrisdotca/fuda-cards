@@ -50,7 +50,7 @@ test('corner spin keeps the corner at the stage centre, full size, with zoom', {
       const opening = await p.evaluate(() => ({ zoom: document.querySelector('#view').state.zoom, width: document.querySelector('#card').getBoundingClientRect().width }));
       assert.ok(opening.zoom > 1, `${name}: the studio must not open at Fit (zoom ${opening.zoom})`);
       assert.ok(Math.abs(opening.width - 300) <= 1, `${name}: the card must open at full size, not ${opening.width}px wide`);
-      await p.getByRole('button', { name: 'Fit' }).click();
+      await p.getByRole('button', { name: 'Fit', exact: true }).click();
       const fit = await sweep();
       assert.ok(Math.max(...fit.off) <= 1, `${name}: the corner is ${Math.max(...fit.off)}px from the stage centre`);
       assert.equal(fit.width, 300, `${name}: the card must stay full size`);
@@ -65,9 +65,11 @@ test('corner spin keeps the corner at the stage centre, full size, with zoom', {
       await p.getByRole('button', { name: 'Zoom out' }).click();
       await p.getByRole('button', { name: 'Zoom out' }).click();
       assert.ok(await zoom() < 1, `${name}: Zoom out must go below Fit`);
-      await p.getByRole('button', { name: 'Zoom to 2 times' }).click();
-      assert.equal(await zoom(), 2, `${name}: 2x`);
-      await p.getByRole('button', { name: 'Fit' }).click();
+      // 0.10 of the view controls has no 2x button: a double press on the view goes to 2 times, and the one number on the bar says so.
+      await p.locator('#stage').dblclick({ position: { x: 8, y: 8 } });
+      assert.equal(await zoom(), 2, `${name}: a double press goes to 2 times`);
+      assert.equal(await p.locator('#view').locator('[data-b="level"]').innerText(), '2×', `${name}: the readout says 2×`);
+      await p.getByRole('button', { name: 'Fit', exact: true }).click();
       assert.equal(await zoom(), 1, `${name}: Fit must return to 1`);
       const box = await p.locator('#stage').boundingBox();
       await p.keyboard.down('Control');
@@ -75,7 +77,7 @@ test('corner spin keeps the corner at the stage centre, full size, with zoom', {
       await p.mouse.wheel(0, -300);
       await p.keyboard.up('Control');
       assert.ok(await zoom() > 1, `${name}: Ctrl+wheel must zoom`);
-      await p.getByRole('button', { name: 'Fit' }).click();
+      await p.getByRole('button', { name: 'Fit', exact: true }).click();
 
       await p.getByRole('button', { name: /Animate/ }).click();
       assert.equal(await p.evaluate(() => document.querySelector('#card').hasAttribute('playing')), true, `${name}: the card's Animate button must still work on the stage`);

@@ -22,7 +22,7 @@ An item says what it is with `kind` (`"card"`, the default, or `"object"`; see `
 
 ## Zoom, Fit and move (every view)
 
-Every view has the shared view controls (`@johnmorrisdotca/kazoku-ui`) on the view: zoom out, 2×, zoom in, **Fit**, and, zoomed in, an arrow pad. Ctrl or Command with the wheel, a trackpad pinch and a two-finger pinch zoom about the pointer; zoomed in, a drag or the wheel moves the view. The views are flat, so none turns in 3D and the angle, tilt and auto-turn controls are hidden.
+Every view has the shared view controls (`@johnmorrisdotca/kazoku-ui`) on the view: zoom out, the zoom as a number, zoom in, **Fit**, and, under **More**, an arrow pad. A double press on the view goes to 2 times. Ctrl or Command with the wheel, a trackpad pinch and a two-finger pinch zoom about the pointer; zoomed in, a drag or the wheel moves the view. The views are flat, so none turns in 3D and the angle, tilt and auto-turn controls are hidden.
 
 - The controls take every press on the view, including one that starts on a card, so a drag or a pinch works over the cards. A tap that did not move is passed to the card as a click, and the keyboard still opens a focused card with Enter.
 - **Fit** shows every card the view draws, at most at natural size. The wall, story and atlas open at half size or larger and start at their first card; the other views open at Fit. Zoom out goes to 0.4 of Fit.

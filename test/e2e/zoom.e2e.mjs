@@ -53,8 +53,10 @@ async function exercise(p, name, spec) {
   assert.ok(zin.barBottom <= size.height, here(`the controls leave the first screen when zoomed (${zin.barBottom})`));
   assert.ok(zin.scrollWidth <= zin.innerWidth, here('the page grew wider when zoomed'));
   await bar('Zoom in').click();
+  if (!(await bar('Move left').isVisible())) await bar('More').click(); // the arrows are under More since kazoku-ui 0.8, and the choice is remembered
   await bar('Move left').click();
   assert.ok((await geo()).panX < 0, here('the arrow pad did not move the view'));
+  await bar('More').click(); // back to the basic bar, for the views after this one: the reader's choice is remembered
 
   const grab = await aim(p, stage, spec.cards), before = await geo();
   await p.mouse.move(grab.x, grab.y);
