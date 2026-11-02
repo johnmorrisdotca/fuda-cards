@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {collectionViews,parseCollection,randomDrawIndex,movePage} from '../dist/collection.js';
-test('each promised view has a distinct stable id',()=>{assert.equal(collectionViews.length,12);assert.equal(new Set(collectionViews.map(v=>v.id)).size,12)});
+import {collectionViews,collectionViewAliases,parseCollection,randomDrawIndex,movePage} from '../dist/collection.js';
+test('each display has a distinct stable id, and the two dropped names still open a display',()=>{assert.equal(collectionViews.length,10);assert.equal(new Set(collectionViews.map(v=>v.id)).size,10);assert.deepEqual(collectionViewAliases,{jukebox:'deck',tower:'deck'});assert.ok(Object.values(collectionViewAliases).every(id=>collectionViews.some(v=>v.id===id)))});
 test('normalizes card input and retains optional back',()=>{assert.deepEqual(parseCollection([{name:'Card',image:'front.jpg',backImage:'back.jpg'}]),[{id:'0',name:'Card',image:'front.jpg',backImage:'back.jpg'}])});
 test('rejects malformed cards and duplicate ids',()=>{assert.throws(()=>parseCollection({}),/array/);assert.throws(()=>parseCollection([{name:'Card'}]),/image/);assert.throws(()=>parseCollection([{id:'x',name:'A',image:'a'},{id:'x',name:'B',image:'b'}]),/Duplicate/)});
 test('imports collection objects and preserves collector metadata',()=>{
@@ -21,7 +21,7 @@ test('page navigation wraps and handles partial and empty pages',()=>{
 
 
 import { fanLayout, deckLandings, normalizeLanding } from '../dist/collection.js';
-test('the fan has twelve displays in all, two landings and a layout that closes to a deck and opens to a hand', () => {
+test('the fan is one of the displays, two landings and a layout that closes to a deck and opens to a hand', () => {
   assert.ok(collectionViews.some((v) => v.id === 'fan'));
   assert.deepEqual(deckLandings.map((l) => l.id), ['face-up', 'face-down'], 'two landings: still facing up, turned over');
   assert.deepEqual(['face-up', 'face-down', 'upside-down', 'turned-over', 'x', null].map(normalizeLanding), ['face-up', 'face-down', 'face-down', 'face-down', 'face-up', 'face-up'], 'the 0.6.0 value upside-down means turned over');

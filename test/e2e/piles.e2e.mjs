@@ -25,7 +25,7 @@ const deckCards = (p) => shadow(p, `const o = root.querySelector('.stage').getBo
 const stageBox = (p) => shadow(p, `const r = root.querySelector('.stage').getBoundingClientRect(); return { x: r.x, y: r.y, right: r.right, bottom: r.bottom }`);
 const settle = (p, ms = 1700) => p.waitForTimeout(ms);
 const same = (a, b, message) => { assert.equal(a.length, b.length, message); a.forEach((c, k) => { assert.deepEqual([c.i, c.t, c.o], [b[k].i, b[k].t, b[k].o], `${message}: card ${k}`); for (const key of ['x', 'y', 'w', 'h']) assert.ok(Math.abs(c[key] - b[k][key]) < 0.6, `${message}: card ${k} ${key} ${c[key]} vs ${b[k][key]}`); }); };
-const PILES = ['deck', 'random', 'jukebox', 'tower'];
+const PILES = ['deck', 'random'];
 
 test('every pile display fans open and closes back exactly, shows up to ten cards, fits a phone and keeps the choice in the address', { skip: !chromium && 'Playwright not installed' }, async () => {
   const browser = await launch(), server = serve(PORT);
@@ -155,8 +155,8 @@ test('the Animate and Speed choices are buttons, kept in the address, and the ad
     await choice(p, 'on'); await choice(p, 'normal'); await p.waitForTimeout(400);
     assert.deepEqual([new URL(p.url()).searchParams.get('animate'), new URL(p.url()).searchParams.get('speed')], [null, null], 'the defaults leave the address');
     await context.close();
-    const linked = await open(browser, sizes[0][1], '?view=jukebox&fan=open&animate=off&speed=quick&land=upside-down');
-    assert.deepEqual(await shadow(linked.p, `return [...root.querySelectorAll('.opts [aria-checked=true]')].map((b) => b.dataset.value)`), ['face-down', 'open', 'off', 'quick'], 'a link opens the same choices (and 0.6.0 upside-down means turned over)');
+    const linked = await open(browser, sizes[0][1], '?view=jukebox&fan=open&animate=off&speed=quick&land=upside-down'); // jukebox, dropped in 0.8.0, still opens the deck
+    assert.deepEqual(await shadow(linked.p, `return [...root.querySelectorAll('.opts .choice:not([hidden]) [aria-checked=true]')].map((b) => b.dataset.value)`), ['face-down', 'open', 'off', 'quick'], 'a link opens the same choices (and 0.6.0 upside-down means turned over)');
     assert.equal(await shadow(linked.p, `return root.querySelector('.v').classList.contains('fan-open')`), true);
     await linked.context.close();
   } finally { await browser.close(); server.close(); }

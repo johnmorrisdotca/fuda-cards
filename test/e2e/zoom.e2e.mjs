@@ -5,7 +5,7 @@ import { strict as assert } from 'node:assert';
 import { chromium, serve, sizes, offline, choose } from './support.mjs';
 
 const origin = 'http://127.0.0.1:8113';
-const views = (process.env.FUDA_VIEWS ?? 'deck,rolodex,binder,case,jukebox,random,story,wall,tower,spotlight,atlas,fan').split(',');
+const views = (process.env.FUDA_VIEWS ?? 'deck,rolodex,binder,case,random,story,wall,spotlight,atlas,fan').split(',');
 
 // Page code that finds the stage and the controls, inside the collection's shadow root when there is one.
 const find = `const root = document.querySelector('fuda-collection')?.shadowRoot ?? document; const q = (s) => root.querySelector(s); const all = (s) => [...root.querySelectorAll(s)];`;

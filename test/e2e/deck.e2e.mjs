@@ -69,7 +69,7 @@ test('a card lands still facing up or turned over sideways, as chosen, never on 
   const browser = await chromium.launch({ executablePath: process.env.PLAYWRIGHT_CHROMIUM }), server = serve(PORT);
   try {
     const { context, p } = await open(browser, sizes[0][1]);
-    assert.deepEqual(await p.locator('fuda-collection').locator('.opts [data-value]').evaluateAll((l) => l.map((b) => b.dataset.value)), ['face-up', 'face-down', 'closed', 'open', 'on', 'off', 'slow', 'normal', 'quick'], 'two landings (then the fan, animate and speed choices): no Upside down');
+    assert.deepEqual(await p.locator('fuda-collection').locator('.opts .choice:not([hidden]) [data-value]').evaluateAll((l) => l.map((b) => b.dataset.value)), ['face-up', 'face-down', 'closed', 'open', 'on', 'off', 'slow', 'normal', 'quick'], 'two landings (then the fan, animate and speed choices): no Upside down');
     assert.equal(await p.locator('fuda-collection').getByText('Upside down').count(), 0, 'no Upside down button');
     let up = await piles(p), before = up.discardCount;
     await p.getByRole('button', { name: 'Next →' }).click();
@@ -182,14 +182,14 @@ test('the fan opens to show most of each card and closes back to the deck it sta
   } finally { await browser.close(); server.close(); }
 });
 
-test('the displays are buttons, not a drop-down: all twelve on screen, at least 48 px high, one chosen, kept in the address', { skip: !chromium && 'Playwright not installed' }, async () => {
+test('the displays are buttons, not a drop-down: all ten on screen, at least 48 px high, one chosen, kept in the address', { skip: !chromium && 'Playwright not installed' }, async () => {
   const browser = await chromium.launch({ executablePath: process.env.PLAYWRIGHT_CHROMIUM }), server = serve(PORT);
   try {
     for (const [name, size] of sizes) {
       for (const scheme of ['dark', 'light']) {
         const { context, p } = await open(browser, size, '', { colorScheme: scheme });
         const info = await shadow(p, `const b = [...root.querySelectorAll('.displays button')]; const rects = b.map((x) => x.getBoundingClientRect()); const host = root.querySelector('.displays').getBoundingClientRect(); return { n: b.length, minHeight: Math.min(...rects.map((r) => r.height)), minWidth: Math.min(...rects.map((r) => r.width)), checked: b.filter((x) => x.getAttribute('aria-checked') === 'true').map((x) => x.dataset.value), selects: root.querySelectorAll('select').length, spans: Math.max(...rects.map((r) => r.right)) - Math.min(...rects.map((r) => r.left)), host: host.width, bg: getComputedStyle(root.querySelector('.shell')).backgroundColor, roles: new Set(b.map((x) => x.getAttribute('role'))).size, wide: document.documentElement.scrollWidth <= innerWidth };`);
-        assert.equal(info.n, 12, `${name} ${scheme}`);
+        assert.equal(info.n, 10, `${name} ${scheme}`);
         assert.ok(info.minHeight >= 48, `${name} ${scheme}: a button is ${info.minHeight}px high`);
         assert.deepEqual(info.checked, ['deck']);
         assert.equal(info.selects, 0, `${name} ${scheme}: no drop-down in the collection`);
@@ -204,7 +204,7 @@ test('the displays are buttons, not a drop-down: all twelve on screen, at least 
         await p.locator('fuda-collection').locator('.displays [data-value="wall"]').focus();
         await p.keyboard.press('ArrowRight');
         await p.waitForTimeout(300);
-        assert.equal(await shadow(p, `return root.querySelector('.stage').className`), 'stage tower', `${name}: the arrow key chooses the next display`);
+        assert.equal(await shadow(p, `return root.querySelector('.stage').className`), 'stage spotlight', `${name}: the arrow key chooses the next display`);
         await context.close();
       }
     }
