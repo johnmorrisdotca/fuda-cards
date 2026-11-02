@@ -27,6 +27,7 @@ const scenes = [
   ['the deck: a card taken off an open fan, turned over', { url: demo('land=face-down&fan=open'), start: 'next', ...collection }],
   ['the deck: a card taken off after the view was turned', { url: demo('land=face-down&yaw=40&tilt=-10'), start: 'next', ...collection }],
   ['the deck: a card put back from a turned-over pile', { url: demo('land=face-down'), start: 'back', ...collection }],
+  ['the deck: the last card put back from the pile (the pile is an empty slot afterwards)', { url: demo('land=face-down'), start: 'backlast', ...collection }],
   ['a stack: a card taken off, turned over', { url: pile, start: 'stack:deck-land=face-down', ...stack }],
   ['a stack: a card taken off, still facing up', { url: pile, start: 'stack:deck-land=face-up', ...stack }],
   ['a stack: a card taken off an open fan', { url: pile, start: 'stack:deck-land=face-down,fan=open', ...stack }],
@@ -47,6 +48,12 @@ async function begin(page, s) {
     // Two cards on the pile, so putting one back leaves a pile to fly from (the last card off a pile has no pile to leave).
     await page.evaluate(() => document.querySelector('fuda-collection').setAttribute('animate', 'off'));
     await press('Next →'); await press('Next →'); await page.waitForTimeout(300);
+    await page.evaluate(() => document.querySelector('fuda-collection').removeAttribute('animate')); await page.waitForTimeout(200);
+    await press('← Previous');
+  } else if (s.start === 'backlast') {
+    // One card on the pile: putting it back leaves the pile empty, drawn as a dashed slot, and the card must still fly from where the pile was (MODULES-176).
+    await page.evaluate(() => document.querySelector('fuda-collection').setAttribute('animate', 'off'));
+    await press('Next →'); await page.waitForTimeout(300);
     await page.evaluate(() => document.querySelector('fuda-collection').removeAttribute('animate')); await page.waitForTimeout(200);
     await press('← Previous');
   } else if (s.start === 'single') await page.evaluate(() => document.querySelector('#n').setAttribute('flipped', ''));

@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.9.2 - 2026-11-02
+
+- Fixed (MODULES-176): **the last card put back from the deck's pile flies too.** With one card on the pile, Previous drew the empty pile as a dashed slot and `playFlip` returned at once for want of a `.discard-pile`, so the card jumped back with no flight. The flight needs only the moving card and the distance between the piles, so it no longer asks for a pile at the other end; the card flies from where the pile was (the slot) to the deck, turning back if it landed turned over.
+- New test (`test/e2e/flip.e2e.mjs`, "the last card put back from the pile"): the same twelve-moment pixel check, started from one card on the pile. On 0.9.1 it fails (no card in the air: `moving: 0`); on 0.9.2 it passes.
+
 ## 0.9.1 - 2026-11-02
 
 - Fixed (MODULES-98): **the Vertical Story Scroll's Fit shows every card.** Its cards were as tall as their pictures once those loaded, and 90 percent of the view before, so Fit was measured on a layout that then grew (cards 117 px outside the view on a desk). Its cards keep the 90 percent (`min-height:0`), so the layout does not change when the pictures arrive.

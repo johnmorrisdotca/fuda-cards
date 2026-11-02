@@ -194,9 +194,10 @@ export class FudaCollection extends HTMLElement {
   }
   /** The card that just moved flies between the two piles, turning over sideways on the way if it lands face down. The same element, so the card is never drawn twice. An open fan sends the card from where the fan holds it. */
   private playFlip(direction:'off'|'back',v:HTMLElement,ms:number){
+    // Either pile may be an empty dashed slot (the last card put back leaves the pile empty): the card still flies the same distance, from where the pile was.
     const deck=v.querySelector<HTMLElement>('.deck-pile'),discard=v.querySelector<HTMLElement>('.discard-pile');
     const moved=direction==='off'?discard?.querySelector<HTMLElement>('.card.top'):deck?.querySelector<HTMLElement>('.card.top');
-    if(!moved||!deck||!discard)return;
+    if(!moved)return;
     const style=getComputedStyle(v),w=parseFloat(style.getPropertyValue('--w'))||200,gap=parseFloat(style.getPropertyValue('--gap'))||56,fr=parseFloat(v.style.getPropertyValue('--fr'))||0;
     const dx=(1+fr)*w+gap,dy=0;
     const fly=moved.querySelector<HTMLElement>('.fly')!,turn=moved.querySelector<HTMLElement>('.turn')!;
