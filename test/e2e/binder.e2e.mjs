@@ -3,10 +3,9 @@
 // bends it, and shows the pockets on its back.
 import { test } from 'node:test';
 import { strict as assert } from 'node:assert';
-import { chromium, serve, sizes, offline } from './support.mjs';
+import { chromium, launch, portShift, serve, sizes, offline } from './support.mjs';
 
-const PORT = 8110, origin = `http://127.0.0.1:${PORT}`;
-const launch = () => chromium.launch({ executablePath: process.env.PLAYWRIGHT_CHROMIUM });
+const PORT = 8110 + portShift, origin = `http://127.0.0.1:${PORT}`;
 const shadow = (p, code, arg) => p.evaluate(({ code, arg }) => new Function('root', 'arg', code)(document.querySelector('fuda-collection').shadowRoot, arg), { code, arg });
 const open = async (browser, size, query = '', extra = {}) => {
   const context = await browser.newContext({ viewport: size, ...extra }), p = await context.newPage(), problems = [];

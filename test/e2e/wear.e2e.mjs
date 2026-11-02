@@ -2,16 +2,16 @@
 import { test } from 'node:test';
 import { strict as assert } from 'node:assert';
 import { readFile } from 'node:fs/promises';
-import { chromium, serve, sizes, root } from './support.mjs';
+import { chromium, launch, portShift, serve, sizes, root } from './support.mjs';
 
-const PORT = 8118;
+const PORT = 8118 + portShift;
 const base = `http://127.0.0.1:${PORT}/test/e2e/fixtures`;
 const shadow = (page, id) => page.evaluate((id) => document.getElementById(id).shadowRoot.innerHTML, id);
 const ready = (page) => page.waitForFunction(() => customElements.get('fuda-card') && [...document.querySelectorAll('fuda-card')].every((c) => c.shadowRoot.querySelector('.art.ready')));
 const worn = (page, id) => page.waitForFunction((id) => document.getElementById(id).shadowRoot.querySelector('.wear'), id);
 
 test('a perfect card is drawn exactly as 0.4.0 drew it and never loads the wear code', { skip: !chromium && 'Playwright not installed' }, async () => {
-  const browser = await chromium.launch({ executablePath: process.env.PLAYWRIGHT_CHROMIUM }), server = serve(PORT);
+  const browser = await launch(), server = serve(PORT);
   try {
     const before = await readFile(new URL('./fixtures/perfect-card-0.4.0.html', import.meta.url), 'utf8');
     for (const [name, size] of sizes) {
@@ -36,7 +36,7 @@ test('a perfect card is drawn exactly as 0.4.0 drew it and never loads the wear 
 });
 
 test('a worn card is drawn from its seed: the same every time, another seed another card, and taking wear away restores the card', { skip: !chromium && 'Playwright not installed' }, async () => {
-  const browser = await chromium.launch({ executablePath: process.env.PLAYWRIGHT_CHROMIUM }), server = serve(PORT);
+  const browser = await launch(), server = serve(PORT);
   try {
     const before = await readFile(new URL('./fixtures/perfect-card-0.4.0.html', import.meta.url), 'utf8');
     for (const [name, size] of sizes) {
@@ -76,7 +76,7 @@ test('a worn card is drawn from its seed: the same every time, another seed anot
 });
 
 test('wear shows on the back of a turned card too, and an override beats the preset', { skip: !chromium && 'Playwright not installed' }, async () => {
-  const browser = await chromium.launch({ executablePath: process.env.PLAYWRIGHT_CHROMIUM }), server = serve(PORT);
+  const browser = await launch(), server = serve(PORT);
   try {
     const context = await browser.newContext({ viewport: sizes[0][1] }), page = await context.newPage();
     await page.goto(`${base}/perfect.html`);

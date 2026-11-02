@@ -1,9 +1,9 @@
 // Browser test: run with `pnpm test:e2e`. The quiet Animate button and autoplay="focus", at a desk and a phone size.
 import { test } from 'node:test';
 import { strict as assert } from 'node:assert';
-import { chromium, serve, sizes } from './support.mjs';
+import { chromium, launch, portShift, serve, sizes } from './support.mjs';
 
-const PORT = 8116;
+const PORT = 8116 + portShift;
 // A running pan is the card's art with the pan animation on it. The animation comes from the card's shadow styles (::slotted), and Chromium 147 hands it back as a plain Animation with no `animationName`, so the name is read from the computed style.
 const moving = (page) => page.evaluate(() => Object.fromEntries([...document.querySelectorAll('fuda-card')].map((c) => { const img = c.querySelector('img'); return [c.id, getComputedStyle(img).animationName.split(', ').includes('fuda-pan') ? img.getAnimations().filter((a) => a.playState === 'running').length : 0]; })));
 const open = async (browser, size, extra = {}) => {
@@ -15,7 +15,7 @@ const open = async (browser, size, extra = {}) => {
 const centre = (page, id) => page.locator(`#${id}`).boundingBox().then((b) => ({ x: b.x + b.width / 2, y: b.y + b.height / 3 }));
 
 test('the Animate button is an icon with a name, 48 px square, and quiet until used', { skip: !chromium && 'Playwright not installed' }, async () => {
-  const browser = await chromium.launch({ executablePath: process.env.PLAYWRIGHT_CHROMIUM }), server = serve(PORT);
+  const browser = await launch(), server = serve(PORT);
   try {
     for (const [name, size] of sizes) {
       const { context, page } = await open(browser, size);
@@ -38,7 +38,7 @@ test('the Animate button is an icon with a name, 48 px square, and quiet until u
 });
 
 test('autoplay="focus": only the card in focus animates (pointer, keyboard, tap)', { skip: !chromium && 'Playwright not installed' }, async () => {
-  const browser = await chromium.launch({ executablePath: process.env.PLAYWRIGHT_CHROMIUM }), server = serve(PORT);
+  const browser = await launch(), server = serve(PORT);
   try {
     for (const [name, size] of sizes) {
       const { context, page } = await open(browser, size);
@@ -67,7 +67,7 @@ test('autoplay="focus": only the card in focus animates (pointer, keyboard, tap)
 });
 
 test('autoplay="focus" on a touch screen: a tap focuses one card, a tap outside stops it', { skip: !chromium && 'Playwright not installed' }, async () => {
-  const browser = await chromium.launch({ executablePath: process.env.PLAYWRIGHT_CHROMIUM }), server = serve(PORT);
+  const browser = await launch(), server = serve(PORT);
   try {
     for (const [name, size] of sizes) {
       const { context, page } = await open(browser, size, { hasTouch: true });
@@ -90,7 +90,7 @@ test('autoplay="focus" on a touch screen: a tap focuses one card, a tap outside 
 });
 
 test('autoplay="focus" never starts with reduced motion', { skip: !chromium && 'Playwright not installed' }, async () => {
-  const browser = await chromium.launch({ executablePath: process.env.PLAYWRIGHT_CHROMIUM }), server = serve(PORT);
+  const browser = await launch(), server = serve(PORT);
   try {
     const { context, page } = await open(browser, sizes[0][1], { reducedMotion: 'reduce' });
     const a = await centre(page, 'a');

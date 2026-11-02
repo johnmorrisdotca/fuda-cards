@@ -2,32 +2,28 @@
 import { test } from 'node:test';
 import { strict as assert } from 'node:assert';
 import { createServer } from 'node:http';
-import { createRequire } from 'node:module';
 import { readFile } from 'node:fs/promises';
 import { resolve, extname } from 'node:path';
+import { chromium, launch, portShift } from './support.mjs';
 
+const PORT = 8111 + portShift;
 const root = resolve(import.meta.dirname, '../..');
 const choose = async (page, id, value) => { const button = page.locator(`#${id}`).locator('xpath=..').locator(`button[data-value="${value}"]`); if (await button.count()) await button.click(); else await page.selectOption(`#${id}`, value); };
 const types = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.jpg': 'image/jpeg' };
-let chromium;
-try {
-  const require = createRequire(process.env.PLAYWRIGHT_FROM ?? import.meta.url);
-  ({ chromium } = require('playwright'));
-} catch {}
 
 const sizes = [['desktop', { width: 1280, height: 800 }], ['mobile', { width: 390, height: 844 }]];
 
 test('corner spin keeps the corner at the stage centre, full size, with zoom', { skip: !chromium && 'Playwright not installed' }, async () => {
-  const browser = await chromium.launch({ executablePath: process.env.PLAYWRIGHT_CHROMIUM });
+  const browser = await launch();
   const server = createServer(async (req, res) => {
     const url = req.url.split('?')[0], path = url === '/' ? '/index.html' : url;
     try { res.writeHead(200, { 'Content-Type': types[extname(path)] ?? 'text/plain' }).end(await readFile(resolve(root, '.' + path))); }
     catch { res.writeHead(404).end(); }
-  }).listen(8111, '127.0.0.1');
+  }).listen(PORT, '127.0.0.1');
   try {
     for (const [name, size] of sizes) {
       const p = await browser.newPage({ viewport: size });
-      await p.goto('http://127.0.0.1:8111/');
+      await p.goto(`http://127.0.0.1:${PORT}/`);
       await p.waitForFunction(() => customElements.get('fuda-card') && customElements.get('kazoku-view-controls') && document.querySelector('#view').state);
       await choose(p, 'card-spin', 'corner');
       const bar = await p.evaluate(() => document.querySelector('#view').getBoundingClientRect().bottom);
@@ -92,14 +88,14 @@ test('corner spin keeps the corner at the stage centre, full size, with zoom', {
       await p.close();
 
       const a = await browser.newPage({ viewport: size });
-      await a.goto('http://127.0.0.1:8111/?zoom=2');
+      await a.goto(`http://127.0.0.1:${PORT}/?zoom=2`);
       await a.waitForFunction(() => document.querySelector('#view').state);
       await choose(a, 'card-spin', 'corner');
       assert.equal(await a.evaluate(() => document.querySelector('#view').state.zoom), 2, `${name}: an address zoom must win over the default`);
       await a.close();
 
       const q = await browser.newPage({ viewport: size, reducedMotion: 'reduce' });
-      await q.goto('http://127.0.0.1:8111/');
+      await q.goto(`http://127.0.0.1:${PORT}/`);
       await q.waitForFunction(() => document.querySelector('#view').state);
       await choose(q, 'card-spin', 'corner');
       const still = await q.evaluate(() => ({ turning: document.querySelector('#view').state.turning, animations: document.querySelector('#card').shadowRoot.querySelector('.rotation').getAnimations().length }));

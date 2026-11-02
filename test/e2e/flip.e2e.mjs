@@ -5,12 +5,11 @@
 // turn), `<fuda-card stack>`, the single card's own flip and the binder's turning leaf are all covered.
 import { test } from 'node:test';
 import { strict as assert } from 'node:assert';
-import { chromium, serve, offline } from './support.mjs';
+import { chromium, launch, portShift, serve, offline } from './support.mjs';
 import { freeze, seek, pictures, faults } from './seethrough.mjs';
 
-const PORT = 8112, origin = `http://127.0.0.1:${PORT}`, STEPS = 12;
+const PORT = 8112 + portShift, origin = `http://127.0.0.1:${PORT}`, STEPS = 12;
 // Drawn in software, never on the graphics card, one browser at a time.
-const SOFTWARE = ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'];
 // A fault is a pixel of the card's outline that shows something else. A few edge pixels are anti-aliasing; a card cut by the cards it passes
 // loses tens of thousands of them, so this is 0.7 percent of the outline.
 const LIMIT = 0.007;
@@ -71,7 +70,7 @@ async function begin(page, s) {
 
 for (const [name, s] of scenes) {
   test(`${name}: no part of the card shows what is behind it`, { skip: !chromium && 'Playwright not installed' }, async () => {
-    const browser = await chromium.launch({ executablePath: process.env.PLAYWRIGHT_CHROMIUM, args: SOFTWARE }), server = serve(PORT);
+    const browser = await launch(), server = serve(PORT);
     try {
       const context = await browser.newContext({ viewport: { width: 1000, height: 1200 }, deviceScaleFactor: 1 });
       const page = await context.newPage(), scanner = await context.newPage(), problems = [];

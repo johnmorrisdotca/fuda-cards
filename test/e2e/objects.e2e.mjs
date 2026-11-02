@@ -3,10 +3,9 @@
 // turnable by the controls or by the address (`?yaw=-81`); a card is exactly as before; in a mixed collection each item acts as what it is.
 import { test } from 'node:test';
 import { strict as assert } from 'node:assert';
-import { chromium, serve, offline, choose } from './support.mjs';
+import { chromium, launch, portShift, serve, offline, choose } from './support.mjs';
 
-const PORT = 8113, origin = `http://127.0.0.1:${PORT}`;
-const SOFTWARE = ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'];
+const PORT = 8113 + portShift, origin = `http://127.0.0.1:${PORT}`;
 const ready = (p) => p.waitForFunction(() => { const r = document.querySelector('fuda-collection')?.shadowRoot; return customElements.get('kazoku-view-controls') && r?.querySelector('kazoku-view-controls')?.state && r.querySelector('.card img'); });
 const shadow = (p, code, arg) => p.evaluate(({ code, arg }) => new Function('root', 'arg', code)(document.querySelector('fuda-collection').shadowRoot, arg), { code, arg });
 async function open(browser, query, user) {
@@ -25,7 +24,7 @@ const visible = (p, text) => p.locator('fuda-collection').getByText(text, { exac
 const mixed = (kinds) => kinds.map((kind, i) => ({ id: `m${i}`, name: `${kind} ${i}`, kind, image: `https://assets.tcgdex.net/en/base/base1/${i + 1}` }));
 
 test('Riley\'s consoles cannot be turned: not by the address, not by the controls, no back, always landing facing up', { skip: !chromium && 'Playwright not installed' }, async () => {
-  const browser = await chromium.launch({ executablePath: process.env.PLAYWRIGHT_CHROMIUM, args: SOFTWARE }), server = serve(PORT);
+  const browser = await launch(), server = serve(PORT);
   try {
     // John's address: the fan, open, turned to -81 degrees.
     const { context, page: p, problems } = await open(browser, 'land=face-down&view=fan&fan=open&yaw=-81&tilt=-2&animate=off', 'riley');
@@ -61,7 +60,7 @@ test('Riley\'s consoles cannot be turned: not by the address, not by the control
 });
 
 test('a card is as before: the same address turns it, and the controls are there', { skip: !chromium && 'Playwright not installed' }, async () => {
-  const browser = await chromium.launch({ executablePath: process.env.PLAYWRIGHT_CHROMIUM, args: SOFTWARE }), server = serve(PORT);
+  const browser = await launch(), server = serve(PORT);
   try {
     const { context, page: p } = await open(browser, 'land=face-down&view=fan&fan=open&animate=off');
     assert.equal(await turned(p), false, 'the fan starts square');
@@ -75,7 +74,7 @@ test('a card is as before: the same address turns it, and the controls are there
 });
 
 test('a mixed collection: the cards turn, the objects stay square to the reader and land facing up', { skip: !chromium && 'Playwright not installed' }, async () => {
-  const browser = await chromium.launch({ executablePath: process.env.PLAYWRIGHT_CHROMIUM, args: SOFTWARE }), server = serve(PORT);
+  const browser = await launch(), server = serve(PORT);
   try {
     const { context, page: p } = await open(browser, 'view=deck&animate=off&land=face-down');
     await p.evaluate((cards) => { document.querySelector('fuda-collection').cards = cards; }, mixed(['object', 'card', 'card']));

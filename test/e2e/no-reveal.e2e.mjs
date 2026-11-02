@@ -3,9 +3,9 @@
 // and no page may shift (CLS). The art is a solid magenta picture the size of the real one, so any unframed pixel is found in a screenshot.
 import { test } from 'node:test';
 import { strict as assert } from 'node:assert';
-import { chromium, webkit, serve, sizes, offline } from './support.mjs';
+import { chromium, launch, portShift, webkit, launchWebKit, serve, sizes, offline } from './support.mjs';
 
-const port = 8115, origin = `http://127.0.0.1:${port}`;
+const port = 8115 + portShift, origin = `http://127.0.0.1:${port}`;
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 const art = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 465 1165" width="465" height="1165"><rect width="465" height="1165" fill="#ff00ff"/></svg>';
 // [script delay, art delay] in ms: a slow script with a fast picture, and a fast script with a slow picture.
@@ -60,10 +60,10 @@ async function film(browser, name, size, [, ...timing], throttle) {
   return { name, seen, settled, cls, problems, last: await state(page).catch(() => null) };
 }
 
-for (const [label, launcher] of [['Chromium', chromium], ['WebKit', webkit]]) {
-  test(`${label}: the art is never seen outside the card or before the card is ready`, { skip: !launcher && 'Playwright not installed' }, async (t) => {
+for (const [label, available, launcher, why] of [['Chromium', chromium, launch, 'Playwright not installed'], ['WebKit', webkit, launchWebKit, 'WebKit runs only on CI: it has no software drawing']]) {
+  test(`${label}: the art is never seen outside the card or before the card is ready`, { skip: !available && why }, async (t) => {
     let browser;
-    try { browser = await launcher.launch({ executablePath: label === 'Chromium' ? process.env.PLAYWRIGHT_CHROMIUM : undefined }); } catch (error) { t.skip(`${label} is not installed`); return; }
+    try { browser = await launcher(); } catch (error) { t.skip(`${label} did not start: ${error.message}`); return; }
     const server = serve(port);
     try {
       for (const [device, size] of sizes) for (const timing of timings) {
@@ -84,7 +84,7 @@ for (const [label, launcher] of [['Chromium', chromium], ['WebKit', webkit]]) {
 }
 
 test('no demo page shifts while it loads, on a desk and a phone, with a slow script', { skip: !chromium && 'Playwright not installed' }, async () => {
-  const browser = await chromium.launch({ executablePath: process.env.PLAYWRIGHT_CHROMIUM }), server = serve(port);
+  const browser = await launch(), server = serve(port);
   try {
     for (const path of ['/index.html', '/demo/collections-component.html', '/demo/collections.html', '/demo/tcgdex.html', '/demo/rolodex.html']) for (const [device, size] of sizes) {
       const { context, page, problems } = await load(browser, size, [600, 50], true);

@@ -41,12 +41,14 @@ This repo is one of the family of John Morris's npm packages. The rules every pa
 | Repo | `johnmorrisdotca/fuda-cards` |
 | Board | `modules` (tickets are `fuda-cards: F<n> ...`; `docs/task-board.md` keeps only the Done rows) |
 | Title prefix and `--area` | `fuda-cards` |
-| Ports | 8100-8199 (John's port table): 8100 `pnpm dev`, 8101 reserved for tests, the browser tests use 8111-8119, worktrees and scratch servers 8102-8110 and 8120 up |
+| Ports | 8100-8199 (John's port table): 8100 `pnpm dev`, 8101 reserved for tests, the browser tests use 8110-8119 (`FUDA_E2E_PORT_SHIFT=20` moves a second session's to 8130-8139), worktrees and scratch servers 8102-8109 and 8120 up |
 | Checks before a push | `pnpm check` (typecheck, build, tests), `pnpm test:e2e` (Playwright; set `PLAYWRIGHT_FROM` to a package.json that can resolve `playwright`) |
 | Release | `release.yml` calls kazoku-ui `reusable-release.yml`; trusted publisher entry: `release.yml` |
 | Hand-off project | `fuda-cards` |
 
 ## This repo
+
+**Browsers in tests:** headless and in software, only through `launch()` in `test/e2e/support.mjs` (a test run on the Mac's own GPU panicked its driver on 2026-11-02). No WebKit off CI. `pnpm test:e2e` holds one file at a time to a time and a memory limit.
 
 Reusable cards and collection displays for caller-provided content and several frameworks. Keep the separate Mac checkout and cloud environment in mind: a synced conversation does not imply a shared working tree.
 

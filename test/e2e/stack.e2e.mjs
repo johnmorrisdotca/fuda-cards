@@ -1,9 +1,9 @@
 // Browser test: run with `pnpm test:e2e`. Materials and stacks: true height, cheap stills, and no frames at idle.
 import { test } from 'node:test';
 import { strict as assert } from 'node:assert';
-import { chromium, serve, sizes, choose } from './support.mjs';
+import { chromium, launch, portShift, serve, sizes, choose } from './support.mjs';
 
-const PORT = 8117, WIDTH = 300;
+const PORT = 8117 + portShift, WIDTH = 300;
 const url = `http://127.0.0.1:${PORT}/test/e2e/fixtures/stack.html`;
 const open = async (browser, size, init) => {
   const context = await browser.newContext({ viewport: size }), page = await context.newPage();
@@ -18,7 +18,7 @@ const measure = (page, id) => page.evaluate((id) => {
 }, id);
 
 test('a stack is count times the material thickness high, drawn as one block plus a few stills', { skip: !chromium && 'Playwright not installed' }, async () => {
-  const browser = await chromium.launch({ executablePath: process.env.PLAYWRIGHT_CHROMIUM }), server = serve(PORT);
+  const browser = await launch(), server = serve(PORT);
   try {
     for (const [name, size] of sizes) {
       const { context, page } = await open(browser, size);
@@ -59,7 +59,7 @@ test('a stack is count times the material thickness high, drawn as one block plu
 });
 
 test('turned side-on, a stack shows its true depth and a card shows almost none', { skip: !chromium && 'Playwright not installed' }, async () => {
-  const browser = await chromium.launch({ executablePath: process.env.PLAYWRIGHT_CHROMIUM }), server = serve(PORT);
+  const browser = await launch(), server = serve(PORT);
   try {
     const { context, page } = await open(browser, sizes[0][1]);
     await page.evaluate(() => { for (const c of document.querySelectorAll('fuda-card')) c.style.setProperty('--fuda-yaw', '90deg'); });
@@ -72,7 +72,7 @@ test('turned side-on, a stack shows its true depth and a card shows almost none'
 });
 
 test('a 52-card stack at rest requests no frames', { skip: !chromium && 'Playwright not installed' }, async () => {
-  const browser = await chromium.launch({ executablePath: process.env.PLAYWRIGHT_CHROMIUM }), server = serve(PORT);
+  const browser = await launch(), server = serve(PORT);
   try {
     for (const [name, size] of sizes) {
       const { context, page } = await open(browser, size, () => {
@@ -104,7 +104,7 @@ test('a 52-card stack at rest requests no frames', { skip: !chromium && 'Playwri
 });
 
 test('the Studio offers every material and preset, sets the stack and tells its height', { skip: !chromium && 'Playwright not installed' }, async () => {
-  const browser = await chromium.launch({ executablePath: process.env.PLAYWRIGHT_CHROMIUM }), server = serve(PORT);
+  const browser = await launch(), server = serve(PORT);
   try {
     for (const [name, size] of sizes) {
       const context = await browser.newContext({ viewport: size }), page = await context.newPage();

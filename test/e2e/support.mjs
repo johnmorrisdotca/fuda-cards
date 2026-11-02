@@ -12,6 +12,54 @@ try {
   ({ chromium, webkit } = require('playwright'));
 } catch {}
 
+// A test run on a Mac's own GPU once panicked its graphics driver (2026-11-02). Every browser of these tests is headless and draws in software, and a test
+// starts one only through launch() below. test/e2e-safety.test.mjs fails when a file does otherwise. WebKit has no software switch, so it runs only on CI.
+export const SOFTWARE_GL_ARGS = ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'];
+/** No browser outlives this; a test that needs longer is too long. */
+export const BROWSER_LIFE_MS = Number(process.env.FUDA_BROWSER_LIFE_MS) || 5 * 60_000;
+if (!process.env.CI) webkit = undefined;
+delete process.env.PWDEBUG; // It would open a window.
+
+const hardStop = (browser, label) => {
+  const stop = setTimeout(() => { console.error(`${label}: stopped after ${BROWSER_LIFE_MS} ms`); browser.close().catch(() => {}); }, BROWSER_LIFE_MS);
+  stop.unref();
+  browser.on('disconnected', () => clearTimeout(stop));
+};
+
+/** What WebGL draws on in this browser, as the browser says it. */
+export async function glRenderer(browser) {
+  const page = await browser.newPage();
+  try {
+    return await page.evaluate(() => {
+      const gl = document.createElement('canvas').getContext('webgl');
+      if (!gl) return 'no WebGL';
+      const info = gl.getExtension('WEBGL_debug_renderer_info'), name = info ? gl.getParameter(info.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER);
+      gl.getExtension('WEBGL_lose_context')?.loseContext();
+      return String(name);
+    });
+  } finally { await page.close(); }
+}
+
+/** The one way these tests start Chromium: headless, drawing in software, checked to be so before anything is driven, with a hard limit on its life. */
+export async function launch() {
+  const browser = await chromium.launch({ headless: true, executablePath: process.env.PLAYWRIGHT_CHROMIUM, args: SOFTWARE_GL_ARGS });
+  hardStop(browser, 'Chromium');
+  const renderer = await glRenderer(browser);
+  if (!/swiftshader/i.test(renderer)) { await browser.close(); throw new Error(`Refusing to drive a browser that does not draw in software: ${renderer}`); }
+  return browser;
+}
+
+/** WebKit, on CI only: on a Mac it draws on the machine's GPU and has no switch to stop it. */
+export async function launchWebKit() {
+  if (!process.env.CI || !webkit) throw new Error('WebKit runs only on CI');
+  const browser = await webkit.launch({ headless: true });
+  hardStop(browser, 'WebKit');
+  return browser;
+}
+
+// The tests' ports are 8110-8119 of the repo's block; a second session running them moves its own set with this (20 gives 8130-8139).
+export const portShift = Number(process.env.FUDA_E2E_PORT_SHIFT) || 0;
+
 export const sizes = [['desktop', { width: 1280, height: 800 }], ['mobile', { width: 390, height: 844 }]];
 
 export function serve(port) {

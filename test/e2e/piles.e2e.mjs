@@ -4,10 +4,9 @@
 import { test } from 'node:test';
 import { strict as assert } from 'node:assert';
 import { readFile } from 'node:fs/promises';
-import { chromium, serve, sizes, offline } from './support.mjs';
+import { chromium, launch, portShift, serve, sizes, offline } from './support.mjs';
 
-const PORT = 8114, origin = `http://127.0.0.1:${PORT}`;
-const launch = () => chromium.launch({ executablePath: process.env.PLAYWRIGHT_CHROMIUM });
+const PORT = 8114 + portShift, origin = `http://127.0.0.1:${PORT}`;
 const ready = (p) => p.waitForFunction(() => { const r = document.querySelector('fuda-collection')?.shadowRoot; return customElements.get('kazoku-view-controls') && r?.querySelector('kazoku-view-controls')?.state && r.querySelector('.card img'); });
 const shadow = (p, code, arg) => p.evaluate(({ code, arg }) => new Function('root', 'arg', code)(document.querySelector('fuda-collection').shadowRoot, arg), { code, arg });
 const open = async (browser, size, query = '', extra = {}) => {

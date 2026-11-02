@@ -2,31 +2,27 @@
 import { test } from 'node:test';
 import { strict as assert } from 'node:assert';
 import { createServer } from 'node:http';
-import { createRequire } from 'node:module';
 import { readFile } from 'node:fs/promises';
 import { resolve, extname } from 'node:path';
+import { chromium, launch, portShift } from './support.mjs';
 
+const PORT = 8112 + portShift;
 const root = resolve(import.meta.dirname, '../..');
 const types = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.jpg': 'image/jpeg' };
-let chromium;
-try {
-  const require = createRequire(process.env.PLAYWRIGHT_FROM ?? import.meta.url);
-  ({ chromium } = require('playwright'));
-} catch {}
 
 const sizes = [['desktop', { width: 1280, height: 800 }], ['mobile', { width: 390, height: 844 }]];
 
 test('a turned card shows its back, not the mirrored front, and has a true-scale edge', { skip: !chromium && 'Playwright not installed' }, async () => {
-  const browser = await chromium.launch({ executablePath: process.env.PLAYWRIGHT_CHROMIUM });
+  const browser = await launch();
   const server = createServer(async (req, res) => {
     const url = req.url.split('?')[0], path = url === '/' ? '/index.html' : url;
     try { res.writeHead(200, { 'Content-Type': types[extname(path)] ?? 'text/plain' }).end(await readFile(resolve(root, '.' + path))); }
     catch { res.writeHead(404).end(); }
-  }).listen(8112, '127.0.0.1');
+  }).listen(PORT, '127.0.0.1');
   try {
     for (const [name, size] of sizes) {
       const p = await browser.newPage({ viewport: size, deviceScaleFactor: 2 });
-      await p.goto('http://127.0.0.1:8112/');
+      await p.goto(`http://127.0.0.1:${PORT}/`);
       await p.waitForFunction(() => customElements.get('fuda-card') && customElements.get('kazoku-view-controls') && document.querySelector('#view').state);
       const turn = (yaw) => p.evaluate(async (y) => { document.querySelector('#view').set({ yaw: y, tilt: 0 }); await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))); }, yaw);
       const box = async () => {

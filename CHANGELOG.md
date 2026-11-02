@@ -4,6 +4,9 @@
 
 - Fixed (MODULES-176): **the last card put back from the deck's pile flies too.** With one card on the pile, Previous drew the empty pile as a dashed slot and `playFlip` returned at once for want of a `.discard-pile`, so the card jumped back with no flight. The flight needs only the moving card and the distance between the piles, so it no longer asks for a pile at the other end; the card flies from where the pile was (the slot) to the deck, turning back if it landed turned over.
 - New test (`test/e2e/flip.e2e.mjs`, "the last card put back from the pile"): the same twelve-moment pixel check, started from one card on the pile. On 0.9.1 it fails (no card in the air: `moving: 0`); on 0.9.2 it passes.
+## Unreleased
+
+- Tests: **every browser of the tests is headless and draws in software** (`test/e2e/support.mjs`, after a kernel panic in a Mac's GPU driver raised from Chrome's GPU process on 2026-11-02). `launch()` is the one way a test starts Chromium (`--use-gl=angle --use-angle=swiftshader --enable-unsafe-swiftshader`), it reads the WebGL renderer and refuses to go on unless that says SwiftShader, and no browser lives over 5 minutes. WebKit has no software switch, so its one test (no-reveal) runs only with `CI` set and is skipped on a Mac. `pnpm test:e2e` is now `scripts/e2e.mjs`: one file at a time, one worker, 20 minutes a file, stopped by process id at 3 GB; it refuses to start when one of its ports is taken (`FUDA_E2E_PORT_SHIFT=20` moves a second session's). `test/e2e-safety.test.mjs` fails when a file starts a browser any other way.
 
 ## 0.9.1 - 2026-11-02
 

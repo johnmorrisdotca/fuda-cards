@@ -1,9 +1,9 @@
 // Browser test: run with `pnpm test:e2e`. The deck: it turns in 3D, a card flipped off it lands on the pile at its other side (face up, upside down or face down), and the fan opens and closes back to the deck.
 import { test } from 'node:test';
 import { strict as assert } from 'node:assert';
-import { chromium, serve, sizes, offline, choose } from './support.mjs';
+import { chromium, launch, portShift, serve, sizes, offline, choose } from './support.mjs';
 
-const PORT = 8119, origin = `http://127.0.0.1:${PORT}`;
+const PORT = 8119 + portShift, origin = `http://127.0.0.1:${PORT}`;
 const ready = (p) => p.waitForFunction(() => { const r = document.querySelector('fuda-collection')?.shadowRoot; return customElements.get('kazoku-view-controls') && r?.querySelector('kazoku-view-controls')?.state && r.querySelector('.card img'); });
 const shadow = (p, code, arg) => p.evaluate(({ code, arg }) => new Function('root', 'arg', code)(document.querySelector('fuda-collection').shadowRoot, arg), { code, arg });
 const open = async (browser, size, query = '', extra = {}) => {
@@ -19,7 +19,7 @@ const piles = (p) => shadow(p, `const d = root.querySelector('.deck-pile'), s = 
 const matrix = (p, selector) => shadow(p, `const t = getComputedStyle(root.querySelector(arg)).transform; return t === 'none' ? null : t.match(/matrix(3d)?\\((.*)\\)/)[2].split(',').map(Number);`, selector);
 
 test('Next flips the top card off the deck onto a pile at its other side, and Previous brings it back', { skip: !chromium && 'Playwright not installed' }, async () => {
-  const browser = await chromium.launch({ executablePath: process.env.PLAYWRIGHT_CHROMIUM }), server = serve(PORT);
+  const browser = await launch(), server = serve(PORT);
   try {
     for (const [name, size] of sizes) {
       const { context, p, problems } = await open(browser, size);
@@ -66,7 +66,7 @@ const faceTurn = (p, pile = '.discard-pile') => shadow(p, `
   return { face: hit.classList.contains('back') ? 'back' : 'front', angle: Math.round(Math.atan2(m.b, m.a) * 1800 / Math.PI) / 10, flipped: m.a * m.d - m.b * m.c < 0 };`);
 
 test('a card lands still facing up or turned over sideways, as chosen, never on its head, and the choice is in the address', { skip: !chromium && 'Playwright not installed' }, async () => {
-  const browser = await chromium.launch({ executablePath: process.env.PLAYWRIGHT_CHROMIUM }), server = serve(PORT);
+  const browser = await launch(), server = serve(PORT);
   try {
     const { context, p } = await open(browser, sizes[0][1]);
     assert.deepEqual(await p.locator('fuda-collection').locator('.opts .choice:not([hidden]) [data-value]').evaluateAll((l) => l.map((b) => b.dataset.value)), ['face-up', 'face-down', 'closed', 'open', 'on', 'off', 'slow', 'normal', 'quick'], 'two landings (then the fan, animate and speed choices): no Upside down');
@@ -111,7 +111,7 @@ test('a card lands still facing up or turned over sideways, as chosen, never on 
 });
 
 test('with reduced motion the card moves without flying, and every landing still shows', { skip: !chromium && 'Playwright not installed' }, async () => {
-  const browser = await chromium.launch({ executablePath: process.env.PLAYWRIGHT_CHROMIUM }), server = serve(PORT);
+  const browser = await launch(), server = serve(PORT);
   try {
     const { context, p } = await open(browser, sizes[0][1], '?land=face-down', { reducedMotion: 'reduce' });
     await p.getByRole('button', { name: 'Next →' }).click();
@@ -123,7 +123,7 @@ test('with reduced motion the card moves without flying, and every landing still
 });
 
 test('the deck turns in 3D with the angle and tilt, and the other displays stay flat', { skip: !chromium && 'Playwright not installed' }, async () => {
-  const browser = await chromium.launch({ executablePath: process.env.PLAYWRIGHT_CHROMIUM }), server = serve(PORT);
+  const browser = await launch(), server = serve(PORT);
   try {
     const { context, p } = await open(browser, sizes[0][1]);
     const controls = () => shadow(p, `const c = root.querySelector('kazoku-view-controls'); return { flat: c.hasAttribute('flat'), yaw: c.state.yaw, tilt: c.state.tilt, transform: root.querySelector('.v').style.transform, angle: !!root.querySelector('kazoku-view-controls').shadowRoot.querySelector('input[type=range]:not([hidden])') };`);
@@ -150,7 +150,7 @@ test('the deck turns in 3D with the angle and tilt, and the other displays stay 
 });
 
 test('the fan opens to show most of each card and closes back to the deck it started as', { skip: !chromium && 'Playwright not installed' }, async () => {
-  const browser = await chromium.launch({ executablePath: process.env.PLAYWRIGHT_CHROMIUM }), server = serve(PORT);
+  const browser = await launch(), server = serve(PORT);
   try {
     for (const [name, size] of sizes) {
       const { context, p } = await open(browser, size, '?view=fan');
@@ -183,7 +183,7 @@ test('the fan opens to show most of each card and closes back to the deck it sta
 });
 
 test('the displays are buttons, not a drop-down: all ten on screen, at least 48 px high, one chosen, kept in the address', { skip: !chromium && 'Playwright not installed' }, async () => {
-  const browser = await chromium.launch({ executablePath: process.env.PLAYWRIGHT_CHROMIUM }), server = serve(PORT);
+  const browser = await launch(), server = serve(PORT);
   try {
     for (const [name, size] of sizes) {
       for (const scheme of ['dark', 'light']) {
@@ -212,7 +212,7 @@ test('the displays are buttons, not a drop-down: all ten on screen, at least 48 
 });
 
 test('no control in the demo pages is left in the browser style: every visible button, field and select is at least 44 px high with a rounded border', { skip: !chromium && 'Playwright not installed' }, async () => {
-  const browser = await chromium.launch({ executablePath: process.env.PLAYWRIGHT_CHROMIUM }), server = serve(PORT);
+  const browser = await launch(), server = serve(PORT);
   try {
     for (const path of ['/index.html', '/demo/collections-component.html', '/demo/vintage.html']) {
       for (const [name, size] of sizes) {
