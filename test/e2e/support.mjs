@@ -6,10 +6,10 @@ import { resolve, extname } from 'node:path';
 
 export const root = resolve(import.meta.dirname, '../..');
 const types = { '.html': 'text/html', '.js': 'text/javascript', '.jpg': 'image/jpeg', '.svg': 'image/svg+xml' };
-export let chromium;
+export let chromium, webkit;
 try {
   const require = createRequire(process.env.PLAYWRIGHT_FROM ?? import.meta.url);
-  ({ chromium } = require('playwright'));
+  ({ chromium, webkit } = require('playwright'));
 } catch {}
 
 export const sizes = [['desktop', { width: 1280, height: 800 }], ['mobile', { width: 390, height: 844 }]];

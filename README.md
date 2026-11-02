@@ -15,6 +15,7 @@ Requires Node 22+ and pnpm. Run `pnpm install`, `pnpm check`, then `pnpm dev` an
 ## Embed
 
 ```html
+<!-- in the head, first: the one line from "No flash before the card is ready" below -->
 <script type="module" src="/path/to/fuda-cards/dist/element.js"></script>
 <fuda-card title="Explorer One" category="ROCKET" variant="cosmic" finish="foil" description="A new explorer.">
   <img src="rocket.jpg" alt="Explorer One rocket">
@@ -28,6 +29,16 @@ The default slot accepts HTML, including an existing interactive 3D viewer; its 
 3D integrations, framework-specific examples, polished front and back designs, accessibility validation, and photorealistic finishes remain future work.
 
 Collection presentation prototypes are available as a reusable `<fuda-collection>` component. See the [collection demo](demo/collections-component.html) and [collection display notes](docs/collection-displays.md).
+
+### No flash before the card is ready
+
+A card never shows the art it is about to frame. Until the script has defined `<fuda-card>`, a browser draws your `<img>` at its natural size, so the whole picture flashes before it moves into the frame. Put this one line in the `<head>`, before the script and your own styles, and the card stays invisible while its box is already reserved at the card's size (nothing moves when it appears):
+
+```html
+<style>fuda-card:where(:not(:defined)){display:inline-block;width:300px;aspect-ratio:2.5/3.5;overflow:hidden;visibility:hidden}fuda-collection:where(:not(:defined)){display:block;min-height:calc(var(--fuda-stage-height,clamp(300px,calc(100svh - 440px),620px)) + 200px)}</style>
+```
+
+It keeps `<fuda-card>` (300 px wide, 2.5:3.5, or whatever width your own rule gives it) and `<fuda-collection>` (the height of its view, `--fuda-stage-height`) in place. Once defined, the card also keeps the art invisible until the card has a size on screen and every slotted image has loaded, then fades it in (no fade with `prefers-reduced-motion`). Without the line the card still reveals the art only inside its frame after it is defined, but the browser may show the raw picture until your script runs. If scripts never run, the card stays blank; add `<noscript><style>fuda-card:not(:defined){visibility:visible}</style></noscript>` if you want the plain picture then.
 
 ### Back face and thickness
 
