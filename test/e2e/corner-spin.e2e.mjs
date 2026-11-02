@@ -7,6 +7,7 @@ import { readFile } from 'node:fs/promises';
 import { resolve, extname } from 'node:path';
 
 const root = resolve(import.meta.dirname, '../..');
+const choose = async (page, id, value) => { const button = page.locator(`#${id}`).locator('xpath=..').locator(`button[data-value="${value}"]`); if (await button.count()) await button.click(); else await page.selectOption(`#${id}`, value); };
 const types = { '.html': 'text/html', '.js': 'text/javascript', '.jpg': 'image/jpeg' };
 let chromium;
 try {
@@ -28,7 +29,7 @@ test('corner spin keeps the corner at the stage centre, full size, with zoom', {
       const p = await browser.newPage({ viewport: size });
       await p.goto('http://127.0.0.1:8111/');
       await p.waitForFunction(() => customElements.get('fuda-card') && customElements.get('kazoku-view-controls') && document.querySelector('#view').state);
-      await p.selectOption('#card-spin', 'corner');
+      await choose(p, 'card-spin', 'corner');
       const bar = await p.evaluate(() => document.querySelector('#view').getBoundingClientRect().bottom);
       assert.ok(bar <= size.height, `${name}: the view controls are below the first screen (${bar}px)`);
 
@@ -93,14 +94,14 @@ test('corner spin keeps the corner at the stage centre, full size, with zoom', {
       const a = await browser.newPage({ viewport: size });
       await a.goto('http://127.0.0.1:8111/?zoom=2');
       await a.waitForFunction(() => document.querySelector('#view').state);
-      await a.selectOption('#card-spin', 'corner');
+      await choose(a, 'card-spin', 'corner');
       assert.equal(await a.evaluate(() => document.querySelector('#view').state.zoom), 2, `${name}: an address zoom must win over the default`);
       await a.close();
 
       const q = await browser.newPage({ viewport: size, reducedMotion: 'reduce' });
       await q.goto('http://127.0.0.1:8111/');
       await q.waitForFunction(() => document.querySelector('#view').state);
-      await q.selectOption('#card-spin', 'corner');
+      await choose(q, 'card-spin', 'corner');
       const still = await q.evaluate(() => ({ turning: document.querySelector('#view').state.turning, animations: document.querySelector('#card').shadowRoot.querySelector('.rotation').getAnimations().length }));
       assert.deepEqual(still, { turning: false, animations: 0 }, `${name}: reduced motion must leave the card still`);
       await q.close();

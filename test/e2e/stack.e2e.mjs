@@ -1,7 +1,7 @@
 // Browser test: run with `pnpm test:e2e`. Materials and stacks: true height, cheap stills, and no frames at idle.
 import { test } from 'node:test';
 import { strict as assert } from 'node:assert';
-import { chromium, serve, sizes } from './support.mjs';
+import { chromium, serve, sizes, choose } from './support.mjs';
 
 const PORT = 8117, WIDTH = 300;
 const url = `http://127.0.0.1:${PORT}/test/e2e/fixtures/stack.html`;
@@ -122,7 +122,7 @@ test('the Studio offers every material and preset, sets the stack and tells its 
       await page.fill('#stack', '7');
       assert.equal(await page.evaluate(() => document.querySelector('#card').getAttribute('stack')), '7');
       assert.equal(await page.inputValue('#stack-preset'), 'custom');
-      await page.selectOption('#thickness', '0');
+      await choose(page, 'thickness', '0');
       assert.match(await page.textContent('#stack-info'), /7 cards x 0 mm = 0 mm high/);
       assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), `${name}: the page must not scroll sideways`);
       await context.close();

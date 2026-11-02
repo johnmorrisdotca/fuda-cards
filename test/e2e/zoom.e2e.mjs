@@ -2,10 +2,10 @@
 // Every display view gets Zoom in and out, Fit, Ctrl+wheel, pinch and a drag to move, on a desk and on a phone.
 import { test } from 'node:test';
 import { strict as assert } from 'node:assert';
-import { chromium, serve, sizes, offline } from './support.mjs';
+import { chromium, serve, sizes, offline, choose } from './support.mjs';
 
 const origin = 'http://127.0.0.1:8113';
-const views = ['deck', 'rolodex', 'binder', 'case', 'jukebox', 'random', 'story', 'wall', 'tower', 'spotlight', 'atlas'];
+const views = (process.env.FUDA_VIEWS ?? 'deck,rolodex,binder,case,jukebox,random,story,wall,tower,spotlight,atlas,fan').split(',');
 
 // Page code that finds the stage and the controls, inside the collection's shadow root when there is one.
 const find = `const root = document.querySelector('fuda-collection')?.shadowRoot ?? document; const q = (s) => root.querySelector(s); const all = (s) => [...root.querySelectorAll(s)];`;
@@ -144,7 +144,7 @@ test('every collection view zooms, fits, moves and keeps its clicks', { skip: !c
     for (const [device, size] of sizes) {
       const { p, problems } = await open(browser, size, '/demo/collections.html');
       for (const view of views) {
-        await p.selectOption('fuda-collection select', view);
+        await p.locator('fuda-collection').locator(`.displays [data-value="${view}"]`).click();
         await exercise(p, `${device} ${view}`, component);
       }
       assert.deepEqual(problems, [], `${device}: the page raised errors`);
@@ -207,7 +207,7 @@ test('the zoom is kept in the address, and a card opens from the keyboard', { sk
     await p.getByRole('button', { name: 'Zoom in', exact: true }).click();
     await p.waitForTimeout(500);
     assert.match(new URL(p.url()).search, /zoom=1\.4/);
-    await p.locator('.card').first().focus();
+    await p.locator('fuda-collection button.card, fuda-collection .card[role=button]').first().focus();
     await p.keyboard.press('Enter');
     assert.equal(await p.evaluate(() => document.querySelector('fuda-collection').shadowRoot.querySelector('dialog').open), true, 'Enter on a card must open it');
     await p.close();
@@ -221,13 +221,13 @@ test('the full collection demo keeps the view and its controls in the first scre
     for (const [device, size] of sizes) {
       const { p, problems } = await open(browser, size, '/demo/collections-component.html');
       for (const view of ['deck', 'binder', 'atlas']) {
-        await p.selectOption('fuda-collection select', view);
+        await p.locator('fuda-collection').locator(`.displays [data-value="${view}"]`).click();
         await p.waitForTimeout(300);
         const place = await p.evaluate(() => { const r = document.querySelector('fuda-collection').shadowRoot.querySelector('kazoku-view-controls').getBoundingClientRect(); return { bottom: r.bottom, scrollWidth: document.documentElement.scrollWidth, innerWidth, innerHeight }; });
         assert.ok(place.bottom <= place.innerHeight, `${device} ${view}: the view controls are below the first screen (${place.bottom})`);
         assert.ok(place.scrollWidth <= place.innerWidth, `${device} ${view}: the page is wider than the window`);
       }
-      await p.selectOption('#demo-user', 'sam');
+      await choose(p, 'demo-user', 'sam');
       assert.match(await p.locator('#demo-collection').textContent(), /Sam/);
       assert.deepEqual(problems, [], `${device}: the page raised errors`);
       await p.close();

@@ -39,3 +39,9 @@ export async function offline(page) {
     body: JSON.stringify({ cards: Array.from({ length: 12 }, (_, i) => ({ id: `base1-${i + 1}`, localId: String(i + 1), name: `Card ${i + 1}`, image: `https://assets.tcgdex.net/en/base/base1/${i + 1}` })) })
   }));
 }
+
+/** Choose a value of a control the demos draw as a row of buttons (the select stays in the page, hidden), or of a plain select. */
+export async function choose(page, id, value) {
+  const button = page.locator(`#${id}`).locator('xpath=..').locator(`button[data-value="${value}"]`);
+  if (await button.count()) await button.click(); else await page.selectOption(`#${id}`, value);
+}

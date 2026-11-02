@@ -1,11 +1,12 @@
 import '@johnmorrisdotca/kazoku-ui/view-controls/define';
 
-interface ViewState { zoom: number; panX: number; panY: number }
+interface ViewState { zoom: number; panX: number; panY: number; yaw?: number; tilt?: number }
 export interface ZoomControls extends HTMLElement {
   readonly state: ViewState;
   readonly controller: { readonly startZoom: number };
   view: HTMLElement | undefined;
   set(next: Partial<ViewState>): void;
+  readonly turning?: boolean;
   setFitScale(scale: number): void;
 }
 export interface ZoomOptions {
@@ -15,6 +16,8 @@ export interface ZoomOptions {
   address?: boolean;
   /** Put the controls after this element instead of after the stage. */
   after?: Element;
+  /** The colour theme of the controls (`light` or `dark`); left out they follow the page. */
+  theme?: string;
 }
 export interface ZoomView {
   controls: ZoomControls;
@@ -25,11 +28,13 @@ export interface ZoomView {
   /** Go back to the opening view. */
   reset(): void;
   zoomed(): boolean;
+  /** Let the reader turn the view in 3D (angle, tilt, Auto-turn) or only zoom and move it. Off by default. */
+  setTurnable(on: boolean): void;
 }
 
 const MARGIN = 12;
 const ZOOMED = 1.05;
-const TAPPABLE = 'button:not(:disabled), a[href]';
+const TAPPABLE = 'button:not(:disabled), a[href], [role=button]';
 
 /**
  * Zoom, Fit and pan for a flat view. `stage` clips, `view` is its absolutely positioned child that holds the items and is
@@ -41,7 +46,7 @@ export function zoomView(stage: HTMLElement, view: HTMLElement, options: ZoomOpt
   controls.setAttribute('flat', '');
   controls.setAttribute('ignore', '');
   controls.setAttribute('zoom-min', '0.4');
-  controls.setAttribute('theme', 'dark');
+  if (options.theme) controls.setAttribute('theme', options.theme);
   if (options.address) controls.setAttribute('address', '');
   (options.after ?? stage).after(controls);
   controls.view = stage;
@@ -51,7 +56,8 @@ export function zoomView(stage: HTMLElement, view: HTMLElement, options: ZoomOpt
 
   let box = { w: 0, h: 0, cx: 0, cy: 0, bw: 0, bh: 0 };
   let fit = 1;
-  const self: ZoomView = { controls, minOpen: 0, refresh, reset: () => refresh(true), zoomed: () => controls.state.zoom > ZOOMED };
+  let turnable = false;
+  const self: ZoomView = { controls, minOpen: 0, refresh, reset: () => refresh(true), zoomed: () => controls.state.zoom > ZOOMED, setTurnable };
 
   function measure() {
     const previous = view.style.transform;
@@ -74,7 +80,16 @@ export function zoomView(stage: HTMLElement, view: HTMLElement, options: ZoomOpt
   function draw(state: ViewState) {
     const scale = fit * state.zoom;
     view.style.transformOrigin = `${box.cx}px ${box.cy}px`;
-    view.style.transform = `translate(${box.w / 2 - box.cx + state.panX}px,${box.h / 2 - box.cy + state.panY}px) scale(${scale})`;
+    const turn = turnable ? ` rotateX(${state.tilt ?? 0}deg) rotateY(${state.yaw ?? 0}deg)` : '';
+    view.style.transform = `translate(${box.w / 2 - box.cx + state.panX}px,${box.h / 2 - box.cy + state.panY}px) scale(${scale})${turn}`;
+  }
+
+  function setTurnable(on: boolean) {
+    if (on === turnable) return;
+    turnable = on;
+    if (!on) controls.set({ yaw: 0, tilt: 0 });
+    controls.toggleAttribute('flat', !on);
+    draw(controls.state);
   }
 
   function refresh(open = false) {
