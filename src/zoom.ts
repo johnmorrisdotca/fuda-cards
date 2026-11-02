@@ -30,6 +30,14 @@ export interface ZoomView {
   zoomed(): boolean;
   /** Let the reader turn the view in 3D (angle, tilt, Auto-turn) or only zoom and move it. Off by default. */
   setTurnable(on: boolean): void;
+  /** The selector of the items that must be visible at Fit. It can change with the display. */
+  items: string;
+  /** Run a change that moves the view (a refit, a pan) so that the view glides to its new place over `ms` instead of jumping; 0 jumps. */
+  animated(change: () => void, ms: number): void;
+  /** Move the view so the item is in the middle of the stage, gliding over `ms` (0 jumps). Does nothing when the item is not in the view. */
+  reveal(item: Element, ms: number): void;
+  /** True while the view is turned in 3D. */
+  turned(): boolean;
 }
 
 const MARGIN = 12;
@@ -41,7 +49,6 @@ const TAPPABLE = 'button:not(:disabled), a[href], [role=button]';
  * moved and scaled. Fit shows every item at once; the reader's zoom and pan are never reset by a change of content.
  */
 export function zoomView(stage: HTMLElement, view: HTMLElement, options: ZoomOptions = {}): ZoomView {
-  const items = options.items ?? '.card';
   const controls = document.createElement('kazoku-view-controls') as ZoomControls;
   controls.setAttribute('flat', '');
   controls.setAttribute('ignore', '');
@@ -57,15 +64,20 @@ export function zoomView(stage: HTMLElement, view: HTMLElement, options: ZoomOpt
   let box = { w: 0, h: 0, cx: 0, cy: 0, bw: 0, bh: 0 };
   let fit = 1;
   let turnable = false;
-  const self: ZoomView = { controls, minOpen: 0, refresh, reset: () => refresh(true), zoomed: () => controls.state.zoom > ZOOMED, setTurnable };
+  const self: ZoomView = { controls, minOpen: 0, items: options.items ?? '.card', refresh, reset: () => refresh(true), zoomed: () => controls.state.zoom > ZOOMED, setTurnable, animated, reveal, turned: () => turnable && Boolean(controls.state.yaw || controls.state.tilt) };
+
+  let glide: Animation | undefined;
+  /** A glide that is still running would be measured as if it were the layout, so a new measure ends it first. */
+  function settleGlide() { if (glide) { glide.cancel(); glide = undefined; } }
 
   function measure() {
+    settleGlide();
     const previous = view.style.transform;
     view.style.transform = 'none';
     const origin = stage.getBoundingClientRect();
     const left = origin.left + stage.clientLeft, top = origin.top + stage.clientTop;
     let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
-    for (const item of Array.from(view.querySelectorAll(items))) {
+    for (const item of Array.from(view.querySelectorAll(self.items))) {
       const r = item.getBoundingClientRect();
       if (!r.width || !r.height) continue;
       x0 = Math.min(x0, r.left - left); y0 = Math.min(y0, r.top - top);
@@ -90,6 +102,29 @@ export function zoomView(stage: HTMLElement, view: HTMLElement, options: ZoomOpt
     if (!on) controls.set({ yaw: 0, tilt: 0 });
     controls.toggleAttribute('flat', !on);
     draw(controls.state);
+  }
+
+  const EASE = 'cubic-bezier(.2,.8,.2,1)';
+  function animated(change: () => void, ms: number) {
+    const from = ms > 0 ? getComputedStyle(view).transform : '';
+    change();
+    const to = view.style.transform;
+    if (ms > 0 && from && from !== 'none' && to && from !== to) { settleGlide(); glide = view.animate([{ transform: from }, { transform: to }], { duration: ms, easing: EASE }); }
+  }
+
+  function reveal(item: Element, ms: number) {
+    animated(() => {
+      measure();
+      const previous = view.style.transform;
+      view.style.transform = 'none';
+      const origin = stage.getBoundingClientRect(), r = item.getBoundingClientRect();
+      view.style.transform = previous;
+      if (!r.width) return;
+      const s = fit * controls.state.zoom;
+      const px = r.left + r.width / 2 - origin.left - stage.clientLeft, py = r.top + r.height / 2 - origin.top - stage.clientTop;
+      controls.set({ panX: -s * (px - box.cx), panY: -s * (py - box.cy) });
+      draw(controls.state);
+    }, ms);
   }
 
   function refresh(open = false) {

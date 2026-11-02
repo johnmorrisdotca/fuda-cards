@@ -22,9 +22,10 @@ nav a{display:inline-flex;align-items:center;min-height:48px;margin-right:1rem}
 .zoomer{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;transform-origin:50% 50%}
 .zoomer fuda-card{flex:none;--fuda-perspective:2400px}
 .controls{display:grid;gap:16px;align-content:start;min-width:0}
+.piles:not(.ready){visibility:hidden}.piles{min-height:241px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,13.5rem),1fr));gap:12px}.piles .row,.piles .note{grid-column:1/-1}.piles .choice{--choice-min:4.6rem}.row{display:flex;flex-wrap:wrap;gap:.6rem}
 .note{font-size:12px;margin:0}
 kazoku-view-controls:not(:defined){display:block;min-height:56px}
-@media(max-width:760px){kazoku-view-controls:not(:defined){min-height:200px}.layout{grid-template-columns:1fr}.stage{height:clamp(380px,calc(100svh - 520px),480px)}h1{font-size:38px}main{padding:20px 16px}}
+@media(max-width:760px){.piles{min-height:404px}kazoku-view-controls:not(:defined){min-height:200px}.layout{grid-template-columns:1fr}.stage{height:clamp(380px,calc(100svh - 520px),480px)}h1{font-size:38px}main{padding:20px 16px}}
 </style>
 </head>
 <body>
@@ -37,6 +38,15 @@ kazoku-view-controls:not(:defined){display:block;min-height:56px}
   <div class="viewer">
     <section class="stage" id="stage" tabindex="0" role="group" aria-label="Card preview"><div class="zoomer" id="zoomer"><fuda-card id="card" motion="pan" card-spin="center" card-view title="Starship Block 3" category="ROCKET" subtitle="Starship + Super Heavy" description="Height: 124.4 m · Diameter: 9 m · 33 Raptor 3 booster engines." number="NO. 001" rarity="✦ RARE"><img id="art" alt="Starship Block 3 from Uchusen Rockets" src="assets/starship-v3-preview.jpg"></fuda-card></div></section>
     <kazoku-view-controls id="view" for="stage" address zoom="1" zoom-min="0.5"></kazoku-view-controls>
+    <div class="piles" role="group" aria-label="Pile of cards">
+      <div class="row"><button class="btn" id="take-off" type="button">Take a card off</button><button class="btn" id="put-back" type="button">Put it back</button></div>
+      <label class="demo-field">Fan<select id="fan" data-choice><option value="">Closed</option><option value="open">Open</option></select></label>
+      <label class="demo-field">A card taken off lands<select id="deck-land" data-choice><option value="face-up">Still facing up</option><option value="face-down">Turned over</option></select></label>
+      <label class="demo-field">Animate<select id="animate" data-choice><option value="on">On</option><option value="off">Off</option></select></label>
+      <label class="demo-field">Speed<select id="speed" data-choice><option value="slow">Slow</option><option value="normal" selected>Normal</option><option value="quick">Quick</option></select></label>
+      <input id="taken-off" type="hidden" value="0">
+      <p class="note" id="pile-note" aria-live="polite"></p>
+    </div>
   </div>
   <section class="controls" aria-label="Card controls">
     <label class="demo-field">Card style<select id="variant" data-choice><option value="classic">Classic collectible</option><option value="sport">Silver sport</option><option value="cosmic">Cosmic violet</option></select></label>
@@ -78,7 +88,7 @@ setupPage();
 
 const $ = (selector) => document.querySelector(selector);
 const card = $('#card');
-for (const id of ['variant', 'finish', 'material', 'thickness', 'stack', 'stack-messiness', 'stack-seed', 'wear', 'wear-seed', 'motion', 'pan-direction', 'title', 'category', 'subtitle', 'description']) {
+for (const id of ['fan', 'deck-land', 'animate', 'speed', 'variant', 'finish', 'material', 'thickness', 'stack', 'stack-messiness', 'stack-seed', 'wear', 'wear-seed', 'motion', 'pan-direction', 'title', 'category', 'subtitle', 'description']) {
   const el = document.getElementById(id);
   el.addEventListener('input', () => card.setAttribute(id, el.value));
 }
@@ -118,30 +128,59 @@ $('#initial-motion').addEventListener('change', (e) => card.toggleAttribute('pla
 
 // The short lists become rows of buttons; the long ones stay drop-downs, in the same style.
 for (const select of document.querySelectorAll('select[data-choice]')) choiceFromSelect(select, { layout: select.dataset.choice === 'tiles' ? 'tiles' : 'row' });
+$('.piles').classList.add('ready');
 
 // The stage: the card turns, tips and zooms with the shared view controls.
 const stage = $('#stage'), zoomer = $('#zoomer'), view = $('#view'), spinSelect = $('#card-spin'), speedSelect = $('#spin-speed'), directionSelect = $('#card-spin-direction'), P = 2400;
-let fit = 1, last = { yaw: 0, tilt: 0, zoom: 1, panX: 0, panY: 0 };
+let fit = 1, hull = { x: 0, y: 0 }, last = { yaw: 0, tilt: 0, zoom: 1, panX: 0, panY: 0 };
 function measure() {
-  const w = card.offsetWidth, h = card.offsetHeight, m = 16, corner = card.getAttribute('card-spin') === 'corner';
-  const k = P / (P - (corner ? w : w / 2)), ex = corner ? w * 1.1 : w / 2 * k, ey = corner ? h * k : h / 2 * k;
+  const w = card.offsetWidth, h = card.offsetHeight, m = 16, corner = card.getAttribute('card-spin') === 'corner', pb = card.pileBounds;
+  // The card, an open fan and the pile of cards taken off are one thing to fit: its half width and half height from its own centre.
+  hull = { x: (pb.right - pb.left) / 2 * w, y: (pb.bottom - pb.top) / 2 * w };
+  const hw = (1 + pb.left + pb.right) / 2 * w, hh = h / 2 + (pb.top + pb.bottom) / 2 * w;
+  // The widest the turned thing can look: its near edge comes closer as it turns, and it is widest at the angle where that gains most.
+  const wide = pb.left + pb.right + pb.top + pb.bottom > 0, r = Math.min(0.9, hw / P);
+  const k = corner ? P / (P - w) : wide ? 1 / Math.sqrt(1 - r * r) : P / (P - hw), ex = corner ? w * 1.1 : hw * k, ey = corner ? h * k : hh * k;
   fit = Math.min(1, (stage.clientWidth / 2 - m) / ex, (stage.clientHeight / 2 - m) / ey);
   view.setFitScale(fit);
   draw(last);
 }
 function draw(s) {
   last = s;
-  zoomer.style.transform = `translate(${s.panX}px,${s.panY}px) scale(${fit * s.zoom})`;
+  zoomer.style.transform = `translate(${s.panX - hull.x * fit * s.zoom}px,${s.panY - hull.y * fit * s.zoom}px) scale(${fit * s.zoom})`;
   card.style.setProperty('--fuda-yaw', s.yaw + 'deg');
   card.style.setProperty('--fuda-tilt', s.tilt + 'deg');
 }
 view.addEventListener('kazoku-viewchange', (e) => draw(e.detail));
 new ResizeObserver(measure).observe(stage);
+// A fan or a pile at the side changes what has to fit: the view glides to the new fit (not with reduced motion or Animate off).
+card.addEventListener('fuda-pile', () => {
+  const glide = $('#animate').value !== 'off' && !matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const from = glide ? getComputedStyle(zoomer).transform : '';
+  measure();
+  view.set({ zoom: 1, panX: 0, panY: 0 });
+  if (glide && from && from !== 'none' && from !== zoomer.style.transform) zoomer.animate([{ transform: from }, { transform: zoomer.style.transform }], { duration: 600, easing: 'cubic-bezier(.2,.8,.2,1)' });
+  pileButtons();
+});
 spinSelect.addEventListener('change', () => { card.setAttribute('card-spin', spinSelect.value); measure(); });
 function speed() { view.setAttribute('speed', String((directionSelect.value === 'reverse' ? -1 : 1) * 360 / parseFloat(speedSelect.value))); }
 speedSelect.addEventListener('change', speed);
 directionSelect.addEventListener('change', speed);
 speed();
+// Take the top card off the stack and put it back (the stack must hold more than one card).
+const taken = $('#taken-off'), takeOff = $('#take-off'), putBack = $('#put-back'), pileNote = $('#pile-note');
+function pileButtons() {
+  const n = card.stackCount, t = Number(card.getAttribute('taken-off')) || 0;
+  takeOff.disabled = n < 2 || t >= n - 1;
+  putBack.disabled = t < 1;
+  pileNote.textContent = n < 2 ? 'Make a stack of more than one card to fan it or take a card off.' : t ? `${t} of ${n} cards are on the pile, ${n - t} on the stack.` : `${n} cards on the stack.`;
+  taken.value = String(t);
+  taken.dispatchEvent(new Event('input', { bubbles: true }));
+}
+takeOff.addEventListener('click', () => { card.takeOff(); pileButtons(); });
+putBack.addEventListener('click', () => { card.putBack(); pileButtons(); });
+taken.addEventListener('change', () => { card.setAttribute('taken-off', taken.value); pileButtons(); });
+for (const id of ['stack']) $('#' + id).addEventListener('input', pileButtons);
 $('#flip').addEventListener('click', () => card.toggleAttribute('flipped'));
 let url;
 $('#upload').addEventListener('change', (e) => {
@@ -155,9 +194,10 @@ $('#upload').addEventListener('change', (e) => {
 });
 
 // Every choice is kept in the address (`?wear=damaged&finish=matte`), and a link to it opens the same card.
-keepInAddress(['variant', 'wear', 'wear-seed', 'material', 'thickness', 'stack', 'stack-messiness', 'stack-seed', 'finish', 'motion', 'initial-motion', 'autoplay', 'pan-direction', 'card-spin', 'spin-speed', 'card-spin-direction', 'title', 'category', 'subtitle', 'description']);
+keepInAddress(['fan', 'deck-land', 'animate', 'speed', 'taken-off', 'variant', 'wear', 'wear-seed', 'material', 'thickness', 'stack', 'stack-messiness', 'stack-seed', 'finish', 'motion', 'initial-motion', 'autoplay', 'pan-direction', 'card-spin', 'spin-speed', 'card-spin-direction', 'title', 'category', 'subtitle', 'description']);
 showInfo();
 measure();
+pileButtons();
 </script>
 </body>
 </html>

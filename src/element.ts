@@ -10,7 +10,7 @@ let focusedCard: FudaCard | null = null;
 const reducedMotion = () => typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
 document.addEventListener('pointerdown', event => { if (focusedCard && !event.composedPath().includes(focusedCard)) focusedCard.setFocused(false); }, true);
 export class FudaCard extends HTMLElement {
- static observedAttributes=['title','category','subtitle','description','number','rarity','motion','playing','thickness','autoplay','material','stack','stack-messiness','stack-seed','stack-depth','wear','wear-seed','wear-corners','wear-edges','wear-surface','wear-creases'];
+ static observedAttributes=['title','category','subtitle','description','number','rarity','motion','playing','thickness','autoplay','material','stack','stack-messiness','stack-seed','stack-depth','wear','wear-seed','wear-corners','wear-edges','wear-surface','wear-creases','fan','taken-off','deck-land','animate','speed','pile-controls'];
  private focused=false;
  private hushed=false;
  private focusedAtPress?: boolean;
@@ -57,6 +57,26 @@ export class FudaCard extends HTMLElement {
  get stackCount(): number {const n=Math.floor(Number.parseFloat(this.getAttribute('stack')??''));return n>=1?Math.min(1000,n):1;}
  /** Height of the stack in millimetres: the count times a card's thickness. */
  get stackHeight(): number {return stackHeightMm(this.stackCount,this.cardThicknessMm);}
+ /** How many cards are still in the stack: `stack` less the `taken-off` ones (at least one stays). */
+ get heldCount(): number {const n=this.stackCount,t=Math.floor(Number.parseFloat(this.getAttribute('taken-off')??''));return t>0?Math.max(1,n-t):n;}
+ /** True while the stack is fanned open (`fan="open"`, with more than one card). */
+ get fanOpen(): boolean {return this.getAttribute('fan')==='open'&&this.heldCount>1;}
+ /** How far the pile reaches beyond the card's own box, in card widths: an open fan and the pile of cards taken off. It is zero until a pile feature is used. Pages use it to fit the view; `fuda-pile` is sent when it changes. */
+ pileBounds={left:0,right:0,top:0,bottom:0};
+ /** Take the top card (or `count` cards) off the stack: it flies to a pile at the stack's side and lands as `deck-land` says. At least one card stays. */
+ takeOff(count=1): void {const t=Math.max(0,Math.floor(Number.parseFloat(this.getAttribute('taken-off')??''))||0);this.setAttribute('taken-off',String(Math.min(this.stackCount-1,t+Math.max(1,count))));}
+ /** Bring the card (or `count` cards) back from the pile onto the stack. */
+ putBack(count=1): void {const t=Math.max(0,Math.floor(Number.parseFloat(this.getAttribute('taken-off')??''))||0);if(t-Math.max(1,count)>0)this.setAttribute('taken-off',String(t-Math.max(1,count)));else this.removeAttribute('taken-off');}
+ pileUsed=false;
+ private pileModule?: typeof import('./pile-card.js');
+ /** Fanning, the pile of cards taken off and the controls are drawn by a module that is loaded only when a stack asks for them; a card without them never loads it. */
+ private applyPile(): void {
+  const asked=this.stackCount>1&&(this.getAttribute('fan')==='open'||this.hasAttribute('taken-off')||this.hasAttribute('pile-controls'));
+  if(!asked&&!this.pileModule)return;
+  if(asked)this.pileUsed=true;
+  const draw=(m:typeof import('./pile-card.js'))=>{if(!this.shadowRoot)return;this.pileModule=m;m.applyPile(this,this.shadowRoot)};
+  if(this.pileModule)draw(this.pileModule);else void import('./pile-card.js').then(draw);
+ }
 
  private wearKey='';
  private wearToken=0;
@@ -79,12 +99,12 @@ export class FudaCard extends HTMLElement {
  private drawStills(card: HTMLElement, count: number): void {
   const num=(name:string,fallback:number)=>{const n=Number.parseFloat(this.getAttribute(name)??'');return Number.isFinite(n)?n:fallback};
   const messiness=num('stack-messiness',0.3),seed=num('stack-seed',1),depth=Math.min(52,Math.max(0,Math.floor(num('stack-depth',10))));
-  const places=count>1&&messiness>0?stackLayout(count,{messiness,seed,depth}):[];
+  const places=count>1&&(messiness>0||this.pileUsed)?stackLayout(count,{messiness,seed,depth}):[];
   const key=places.length?JSON.stringify([count,messiness,seed,depth]):'';
   if(key===this.stillsKey)return;this.stillsKey=key;
   const holder=card.querySelector('.stills');
   if(holder)holder.innerHTML=places.map((p,at)=>`<i class="still" style="--x:${p.x};--y:${p.y};--r:${p.rotate};--k:${count-places.length+at}"></i>`).join('');
  }
- render(): void {const card=this.shadowRoot?.querySelector<HTMLElement>('.card');if(card){const mm=this.cardThicknessMm,count=this.stackCount,material=cardMaterial(this.getAttribute('material'));card.style.setProperty('--mm',String(mm*count));card.style.setProperty('--mm1',String(mm));card.classList.toggle('stacked',count>1);if(material)card.style.setProperty('--edge',material.edge);else card.style.removeProperty('--edge');this.drawStills(card,count);}this.applyWear();const button=this.shadowRoot?.querySelector<HTMLButtonElement>('.motion-button');if(button){button.hidden=this.getAttribute('motion')!=='pan';const active=this.isMoving;this.toggleAttribute('moving',active);button.setAttribute('aria-pressed',String(active));}for(const key of FudaCard.observedAttributes){const node=this.shadowRoot?.getElementById(key);if(node)node.textContent=this.getAttribute(key)||(defaults[key] ?? '');}}
+ render(): void {const card=this.shadowRoot?.querySelector<HTMLElement>('.card');if(card){const mm=this.cardThicknessMm,count=this.heldCount,fan=this.fanOpen,material=cardMaterial(this.getAttribute('material'));card.style.setProperty('--mm',String(fan?mm:mm*count));card.style.setProperty('--mm1',String(mm));card.classList.toggle('stacked',count>1&&!fan);if(material)card.style.setProperty('--edge',material.edge);else card.style.removeProperty('--edge');this.drawStills(card,count);}this.applyWear();this.applyPile();const button=this.shadowRoot?.querySelector<HTMLButtonElement>('.motion-button');if(button){button.hidden=this.getAttribute('motion')!=='pan';const active=this.isMoving;this.toggleAttribute('moving',active);button.setAttribute('aria-pressed',String(active));}for(const key of FudaCard.observedAttributes){const node=this.shadowRoot?.getElementById(key);if(node)node.textContent=this.getAttribute(key)||(defaults[key] ?? '');}}
 }
 if(typeof customElements !== 'undefined' && !customElements.get('fuda-card'))customElements.define('fuda-card',FudaCard);
