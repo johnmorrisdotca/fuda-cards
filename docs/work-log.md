@@ -225,3 +225,11 @@
 - Research for MODULES-76 is in docs/card-images.md: sources, their terms as read, and what was not used. Short answer: no free hockey or baseball card API with showable pictures; the licence-clean route is public-domain vintage cards, checked per item. Built `demo/vintage.html` with 36 hockey cards (Commons, "Public domain" on every file) and 24 baseball cards (the Met, `isPublicDomain` true on every object). Several tools got HTTP 403 (PSA, TCGplayer, TCDB, LoC, Smithsonian pages): those terms were not read and the doc says so.
 - MODULES-75: Alex has 25 Base Set cards (5 by 5), Sam a pack of 10; the card names were checked against the TCGdex set listing (40 of 40). Vintage collections have 36 and 24.
 - Tests: `test/vintage.test.mjs` (public domain notes, hosts, no league or maker names, demo not in the package files), `test/demo-users.test.mjs` (25 and 10).
+
+## 2026-11-02 - Releases 0.5.0 and 0.6.0 (MODULES-72 to 78), machine1 subagent
+
+- 0.5.0 (wear): tag v0.5.0 on 397df1c, Release run green, `+ @johnmorrisdotca/fuda-cards@0.5.0` in its log, on npm. 0.6.0 (deck, fan, display buttons, vintage demo): tag v0.6.0 on 88d6a70, Release run 41468137220 green, `+ @johnmorrisdotca/fuda-cards@0.6.0` in its log.
+- Checks before each tag: `pnpm check` green (Pages runs it too), Pages green on the release commit, no Release run in progress, version not on npm, `coord.py since 2h` read. `pnpm test:e2e`: 28 tests, 24 pass; the 4 that fail (autoplay x3, zoom story view) fail identically on a clean 0.4.0 checkout (MODULES-98).
+- The push guard of this clone allows john@johnmorris.ca (`git config pushguard.authors`), as for the other public repos.
+- Ports: the repo now owns 8100 to 8199 (row added to John's port table).
+- Bytes (raw, gzip -9): 0.4.0 element.js 17258/5318, collection-element.js 10702/3806, collection.js 3764/1281, zoom.js 5062/1913. 0.5.0 element.js 19027/5826, new wear.js 16901/5434 (loaded only on demand). 0.6.0 collection-element.js 26553/8038, new choice.js 4623/1811, collection.js 4725/1634, zoom.js 5509/2051.
