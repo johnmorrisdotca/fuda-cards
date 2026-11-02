@@ -252,3 +252,12 @@
 - Audit: see `docs/collection-displays.md` ("Real-life audit") and the CHANGELOG. Removed: Jukebox Carousel and Flip Tower (alias to the deck, `collectionViewAliases`); renamed Infinite Card Atlas to Card Table; the case got a frame, a glass lid and ledges.
 - Tests: `binder.e2e.mjs` (3): nine pockets three by three, one card in each, sheen, holes by the spine, rings, green cover, two facing pages with holes against the rings, a part-full sheet; options in the address and a link, 44 px buttons, `page-size`/`columns`; the turn (a leaf with four slices swings 0 to -180 forwards and -180 to 0 backwards, bends at mid turn, carries 9 pockets on each side), nothing running afterwards, Animate on and off end in the same place for one Next, a quick double Next and Next then Previous, no leaf with reduced motion. `collection.test.mjs` (10 displays and the aliases). `pnpm check` 33 pass.
 - Limits: headless Chromium only; the leaf's shading is only the pockets' sheen (no shadow cast on the page under it); a 12-pocket sheet on a phone has small cards (zoom in); the case is still a tilted grid with a frame and glass, not a model of risers.
+
+## 2026-11-02 - e2e fixes (MODULES-98), machine1 subagent / e2e-fix-2026-11-02
+
+- Found on 0.8.0 with `pnpm test:e2e` (Playwright 1.59.1, Chromium 147): autoplay (3 tests) and the story view's Fit failed.
+- Autoplay: the tests counted `getAnimations()` entries named `fuda-pan`; the pan is a CSS animation from the card's shadow styles (`::slotted(img)`) and Chromium 147 returns it with no `animationName`. The test now reads the name from the computed style and counts running animations. No product change.
+- Story Fit: `.story .card` is `flex:0 0 90%` with `min-height:auto`, so before its picture loaded a card was 324 px tall and after it 413 px; Fit was measured before and nothing measured it again. `min-height:0` keeps the 90 percent. The zoom test also measured the last Fit while the glide back was still running; it now waits for the view's animations to end.
+- Result: 39 of 39 browser tests pass, `pnpm check` passes. One run hit EADDRINUSE on 8112, a port another session was using (card-back test); it passes alone.
+- Tried and dropped: refreshing Fit on every picture load (it moved the rolodex's cards in the piles Animate test) and a second Fit pass for perspective (the deck stopped closing back to the same place). Neither was needed once the story's height was stable.
+- Limits: headless Chromium only; the machine was at load 60 to 70 during the runs.

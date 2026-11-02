@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Fixed (MODULES-98): **the Vertical Story Scroll's Fit shows every card.** Its cards were as tall as their pictures once those loaded, and 90 percent of the view before, so Fit was measured on a layout that then grew (cards 117 px outside the view on a desk). Its cards keep the 90 percent (`min-height:0`), so the layout does not change when the pictures arrive.
+- Tests: the autoplay tests read the pan animation's name from the computed style (Chromium 147 hands a shadow-style animation back with no `animationName`, so they counted no motion); the zoom test waits for the glide back to Fit to end before it measures.
+
 ## 0.8.0 - 2026-11-02
 
 - Changed (MODULES-107): **Binder Pages are real sheets in a real binder.** The display is a ring or zip binder open on two facing sheets, each a page of nine clear plastic pockets (three by three) with a slight sheen, one card sitting inside each pocket, on a clear or black sheet, with a strip of nine punched holes by the rings and a plain cover colour. New options, each a row of buttons under the view and in the address: `binder="ring|zip"`, `cover="green|black|teal|navy|red"`, `sheet="clear|black"`, `pockets="4|9|12"`. The older `page-size` and `columns` still work (they set the pockets of a sheet). It replaces the flat tilted grid.
