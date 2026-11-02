@@ -3,7 +3,7 @@ import { test } from 'node:test';
 import { strict as assert } from 'node:assert';
 import { chromium, serve, sizes } from './support.mjs';
 
-const PORT = 8077, WIDTH = 300;
+const PORT = 8117, WIDTH = 300;
 const url = `http://127.0.0.1:${PORT}/test/e2e/fixtures/stack.html`;
 const open = async (browser, size, init) => {
   const context = await browser.newContext({ viewport: size }), page = await context.newPage();

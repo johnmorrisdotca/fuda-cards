@@ -22,11 +22,11 @@ test('a turned card shows its back, not the mirrored front, and has a true-scale
     const url = req.url.split('?')[0], path = url === '/' ? '/index.html' : url;
     try { res.writeHead(200, { 'Content-Type': types[extname(path)] ?? 'text/plain' }).end(await readFile(resolve(root, '.' + path))); }
     catch { res.writeHead(404).end(); }
-  }).listen(8072, '127.0.0.1');
+  }).listen(8112, '127.0.0.1');
   try {
     for (const [name, size] of sizes) {
       const p = await browser.newPage({ viewport: size, deviceScaleFactor: 2 });
-      await p.goto('http://127.0.0.1:8072/');
+      await p.goto('http://127.0.0.1:8112/');
       await p.waitForFunction(() => customElements.get('fuda-card') && customElements.get('kazoku-view-controls') && document.querySelector('#view').state);
       const turn = (yaw) => p.evaluate(async (y) => { document.querySelector('#view').set({ yaw: y, tilt: 0 }); await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))); }, yaw);
       const box = async () => {

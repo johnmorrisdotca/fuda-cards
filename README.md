@@ -10,7 +10,7 @@ This is an early prototype: classic, sport and cosmic are exploratory CSS design
 
 ## Development
 
-Requires Node 22+ and pnpm. Run `pnpm install`, `pnpm check`, then `pnpm dev` and open http://localhost:8000. `pnpm build` emits JavaScript and TypeScript declarations to `dist/`.
+Requires Node 22+ and pnpm. Run `pnpm install`, `pnpm check`, then `pnpm dev` and open http://localhost:8100. `pnpm build` emits JavaScript and TypeScript declarations to `dist/`.
 
 ## Embed
 

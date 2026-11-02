@@ -5,7 +5,7 @@ import { test } from 'node:test';
 import { strict as assert } from 'node:assert';
 import { chromium, webkit, serve, sizes, offline } from './support.mjs';
 
-const port = 8075, origin = `http://127.0.0.1:${port}`;
+const port = 8115, origin = `http://127.0.0.1:${port}`;
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 const art = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 465 1165" width="465" height="1165"><rect width="465" height="1165" fill="#ff00ff"/></svg>';
 // [script delay, art delay] in ms: a slow script with a fast picture, and a fast script with a slow picture.

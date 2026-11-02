@@ -3,7 +3,7 @@ import { test } from 'node:test';
 import { strict as assert } from 'node:assert';
 import { chromium, serve, sizes } from './support.mjs';
 
-const PORT = 8076;
+const PORT = 8116;
 const moving = (page) => page.evaluate(() => Object.fromEntries([...document.querySelectorAll('fuda-card')].map((c) => [c.id, c.querySelector('img').getAnimations().filter((a) => a.animationName === 'fuda-pan' && a.playState === 'running').length])));
 const open = async (browser, size, extra = {}) => {
   const context = await browser.newContext({ viewport: size, ...extra }), page = await context.newPage();

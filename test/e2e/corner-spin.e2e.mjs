@@ -22,11 +22,11 @@ test('corner spin keeps the corner at the stage centre, full size, with zoom', {
     const url = req.url.split('?')[0], path = url === '/' ? '/index.html' : url;
     try { res.writeHead(200, { 'Content-Type': types[extname(path)] ?? 'text/plain' }).end(await readFile(resolve(root, '.' + path))); }
     catch { res.writeHead(404).end(); }
-  }).listen(8071, '127.0.0.1');
+  }).listen(8111, '127.0.0.1');
   try {
     for (const [name, size] of sizes) {
       const p = await browser.newPage({ viewport: size });
-      await p.goto('http://127.0.0.1:8071/');
+      await p.goto('http://127.0.0.1:8111/');
       await p.waitForFunction(() => customElements.get('fuda-card') && customElements.get('kazoku-view-controls') && document.querySelector('#view').state);
       await p.selectOption('#card-spin', 'corner');
       const bar = await p.evaluate(() => document.querySelector('#view').getBoundingClientRect().bottom);
@@ -91,14 +91,14 @@ test('corner spin keeps the corner at the stage centre, full size, with zoom', {
       await p.close();
 
       const a = await browser.newPage({ viewport: size });
-      await a.goto('http://127.0.0.1:8071/?zoom=2');
+      await a.goto('http://127.0.0.1:8111/?zoom=2');
       await a.waitForFunction(() => document.querySelector('#view').state);
       await a.selectOption('#card-spin', 'corner');
       assert.equal(await a.evaluate(() => document.querySelector('#view').state.zoom), 2, `${name}: an address zoom must win over the default`);
       await a.close();
 
       const q = await browser.newPage({ viewport: size, reducedMotion: 'reduce' });
-      await q.goto('http://127.0.0.1:8071/');
+      await q.goto('http://127.0.0.1:8111/');
       await q.waitForFunction(() => document.querySelector('#view').state);
       await q.selectOption('#card-spin', 'corner');
       const still = await q.evaluate(() => ({ turning: document.querySelector('#view').state.turning, animations: document.querySelector('#card').shadowRoot.querySelector('.rotation').getAnimations().length }));

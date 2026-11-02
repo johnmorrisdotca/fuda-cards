@@ -4,7 +4,7 @@ import { test } from 'node:test';
 import { strict as assert } from 'node:assert';
 import { chromium, serve, sizes, offline } from './support.mjs';
 
-const origin = 'http://127.0.0.1:8073';
+const origin = 'http://127.0.0.1:8113';
 const views = ['deck', 'rolodex', 'binder', 'case', 'jukebox', 'random', 'story', 'wall', 'tower', 'spotlight', 'atlas'];
 
 // Page code that finds the stage and the controls, inside the collection's shadow root when there is one.
@@ -139,7 +139,7 @@ async function open(browser, size, path, extra = {}) {
 
 test('every collection view zooms, fits, moves and keeps its clicks', { skip: !chromium && 'Playwright not installed' }, async () => {
   const browser = await chromium.launch({ executablePath: process.env.PLAYWRIGHT_CHROMIUM });
-  const server = serve(8073);
+  const server = serve(8113);
   try {
     for (const [device, size] of sizes) {
       const { p, problems } = await open(browser, size, '/demo/collections.html');
@@ -155,7 +155,7 @@ test('every collection view zooms, fits, moves and keeps its clicks', { skip: !c
 
 test('the standalone rolodex and the Pokémon binder demo zoom and fit too', { skip: !chromium && 'Playwright not installed' }, async () => {
   const browser = await chromium.launch({ executablePath: process.env.PLAYWRIGHT_CHROMIUM });
-  const server = serve(8073);
+  const server = serve(8113);
   try {
     for (const [device, size] of sizes) {
       const rolodex = await open(browser, size, '/demo/rolodex.html');
@@ -185,7 +185,7 @@ test('the standalone rolodex and the Pokémon binder demo zoom and fit too', { s
 
 test('with reduced motion the views do not animate their zoom', { skip: !chromium && 'Playwright not installed' }, async () => {
   const browser = await chromium.launch({ executablePath: process.env.PLAYWRIGHT_CHROMIUM });
-  const server = serve(8073);
+  const server = serve(8113);
   try {
     const { p } = await open(browser, sizes[0][1], '/demo/collections.html', { reducedMotion: 'reduce' });
     const motion = await p.evaluate(() => { const r = document.querySelector('fuda-collection').shadowRoot; return { card: getComputedStyle(r.querySelector('.card')).transitionDuration, view: getComputedStyle(r.querySelector('.v')).transitionDuration, running: r.querySelector('.v').getAnimations({ subtree: true }).length }; });
@@ -198,7 +198,7 @@ test('with reduced motion the views do not animate their zoom', { skip: !chromiu
 
 test('the zoom is kept in the address, and a card opens from the keyboard', { skip: !chromium && 'Playwright not installed' }, async () => {
   const browser = await chromium.launch({ executablePath: process.env.PLAYWRIGHT_CHROMIUM });
-  const server = serve(8073);
+  const server = serve(8113);
   try {
     const { p } = await open(browser, sizes[0][1], '/demo/collections.html?zoom=2');
     const state = () => p.evaluate(() => document.querySelector('fuda-collection').shadowRoot.querySelector('kazoku-view-controls').state.zoom);
@@ -216,7 +216,7 @@ test('the zoom is kept in the address, and a card opens from the keyboard', { sk
 
 test('the full collection demo keeps the view and its controls in the first screen', { skip: !chromium && 'Playwright not installed' }, async () => {
   const browser = await chromium.launch({ executablePath: process.env.PLAYWRIGHT_CHROMIUM });
-  const server = serve(8073);
+  const server = serve(8113);
   try {
     for (const [device, size] of sizes) {
       const { p, problems } = await open(browser, size, '/demo/collections-component.html');

@@ -9,4 +9,4 @@ createServer(async (req,res) => {
     if (!path.startsWith(root + sep)) { res.writeHead(403).end(); return; }
     const body = await readFile(path); res.writeHead(200, {'Content-Type': types[extname(path)] ?? 'application/octet-stream'}).end(body);
   } catch { res.writeHead(404).end('Not found'); }
-}).listen(8000, '127.0.0.1', () => console.log('Fuda: http://localhost:8000'));
+}).listen(8100, '127.0.0.1', () => console.log('Fuda: http://localhost:8100'));

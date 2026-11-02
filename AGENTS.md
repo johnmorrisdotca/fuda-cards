@@ -41,7 +41,7 @@ This repo is one of the family of John Morris's npm packages. The rules every pa
 | Repo | `johnmorrisdotca/fuda-cards` |
 | Board | `modules` (tickets are `fuda-cards: F<n> ...`; `docs/task-board.md` keeps only the Done rows) |
 | Title prefix and `--area` | `fuda-cards` |
-| Ports | 8000 `pnpm dev`; the browser tests use 8073 and 8075 (no block of its own in John's port table; a scratch server takes 7720-7729) |
+| Ports | 8100-8199 (John's port table): 8100 `pnpm dev`, 8101 reserved for tests, the browser tests use 8111-8119, worktrees and scratch servers 8102-8110 and 8120 up |
 | Checks before a push | `pnpm check` (typecheck, build, tests), `pnpm test:e2e` (Playwright; set `PLAYWRIGHT_FROM` to a package.json that can resolve `playwright`) |
 | Release | `release.yml` calls kazoku-ui `reusable-release.yml`; trusted publisher entry: `release.yml` |
 | Hand-off project | `fuda-cards` |
