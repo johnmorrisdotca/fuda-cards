@@ -1,6 +1,6 @@
 {
   "name": "@johnmorrisdotca/fuda-cards",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "Fuda Cards: collectible card frames for images and interactive 3D content.",
   "type": "module",
   "sideEffects": [
