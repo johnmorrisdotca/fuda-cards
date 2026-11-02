@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.9.1 - 2026-11-02
 
 - Fixed (MODULES-98): **the Vertical Story Scroll's Fit shows every card.** Its cards were as tall as their pictures once those loaded, and 90 percent of the view before, so Fit was measured on a layout that then grew (cards 117 px outside the view on a desk). Its cards keep the 90 percent (`min-height:0`), so the layout does not change when the pictures arrive.
 - Tests: the autoplay tests read the pan animation's name from the computed style (Chromium 147 hands a shadow-style animation back with no `animationName`, so they counted no motion); the zoom test waits for the glide back to Fit to end before it measures.
