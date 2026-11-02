@@ -18,7 +18,9 @@ Status key: [x] implemented at prototype level; [~] partial, requires further wo
 
 ## Collection display modes
 Each needs genuine distinct presentation, responsive layout, selection and keyboard/touch support, empty and large-collection behavior, and browser tests.
-- [~] Overlapping deck: large centered card, layered cards behind, swipe/arrows and inspect.
+- [~] Overlapping deck (0.6.0): a deck of up to ten cards beside a pile; Next flips the top card off onto the pile at the other side, face up, upside down or face down (`deck-land`), Previous brings it back; the whole deck turns in 3D with the angle, tilt and Auto-turn controls. Headless Chromium only.
+- [~] Fan (0.6.0): `view="fan"`, up to ten cards in an arc like a hand of playing cards (about half of each card shows) that opens and closes back to the deck, in the address. Not inside `<fuda-card stack>`.
+- [~] Display buttons (0.6.0): the twelve displays are a row of buttons with small pictures, 48 px high, arrow keys, light and dark, in the address; no drop-down.
 - [~] Binder: configurable page size and grid columns, with wrapped page controls; sleeves, covers, page turns and browser verification remain.
 - [~] Rolodex: rotating file of index cards.
 - [~] Convention case: angled tiered rows, configurable spacing and overlap, 3D case and full-screen inspection.
@@ -37,7 +39,7 @@ Each needs genuine distinct presentation, responsive layout, selection and keybo
 - [~] Three fictional demo users: two Pokémon collectors and a retro gaming Hako collector; five published Hako SVG URLs returned successful image responses.
 - [~] Named collections saved per demo profile locally, with delete, JSON import/export, legacy import, and storage errors reported; core flows exercised in Chromium. Cross-device sync requires a chosen backend and is not implemented.
 - [~] Pokémon TCGdex set example using API-provided full-card images; verify live API behavior, missing images, source usage rules and back images.
-- [ ] Define provider adapters and source attribution for additional TCG and sports-card APIs; research actual hockey coverage and image availability.
+- [~] Hockey and baseball card pictures (0.6.0): researched (docs/card-images.md): no free card API with showable pictures; public-domain 1909 to 1911 cards from Wikimedia Commons and The Met are in `demo/vintage.html`. Provider adapters for other APIs are not built.
 - [ ] Search, filters, sorting, collection editing, quantity/condition/grade and optional metadata.
 - [ ] Model custom-framed items and complete scanned cards in a common typed collection model without requiring a specific 3D engine.
 

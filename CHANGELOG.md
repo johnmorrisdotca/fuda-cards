@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.6.0 - 2026-11-02
+
+- New: the collection's **Display** is a row of buttons, not a drop-down. All twelve displays are on screen at once, spanning the width, each with a small picture of its layout; at least 48 px high, one chosen, wrapping on a phone (4 a row; 6 on a desk), arrow keys move the choice. The viewer follows the reader's light or dark setting (`theme="light|dark"` to choose). With `address` the display, the fan and the landing are kept in the page address (`?view=fan&fan=open&land=face-down`).
+- New: **flip a card off the deck.** The deck view is now a deck beside a pile. Next lifts the top card, flies it across and lands it on the pile at the deck's other side; Previous brings it back. `deck-land` chooses how it lands: `face-up` (still facing up, the default), `upside-down` or `face-down` (the pile shows the card's `backImage` or the package's own back). `deck-messiness` and `deck-seed` set the lie of the cards. Reduced motion: no flight.
+- New: **rotate the deck.** The deck is the one display that turns in 3D: the angle, tilt and Auto-turn controls turn the whole table. The others stay flat.
+- New: **fan the deck.** `view="fan"` (a twelfth display): `fan="open"` spreads up to `fan-size` (10) cards like a hand of playing cards, about half of each card showing; without it they are squared up into the deck, and closing puts every card back where it started.
+- New: the demo pages use the same buttons for their short choices, follow the reader's light or dark setting and keep their choices in the address (`?wear=damaged&stack=52`); every button, field and select is at least 48 px high; `?theme=light|dark` chooses a theme. Demo collectors have more cards: Alex 25 (a 5 by 5 binder page) and Sam 10 (a pack).
+- Changed: `<fuda-collection>` is bigger: `collection-element.js` 26.6 KB (8.0 KB gzipped, was 10.7 KB and 3.8 KB), plus `choice.js` 4.6 KB (1.8 KB), `collection.js` 4.7 KB (1.6 KB, was 3.8 KB and 1.3 KB) and `zoom.js` 5.5 KB (2.1 KB, was 5.1 KB and 1.9 KB); it also imports `stack.js` (1.7 KB). `<fuda-card>` is unchanged.
+- New demo: `demo/vintage.html`, real hockey (1910 to 1911, 36 cards) and baseball (T206, 24 cards) cards whose pictures are public domain, read item by item from Wikimedia Commons and The Met's Open Access, loaded from their sources and not shipped. `docs/card-images.md` records what card-picture sources exist, their terms and what was left out.
+- Not changed: `<fuda-card>`, `element.js` and its stack do not fan or flip cards off.
+
+
 ## 0.5.0 - 2026-11-02
 
 - New: `wear`, cards that are not perfect. Presets `mint`, `near-mint`, `lightly-played`, `moderately-played`, `heavily-played` and `damaged` (plain grading terms, sourced in `docs/wear.md`) draw soft, rounded, chipped and folded corners, edge whitening, creases, scratches, specks, staining, yellowing and an off-centre print. `wear-seed` fixes where the marks lie, so a card is the same every time; `wear-corners`, `wear-edges`, `wear-surface` and `wear-creases` (0 to 1) change one kind; `wear="0.5"` sets all. `perfect`, no attribute or an unknown name draws nothing.
