@@ -10,6 +10,8 @@ export interface CardOptions {
   rarity?: string;
   variant?: CardVariant;
   finish?: CardFinish;
+  /** Card thickness in millimetres at the 63 mm wide card size; default 0.3, 0 for a flat card. */
+  thickness?: number;
   flipped?: boolean;
   motion?: 'still' | 'pan';
   playing?: boolean;
