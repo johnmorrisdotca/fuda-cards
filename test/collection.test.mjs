@@ -20,10 +20,11 @@ test('page navigation wraps and handles partial and empty pages',()=>{
 });
 
 
-import { fanLayout, deckLandings } from '../dist/collection.js';
-test('the fan has twelve displays in all, three landings and a layout that closes to a deck and opens to a hand', () => {
+import { fanLayout, deckLandings, normalizeLanding } from '../dist/collection.js';
+test('the fan has twelve displays in all, two landings and a layout that closes to a deck and opens to a hand', () => {
   assert.ok(collectionViews.some((v) => v.id === 'fan'));
-  assert.deepEqual(deckLandings.map((l) => l.id), ['face-up', 'upside-down', 'face-down']);
+  assert.deepEqual(deckLandings.map((l) => l.id), ['face-up', 'face-down'], 'two landings: still facing up, turned over');
+  assert.deepEqual(['face-up', 'face-down', 'upside-down', 'turned-over', 'x', null].map(normalizeLanding), ['face-up', 'face-down', 'face-down', 'face-down', 'face-up', 'face-up'], 'the 0.6.0 value upside-down means turned over');
   const open = fanLayout(10, 1);
   assert.equal(open.length, 10);
   assert.deepEqual(fanLayout(10, 1), open, 'the same seed lays the same fan');

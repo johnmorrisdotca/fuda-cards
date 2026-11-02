@@ -1,4 +1,5 @@
-import {collectionViews, deckLandings, fanLayout, parseCollection, randomDrawIndex, movePage, type CollectionCard, type CollectionView, type DeckLanding} from './collection.js';
+import {collectionViews, parseCollection, randomDrawIndex, movePage, type CollectionCard, type CollectionView} from './collection.js';
+import {deckLandings, fanLayout, flight, normalizeLanding} from './pile.js';
 import {zoomView, type ZoomView} from './zoom.js';
 import {createChoice, CHOICE_CSS, CHOICE_VARS, type ChoiceHandle} from './choice.js';
 import {stackLayout} from './stack.js';
@@ -22,7 +23,7 @@ button:focus-visible,input:focus-visible,.card:focus-visible{outline:3px solid v
 .pile .card{position:absolute;inset:0;display:block;transform-style:preserve-3d;transform:translate3d(calc(var(--x,0) * var(--w)),calc(var(--y,0) * var(--w)),calc(var(--k,0) * .9px)) rotate(calc(var(--r,0) * 1deg))}.pile .card:not(.top){pointer-events:none}.pile .card.top{cursor:pointer}
 .fly,.turn{position:absolute;inset:0;transform-style:preserve-3d}.face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:5%;overflow:hidden}.face img{display:block;width:100%;height:100%;object-fit:contain;border-radius:3%;box-shadow:0 4px 10px #0008}.face.back{transform:rotateY(180deg)}
 .generic-back{display:grid;place-items:center;background:radial-gradient(ellipse at center,#b78745 0 12%,#152d46 13% 27%,#386988 28% 31%,#10233b 32% 62%,#d2b074 63% 66%,#182c45 67%);border:6px solid #b39158;color:#f7e9bf;font:bold 18px Georgia;letter-spacing:.12em;box-shadow:0 4px 10px #0008}
-.pile.discard[data-land=face-down] .card .turn{transform:rotateY(180deg)}.pile.discard[data-land=upside-down] .card .turn{transform:rotate(180deg)}
+.pile.discard[data-land=face-down] .card .turn{transform:rotateY(180deg)}
 .v.fan{--w:190px;display:grid;place-items:end center;padding-bottom:1rem}.fan .card{grid-area:1/1;position:relative;width:var(--w);aspect-ratio:2.5/3.5;height:auto;transform-origin:50% 165%;z-index:var(--z);transform:translate(calc(var(--cx) * var(--w)),calc(var(--cy) * var(--w))) rotate(calc(var(--cr) * 1deg));transition:transform .7s cubic-bezier(.2,.8,.2,1);transition-delay:calc((var(--n) - var(--i)) * 22ms)}.fan.open .card{transform:translate(calc(var(--x) * var(--w)),0) rotate(calc(var(--a) * 1deg));transition-delay:calc(var(--i) * 28ms)}.fan.open .card:hover,.fan.open .card:focus-visible{translate:0 -14px}.fan .card img{border-radius:6%}
 dialog{color:var(--fc-text);background:var(--fc-dialog);border:1px solid var(--fc-btn-border);border-radius:1rem;text-align:center;max-width:95vw;max-height:95vh}dialog::backdrop{background:#000c}.detail{display:block;height:min(70vh,600px);max-width:80vw;object-fit:contain;margin:1rem auto}.empty{text-align:center;padding:3rem}
 @media(max-width:600px){.stage{height:var(--fuda-stage-height,clamp(220px,calc(100svh - 570px),620px))}}@media(max-width:500px){.grid{grid-template-columns:repeat(min(2,var(--columns,3)),minmax(0,1fr))}.shell{padding:.7rem}.v.deck{--w:150px;gap:28px}.v.fan{--w:150px}}@media(prefers-reduced-motion:reduce){*{transition:none!important}}
@@ -61,7 +62,8 @@ export class FudaCollection extends HTMLElement {
   disconnectedCallback(){clearTimeout(this.addressTimer)}
   attributeChangedCallback(name: string){this.pageSize=Math.min(100,Math.max(1,Math.floor(Number(this.getAttribute('page-size'))||9)));if(name==='view'||name==='page-size'||name==='columns'){this.index=0;this.flip=null}this.render(name==='view')}
   private get currentView(): CollectionView {let v=this.getAttribute('view');return collectionViews.some(x=>x.id===v)?v as CollectionView:'deck'}
-  private get land(): DeckLanding {const v=this.getAttribute('deck-land');return deckLandings.some(l=>l.id===v)?v as DeckLanding:'face-up'}
+  /** How a card taken off lands: still facing up, or turned over sideways. The 0.6.0 value `upside-down` is still accepted and means turned over. */
+  private get land(): 'face-up'|'face-down' {return normalizeLanding(this.getAttribute('deck-land'))}
   private get fanOpen(){return this.getAttribute('fan')==='open'}
   private get stacked(){return ![...pages,...scrolling].includes(this.currentView)}
   private q<T extends HTMLElement=HTMLElement>(selector: string){return this.root.querySelector(selector) as T}
@@ -83,7 +85,7 @@ export class FudaCollection extends HTMLElement {
     this.root.innerHTML=STYLE+SHELL;
     this.tiles=createChoice({label:'Display',layout:'tiles',value:this.currentView,options:collectionViews.map(v=>({value:v.id,label:v.label,icon:icon(v.id)})),onChange:value=>{this.setAttribute('view',value);this.writeAddress()}});
     this.q('.displays').append(this.tiles.element);
-    this.landing=createChoice({label:'A card flipped off the deck lands',value:this.land,options:deckLandings.map(l=>({value:l.id,label:l.label})),onChange:value=>{this.setAttribute('deck-land',value);this.writeAddress()}});
+    this.landing=createChoice({label:'A card taken off lands',value:this.land,options:deckLandings.map(l=>({value:l.id,label:l.label})),onChange:value=>{this.setAttribute('deck-land',value);this.writeAddress()}});
     this.fanChoice=createChoice({label:'Fan',value:this.fanOpen?'open':'closed',options:[{value:'closed',label:'Closed deck'},{value:'open',label:'Open fan'}],onChange:value=>{if(value==='open')this.setAttribute('fan','open');else this.removeAttribute('fan');this.writeAddress()}});
     this.q('.opts').append(this.landing.element,this.fanChoice.element);
     this.q('.prev').onclick=()=>this.move(-1);this.q('.next').onclick=()=>this.move(1);
@@ -129,7 +131,7 @@ export class FudaCollection extends HTMLElement {
     if(this.flip&&!reduced()&&n>1)this.playFlip(this.flip,v);
     this.flip=null
   }
-  /** The card that just moved flies between the two piles, turning over on the way if it lands face down (or spinning if it lands upside down). The same element, so the card is never drawn twice. */
+  /** The card that just moved flies between the two piles, turning over sideways on the way if it lands face down. The same element, so the card is never drawn twice. */
   private playFlip(direction:'off'|'back',v:HTMLElement){
     const deck=v.querySelector<HTMLElement>('.deck-pile'),discard=v.querySelector<HTMLElement>('.discard-pile');
     const moved=direction==='off'?discard?.querySelector<HTMLElement>('.card.top'):deck?.querySelector<HTMLElement>('.card.top');
@@ -137,10 +139,7 @@ export class FudaCollection extends HTMLElement {
     const dx=discard.offsetLeft-deck.offsetLeft,dy=discard.offsetTop-deck.offsetTop;
     const fly=moved.querySelector<HTMLElement>('.fly')!,turn=moved.querySelector<HTMLElement>('.turn')!;
     const from=direction==='off'?{x:-dx,y:-dy}:{x:dx,y:dy};
-    const options:KeyframeAnimationOptions={duration:700,easing:'cubic-bezier(.3,.1,.2,1)'};
-    fly.animate([{transform:`translate3d(${from.x}px,${from.y}px,0)`},{transform:`translate3d(${from.x/2}px,${from.y/2-34}px,80px) scale(1.07)`,offset:.5},{transform:'translate3d(0,0,0)'}],options);
-    const land=this.land,final=land==='face-down'?'rotateY(180deg)':land==='upside-down'?'rotate(180deg)':'none';
-    if(final!=='none')turn.animate(direction==='off'?[{transform:'none'},{transform:final}]:[{transform:final},{transform:'none'}],options)
+    flight(fly,turn,from,this.land,direction,700)
   }
   private renderFan(v:HTMLElement){
     v.classList.add('fan');v.classList.toggle('open',this.fanOpen);

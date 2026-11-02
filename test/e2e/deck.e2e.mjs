@@ -56,35 +56,57 @@ test('Next flips the top card off the deck onto a pile at its other side, and Pr
   } finally { await browser.close(); server.close(); }
 });
 
-test('a card lands face up, upside down or face down, as chosen, and the choice is in the address', { skip: !chromium && 'Playwright not installed' }, async () => {
+// How the picture of the card on the pile is turned in the screen's plane, in degrees, and which face is showing: the product of every
+// transform from the face up to the viewer (the view's zoom and turn included). 0 is upright; 180 is on its head.
+const faceTurn = (p, pile = '.discard-pile') => shadow(p, `
+  const top = root.querySelector('${pile} .card.top'); const r = top.getBoundingClientRect();
+  const hit = root.elementsFromPoint(r.x + r.width / 2, r.y + r.height / 2).find((e) => e.classList.contains('face'));
+  let m = new DOMMatrix();
+  for (let e = hit; e && e !== root.querySelector('.stage'); e = e.parentElement) { const t = getComputedStyle(e).transform; if (t !== 'none') m = new DOMMatrix(t).multiply(m); }
+  return { face: hit.classList.contains('back') ? 'back' : 'front', angle: Math.round(Math.atan2(m.b, m.a) * 1800 / Math.PI) / 10, flipped: m.a * m.d - m.b * m.c < 0 };`);
+
+test('a card lands still facing up or turned over sideways, as chosen, never on its head, and the choice is in the address', { skip: !chromium && 'Playwright not installed' }, async () => {
   const browser = await chromium.launch({ executablePath: process.env.PLAYWRIGHT_CHROMIUM }), server = serve(PORT);
   try {
     const { context, p } = await open(browser, sizes[0][1]);
-    for (const [land, expected] of [['face-down', 'rotateY'], ['upside-down', 'rotate']]) {
-      await p.locator('fuda-collection').locator(`.opts [data-value="${land}"]`).click();
-      await p.waitForTimeout(400);
-      assert.match(new URL(p.url()).search, new RegExp(`land=${land}`), `the ${land} choice is kept in the address`);
-      const before = (await piles(p)).discardCount;
-      await p.getByRole('button', { name: 'Next →' }).click();
-      await p.waitForTimeout(900);
-      const m = await matrix(p, '.discard-pile .card.top .turn');
-      assert.ok(m, `${land}: the landed card is turned`);
-      if (land === 'face-down') {
-        const back = await shadow(p, `const t = root.querySelector('.discard-pile .card.top'); const r = t.getBoundingClientRect(); const hit = root.elementsFromPoint(r.x + r.width / 2, r.y + r.height / 2).map((e) => e.className); return hit.join(' ');`);
-        assert.match(back, /generic-back|back/, 'a card landing face down shows its back');
-        assert.ok(Math.abs(m[0] + 1) < 0.01 || Math.abs(m[0]) > 0.99, 'a face down card is turned over about its vertical axis');
-      } else {
-        assert.ok(Math.abs(m[0] + 1) < 0.01 && Math.abs(m[1]) < 0.01, 'an upside down card is turned half way round in its plane');
-      }
-      assert.equal((await piles(p)).discardCount, before + 1);
-    }
+    assert.deepEqual(await p.locator('fuda-collection').locator('.opts [data-value]').evaluateAll((l) => l.map((b) => b.dataset.value)), ['face-up', 'face-down', 'closed', 'open'], 'two landings (and the fan choice): no Upside down');
+    assert.equal(await p.locator('fuda-collection').getByText('Upside down').count(), 0, 'no Upside down button');
+    let up = await piles(p), before = up.discardCount;
+    await p.getByRole('button', { name: 'Next →' }).click();
+    await p.waitForTimeout(900);
+    assert.equal(await shadow(p, `return getComputedStyle(root.querySelector('.discard-pile .card.top .turn')).transform`), 'none', 'a card landing face up is not turned');
+    let t = await faceTurn(p);
+    assert.deepEqual([t.face, Math.abs(t.angle) < 15, t.flipped], ['front', true, false], 'face up: the picture shows, upright');
+    await p.locator('fuda-collection').locator('.opts [data-value="face-down"]').click();
+    await p.waitForTimeout(400);
+    assert.match(new URL(p.url()).search, /land=face-down/, 'the turned over choice is kept in the address');
+    await p.getByRole('button', { name: 'Next →' }).click();
+    await p.waitForTimeout(900);
+    const m = await matrix(p, '.discard-pile .card.top .turn');
+    assert.ok(m && Math.abs(m[0] + 1) < 0.01, 'the landed card is turned over about its vertical axis');
+    assert.ok(Math.abs(m[5] - 1) < 0.01 && Math.abs(m[1]) < 0.01, 'sideways: its up and down are not reversed');
+    t = await faceTurn(p);
+    assert.deepEqual([t.face, Math.abs(t.angle) < 15, t.flipped], ['back', true, false], 'turned over: the back shows, upright, not mirrored');
+    assert.match(await shadow(p, `const r = root.querySelector('.discard-pile .card.top').getBoundingClientRect(); return root.elementsFromPoint(r.x + r.width / 2, r.y + r.height / 2).map((e) => e.className).join(' ')`), /generic-back|back/, 'a card landing turned over shows its back');
+    assert.equal((await piles(p)).discardCount, Math.min(10, before + 2));
     await context.close();
-    // A link opens with the choice made.
-    const linked = await open(browser, sizes[0][1], '?view=deck&land=face-down');
-    assert.equal(await shadow(linked.p, `return root.querySelector('.discard-pile, .slot')?.parentElement.querySelector('.deck-pile')?.dataset.land`), 'face-down');
-    const checked = await shadow(linked.p, `return root.querySelector('.opts [aria-checked=true]').dataset.value`);
-    assert.equal(checked, 'face-down');
-    await linked.context.close();
+    // The 0.6.0 value upside-down, in a link or an attribute, means turned over.
+    for (const query of ['?view=deck&land=upside-down', '?view=deck&land=face-down']) {
+      const linked = await open(browser, sizes[0][1], query);
+      assert.equal(await shadow(linked.p, `return root.querySelector('.deck-pile')?.dataset.land`), 'face-down', `${query} opens turned over`);
+      assert.equal(await shadow(linked.p, `return root.querySelector('.opts [aria-checked=true]').dataset.value`), 'face-down');
+      await linked.p.getByRole('button', { name: 'Next →' }).click();
+      await linked.p.waitForTimeout(900);
+      const x = await faceTurn(linked.p);
+      assert.deepEqual([x.face, Math.abs(x.angle) < 15, x.flipped], ['back', true, false], `${query}: the landed card shows its back, upright`);
+      await linked.context.close();
+    }
+    // Mid-flight, the card never carries a turn in its plane: sample the transforms of the flying card (the fly and the turn layers) all along the move.
+    const flight = await open(browser, sizes[0][1], '?land=face-down');
+    await flight.p.getByRole('button', { name: 'Next →' }).click();
+    const worst = await shadow(flight.p, `const top = root.querySelector('.discard-pile .card.top'); const out = []; for (const a of top.getAnimations({ subtree: true })) { a.pause(); for (const f of [0, .2, .4, .5, .6, .8, 1]) { a.currentTime = f * 700; const m = new DOMMatrix(getComputedStyle(a.effect.target).transform); out.push(Math.abs(m.b) + Math.abs(m.c)); } } return Math.max(...out)`);
+    assert.ok(worst < 0.01, `no frame of the flight spins the card in its plane (${worst})`);
+    await flight.context.close();
   } finally { await browser.close(); server.close(); }
 });
 

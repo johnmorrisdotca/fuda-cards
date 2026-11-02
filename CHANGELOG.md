@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.6.1 - 2026-11-02
+
+- Fixed (MODULES-105): a card taken off the deck no longer ends with its picture on its head. The "Upside down" landing spun the card half way round in its plane; nobody takes a card off and rotates it that way. A card now comes off and turns over **sideways**, about its vertical axis, like turning a page. There are two landings: **Still facing up** (no turn) and **Turned over** (a sideways turn to the back: the card's `backImage` or the package's own back). Previous reverses the same turn.
+- `deck-land="upside-down"` from 0.6.0 is still accepted so nothing breaks, and now means `face-down` (turned over). The address `?land=upside-down` opens the same. The Upside down button is gone from the demo and from the component. The type `DeckLanding` keeps `'upside-down'` as a deprecated alias; `deckLandings` lists the two real landings; new export `normalizeLanding`.
+- The deck's code moved into a small module `pile.js` (`fanLayout`, the landings and the flight), which `<fuda-collection>` imports. `<fuda-card>` is unchanged.
+
 ## 0.6.0 - 2026-11-02
 
 - New: the collection's **Display** is a row of buttons, not a drop-down. All twelve displays are on screen at once, spanning the width, each with a small picture of its layout; at least 48 px high, one chosen, wrapping on a phone (4 a row; 6 on a desk), arrow keys move the choice. The viewer follows the reader's light or dark setting (`theme="light|dark"` to choose). With `address` the display, the fan and the landing are kept in the page address (`?view=fan&fan=open&land=face-down`).

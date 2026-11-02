@@ -1,4 +1,5 @@
-import {stackLayout} from './stack.js';
+export {fanLayout, deckLandings, normalizeLanding} from './pile.js';
+export type {DeckLanding, FanPlace} from './pile.js';
 /** Browser-native collection viewer. Import this module to register <fuda-collection>. */
 export type CollectionView = 'deck' | 'rolodex' | 'binder' | 'case' | 'jukebox' | 'random' | 'story' | 'wall' | 'tower' | 'spotlight' | 'atlas' | 'fan';
 export interface CollectionMetadata {
@@ -56,28 +57,3 @@ export function movePage(index: number, length: number, pageSize: number, delta:
 }
 
 
-/** How a card flipped off the deck lands on the pile at its other side. */
-export type DeckLanding = 'face-up' | 'upside-down' | 'face-down';
-export const deckLandings: ReadonlyArray<{id: DeckLanding; label: string}> = [
-  {id:'face-up',label:'Still facing up'}, {id:'upside-down',label:'Upside down'}, {id:'face-down',label:'Face down'}
-];
-
-/** Where the cards of a fan lie, first card on the left when open and on top when closed. `open` is the fan spread like a hand of playing cards; `closed` is the squared-up deck it starts from and closes back to. */
-export interface FanPlace { angle: number; x: number; y: number; closedAngle: number; closedX: number; closedY: number }
-export function fanLayout(count: number, seed = 1): FanPlace[] {
-  const n = Math.max(0, Math.floor(count));
-  if (!n) return [];
-  const spread = Math.min(110, 11 * (n - 1)), step = n > 1 ? spread / (n - 1) : 0;
-  const nudge = stackLayout(n, {messiness: 0.25, seed, depth: n});
-  return Array.from({length: n}, (_, i) => {
-    const under = i >= 1 ? nudge[i - 1] : undefined;
-    return {
-      angle: Math.round((-spread / 2 + i * step) * 100) / 100,
-      x: Math.round((i - (n - 1) / 2) * 0.34 * 1000) / 1000,
-      y: 0,
-      closedAngle: under ? under.rotate / 3 : 0,
-      closedX: under ? under.x : 0,
-      closedY: under ? under.y : 0
-    };
-  });
-}
