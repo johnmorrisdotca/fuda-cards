@@ -2,12 +2,14 @@
 
 Fuda supplies reusable frames for a caller's cards and reusable ways to display collections on websites. The hosting site supplies the card data and artwork or interactive content. Initial versions of twelve layouts now exist in `<fuda-collection>`. They are prototypes; the detailed capabilities below remain design goals unless described as implemented in the README.
 
-## Choosing a display, the deck and the fan (0.6.0)
+## Choosing a display, piles, the fan and animation (0.6.0, 0.7.0)
 
 - **Display buttons.** All twelve displays are buttons on screen at once, in a row that spans the width, each with a small picture of its layout. No drop-down. At least 48 px high; 4 to a row on a phone, 6 on a desk; arrow keys move the choice; light and dark follow the reader.
-- **Deck.** A deck and a pile. Next flips the top card off to the pile on the deck's other side, Previous brings it back. The landing is a choice: still facing up, or turned over (a sideways turn about the card's vertical axis, like turning a page, showing the back image or the package's own back). A card never lands with its picture on its head; the 0.6.0 value `upside-down` still works and means turned over. One element flies, so a card is never drawn twice. The deck turns in 3D with the angle, tilt and Auto-turn controls.
-- **Fan.** `view="fan"`: the cards of the deck spread in an arc like a hand of playing cards (about half of each card shows) and close back to the squared-up deck, each card back where it started. The state is in the address (`?fan=open`).
-- Not done: a fan or a pile inside `<fuda-card stack>` (those cards all carry the same picture), dealing more than one card at a time, a pile that fills up with the whole discard history (the pile shows the last ten).
+- **Piles (0.7.0).** The Overlapping Deck, Random Draw, the Jukebox Carousel and the Flip Tower (the last three drew a pile of three cards) are the same pile with their own look. Every pile turns in 3D (angle, tilt, Auto-turn), fans open and closed, and has a card taken off it. `<fuda-card stack>` is a pile too. Rolodex and Spotlight spread their cards and are carousels, not piles.
+- **Deck.** A deck and a pile. Next flips the top card off to the pile on the deck's other side, Previous brings it back. The landing is a choice: still facing up, or turned over (a sideways turn about the card's vertical axis, like turning a page, showing the back image or the package's own back). A card never lands with its picture on its head; the 0.6.0 value `upside-down` still works and means turned over. One element flies, so a card is never drawn twice.
+- **Fan.** Every pile fans open and closed with a control right under the view: up to ten cards in an arc, most of each card showing, closing back exactly. `view="fan"` is the same pile with only the fan. In the address (`?fan=open`).
+- **Animate (0.7.0).** `animate="off"` and `speed` for every move: the fan, a card taken off, Next in the carousels, a binder page turn, a switch of display, a pan to the card in the wall, story and atlas. On when the attribute is missing; reduced motion always wins. One shared timing, CSS transforms and one-shot animations, nothing running when idle. Moves with it on and off end in exactly the same place.
+- Not done: dealing more than one card at a time, a pile that fills up with the whole discard history (the pile shows the last ten), wear on the cards of a fan.
 
 ## Zoom, Fit and move (every view)
 

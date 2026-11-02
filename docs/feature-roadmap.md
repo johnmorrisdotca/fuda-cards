@@ -19,7 +19,8 @@ Status key: [x] implemented at prototype level; [~] partial, requires further wo
 ## Collection display modes
 Each needs genuine distinct presentation, responsive layout, selection and keyboard/touch support, empty and large-collection behavior, and browser tests.
 - [~] Overlapping deck (0.6.0): a deck of up to ten cards beside a pile; Next flips the top card off onto the pile at the other side, still facing up or turned over (`deck-land`; `upside-down` is an alias of `face-down`), Previous brings it back; the whole deck turns in 3D with the angle, tilt and Auto-turn controls. Headless Chromium only.
-- [~] Fan (0.6.0): `view="fan"`, up to ten cards in an arc like a hand of playing cards (about half of each card shows) that opens and closes back to the deck, in the address. Not inside `<fuda-card stack>`.
+- [~] Piles (0.7.0): the Overlapping Deck, Random Draw, Jukebox and Flip Tower, and `<fuda-card stack>`, all turn in 3D, fan open and closed (up to ten cards, most of each card showing, closing back exactly, in the address) and have a card taken off them onto a pile at their side. `view="fan"` is the same pile with only the fan. Headless Chromium only.
+- [~] Animate (0.7.0): `animate="off"` and `speed` for the fan, a card taken off, Next in carousels, a switch of display, a pan to the card; on by default; reduced motion wins. Headless Chromium only.
 - [~] Display buttons (0.6.0): the twelve displays are a row of buttons with small pictures, 48 px high, arrow keys, light and dark, in the address; no drop-down.
 - [~] Binder: configurable page size and grid columns, with wrapped page controls; sleeves, covers, page turns and browser verification remain.
 - [~] Rolodex: rotating file of index cards.
