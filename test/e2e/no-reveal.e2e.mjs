@@ -3,6 +3,7 @@
 // and no page may shift (CLS). The art is a solid magenta picture the size of the real one, so any unframed pixel is found in a screenshot.
 import { test } from 'node:test';
 import { strict as assert } from 'node:assert';
+import { writeFile } from 'node:fs/promises';
 import { chromium, launch, portShift, webkit, launchWebKit, serve, sizes, offline } from './support.mjs';
 
 const port = 8115 + portShift, origin = `http://127.0.0.1:${port}`;
@@ -96,3 +97,79 @@ test('no demo page shifts while it loads, on a desk and a phone, with a slow scr
     }
   } finally { await browser.close(); server.close(); }
 });
+
+// Every other page and display, on a slow network with the cache off: every picture is the same tall magenta art, and a magenta pixel may only be inside a card, a pocket's card or a frame on the page at that moment.
+const MAGENTA_SVG = `data:image/svg+xml,${encodeURIComponent(art)}`;
+const frameRects = (page) => page.evaluate(() => {
+  const roots = [document]; for (const root of roots) for (const el of root.querySelectorAll('*')) if (el.shadowRoot) roots.push(el.shadowRoot);
+  const rects = [];
+  for (const root of roots) for (const el of root.querySelectorAll('.card, .art, .plate, dialog[open]')) { const r = el.getBoundingClientRect(); if (r.width && r.height) rects.push({ left: r.left - 3, top: r.top - 3, right: r.right + 3, bottom: r.bottom + 3 }); }
+  return { rects, stage: (() => { for (const root of roots) { const st = root.querySelector('.stage'); if (st) { const r = st.getBoundingClientRect(); return { left: r.left, top: r.top, right: r.right, bottom: r.bottom }; } } return null; })() };
+});
+// Magenta pixels outside every box of a list.
+const magentaOutside = (scanner, png, boxes) => scanner.evaluate(async ({ b64, boxes }) => {
+  const img = new Image(); img.src = `data:image/png;base64,${b64}`; await img.decode();
+  const canvas = document.createElement('canvas'); canvas.width = img.width; canvas.height = img.height;
+  const ctx = canvas.getContext('2d', { willReadFrequently: true }); ctx.drawImage(img, 0, 0);
+  const { data, width } = ctx.getImageData(0, 0, img.width, img.height); let inside = 0, outside = 0;
+  for (let i = 0; i < data.length; i += 4) {
+    if (data[i] < 180 || data[i + 2] < 180 || data[i + 1] > 90) continue;
+    const x = (i / 4) % width, y = Math.floor(i / 4 / width);
+    if (boxes.some((b) => x >= b.left && x <= b.right && y >= b.top && y <= b.bottom)) inside++; else outside++;
+  }
+  return { inside, outside };
+}, { b64: png.toString('base64'), boxes });
+
+async function filmPage(browser, path, size) {
+  const context = await browser.newContext({ viewport: size, deviceScaleFactor: 1, serviceWorkers: 'block' }), page = await context.newPage(), scanner = await context.newPage();
+  await page.bringToFront();
+  const cdp = await context.newCDPSession(page);
+  await cdp.send('Network.enable'); await cdp.send('Network.setCacheDisabled', { cacheDisabled: true });
+  await cdp.send('Network.emulateNetworkConditions', { offline: false, latency: 150, downloadThroughput: 400 * 1024 / 8 * 10, uploadThroughput: 100 * 1024 });
+  await cdp.send('Emulation.setCPUThrottlingRate', { rate: 4 });
+  await page.route(/./, async (route) => {
+    const request = route.request();
+    if (request.resourceType() === 'image') { await sleep(300); return route.fulfill({ contentType: 'image/svg+xml', body: art }); }
+    if (request.resourceType() === 'document') { const response = await route.fetch(); const html = await response.text(); return route.fulfill({ response, body: html.replace(/src="data:image\/[^"]*"/g, `src="${MAGENTA_SVG}"`) }); }
+    if (request.url().startsWith('https://api.tcgdex.net')) return route.fulfill({ contentType: 'application/json', body: JSON.stringify({ cards: Array.from({ length: 12 }, (_, i) => ({ id: `base1-${i + 1}`, localId: String(i + 1), name: `Card ${i + 1}`, image: `https://assets.tcgdex.net/en/base/base1/${i + 1}` })) }) });
+    return route.continue();
+  });
+  const frames = [], start = Date.now();
+  const going = page.goto(origin + path, { waitUntil: 'commit' }).catch(() => {});
+  let done = false; going.then(() => page.waitForLoadState('load')).then(() => sleep(1200)).then(() => { done = true; }).catch(() => { done = true; });
+  while (Date.now() - start < 12000 && !done) {
+    let png, boxes;
+    // Read before and after the picture, because a script may place a card in between: either place is a card's.
+    try { const before = await frameRects(page); png = await page.screenshot(); boxes = await frameRects(page); boxes.rects.push(...before.rects); } catch { await sleep(30); continue; }
+    frames.push({ t: Date.now() - start, png, boxes });
+    await sleep(30);
+  }
+  await going;
+  // The last frame, once the page has had time to show its pictures: the art must be seen at some point, or the film proved nothing.
+  await sleep(2000);
+  frames.push({ t: Date.now() - start, png: await page.screenshot(), boxes: await frameRects(page) });
+  const result = { frames: frames.length, worst: 0, at: 0, shown: 0 };
+  for (const f of frames) {
+    const m = await magentaOutside(scanner, f.png, f.boxes.rects);
+    if (m.outside > result.worst) { result.worst = m.outside; result.at = f.t; result.png = f.png; }
+    result.shown = Math.max(result.shown, m.inside);
+  }
+  await context.close();
+  return result;
+}
+
+const everyView = ['deck', 'rolodex', 'binder', 'case', 'random', 'story', 'wall', 'spotlight', 'atlas', 'fan'].map((v) => `/demo/collections-component.html?view=${v}`);
+test('on a slow network with the cache off, no page and no display shows a picture outside a card, on a desk or a phone', { skip: !chromium && 'Playwright not installed' }, async () => {
+  const browser = await launch(), server = serve(port);
+  try {
+    for (const path of ['/demo/collections.html', '/demo/rolodex.html', '/demo/tcgdex.html', '/demo/live-3d.html', ...everyView]) for (const [device, size] of sizes) {
+      const r = await filmPage(browser, path, size), where = `${device} ${path}`;
+      console.log(`NO-REVEAL ${where}: ${r.frames} frames, most outside ${r.worst}, most inside ${r.shown}`);
+      if (r.worst > 0 && process.env.FUDA_SHOTS) await writeFile(`${process.env.FUDA_SHOTS}/reveal-${device}-${path.replace(/\W+/g, '-')}.png`, r.png);
+      assert.ok(r.frames >= 3, `${where}: too few frames captured`);
+      assert.equal(r.worst, 0, `${where}: ${r.worst} art pixels outside every card at ${r.at} ms`);
+      assert.ok(r.shown > 0, `${where}: the art never showed, so this proves nothing`);
+    }
+  } finally { await browser.close(); server.close(); }
+});
+

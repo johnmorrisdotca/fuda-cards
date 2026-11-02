@@ -288,3 +288,9 @@
 - The runner's memory stop fired once, at 3.18 GB (sum of RSS of the process tree), when a server error left browsers open in a failing run. It stopped the file by process id as designed. The cause in `serve()` (a 200 written before the read) is fixed. Peak since: 1.75 GB.
 - Limits: software GL only, so no real GPU frame time, memory or driver behaviour is measured. A hidden tab is simulated by overriding `visibilityState`. No real phone or Safari. MODULES-35 (controls on the live card, real integration of the packages' viewers) is not started.
 
+## 2026-11-02 - No reveal on every page (MODULES-42), Mac Studio / night
+
+- The element's fix and the Studio's landed earlier (see the entry of work/no-reveal); that test filmed the Studio only. Filmed everything else: `demo/collections.html`, `rolodex.html`, `tcgdex.html`, `live-3d.html`, the ten displays of `collections-component.html`, desk and phone, cache off, slow network, 4x CPU, every picture magenta and tall. One fault: the rolodex demo (49,623 magenta pixels outside the cards at 1,624 ms on a desk) drew its cards unplaced until its script ran. Placed by CSS now; nothing else needed a change.
+- A frame's card boxes are read before and after its screenshot, so a card a script moves in between is not counted as a fault.
+- Limits: headless Chromium in software; a throttled network through CDP, not a real one; WebKit does not run off CI. No real phone.
+
