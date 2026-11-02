@@ -23,7 +23,7 @@ export interface StackLayoutOptions {
 }
 
 /** A stream of numbers in [0, 1) fixed by a seed (mulberry32). */
-function seededRandom(seed: number): () => number {
+export function seededRandom(seed: number): () => number {
   let state = seed >>> 0;
   return () => {
     state = (state + 0x6d2b79f5) >>> 0;

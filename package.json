@@ -35,6 +35,7 @@
     "docs/collection-input.md",
     "docs/framework-integration.md",
     "docs/materials.md",
+    "docs/wear.md",
     "assets/README.md"
   ],
   "engines": {

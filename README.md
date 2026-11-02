@@ -24,7 +24,7 @@ Requires Node 22+ and pnpm. Run `pnpm install`, `pnpm check`, then `pnpm dev` an
 
 In a bundler, import `@johnmorrisdotca/fuda-cards/element` once before rendering `<fuda-card>`. Frameworks may require custom-element configuration (for example, Angular's `CUSTOM_ELEMENTS_SCHEMA`). Framework-specific wrappers have not yet been implemented; see [framework integration examples](docs/framework-integration.md). For published releases, install with `npm install @johnmorrisdotca/fuda-cards`.
 
-The default slot accepts HTML, including an existing interactive 3D viewer; its owner handles rotation, zoom and model loading. The card has no drag-to-flip handler, leaving pointer interaction to that viewer. Control the card's reverse independently by adding or removing the `flipped` attribute. The demo provides a flip button. Attributes: `title`, `category`, `subtitle`, `description`, `number`, `rarity`, `variant` (`classic`, `sport`, `cosmic`), `finish` (`foil`, `matte`), `thickness` (millimetres, default `0.3`), `material`, `stack` and `flipped` (boolean). Set the element width to scale it. The main package entry exports the TypeScript options and available variants and finishes without registering the custom element.
+The default slot accepts HTML, including an existing interactive 3D viewer; its owner handles rotation, zoom and model loading. The card has no drag-to-flip handler, leaving pointer interaction to that viewer. Control the card's reverse independently by adding or removing the `flipped` attribute. The demo provides a flip button. Attributes: `title`, `category`, `subtitle`, `description`, `number`, `rarity`, `variant` (`classic`, `sport`, `cosmic`), `finish` (`foil`, `matte`), `thickness` (millimetres, default `0.3`), `material`, `stack`, `wear` and `flipped` (boolean). Set the element width to scale it. The main package entry exports the TypeScript options and available variants and finishes without registering the custom element.
 
 3D integrations, framework-specific examples, polished front and back designs, accessibility validation, and photorealistic finishes remain future work.
 
@@ -61,6 +61,16 @@ The card has thickness, drawn to scale at the 63 mm wide card size: set `thickne
 ```
 
 The top card is the live card. The block under it is one piece, and with `stack-messiness` above 0 (0 neat to 1 very messy, default 0.3) the `stack-depth` cards under the top one (default 10, at most 52) are drawn as flat stills, nudged and turned from `stack-seed`: the same seed gives the same stack, and a card put on top moves none of those under it. A stack is one 3D scene whatever its count, and it draws nothing while it is at rest: a test checks that a 52-card stack requests no frames at rest. The idea of a pile from neat to messy and its parameters come from [toranpu](https://github.com/johnmorrisdotca/toranpu)'s `<toranpu-pile>`. In script, `card.stackCount` and `card.stackHeight` (mm) are read-only, and the package exports `cardMaterials`, `stackPresets`, `stackHeightMm` and `stackLayout`.
+
+### Wear: cards that are not perfect
+
+`wear="lightly-played"` draws the card after use: corners that are soft, rounded, chipped or folded (a dog-ear), whitening on the edges, creases, scratches, specks, staining, yellowing and a print that sits off centre. The presets are the plain grading terms: `mint`, `near-mint`, `lightly-played`, `moderately-played`, `heavily-played` and `damaged`; `perfect`, no attribute at all, or an unknown name draws nothing. `wear-seed` fixes where the marks lie, so a card looks the same every time it is drawn. `wear-corners`, `wear-edges`, `wear-surface` and `wear-creases` (0 to 1) change one kind on its own, and `wear="0.5"` sets them all at once.
+
+```html
+<fuda-card title="Rookie" wear="moderately-played" wear-seed="7"></fuda-card>
+```
+
+A perfect card is byte for byte what it was: the wear code is a separate module that `<fuda-card>` loads only when a card asks for wear. [docs/wear.md](docs/wear.md) has the sources for the grading words, the presets with their levels, how each mark is drawn and what is not drawn. The package exports `wearPresets`, `wearLayout`, `wearLevels`, `wearOutline` and `wearOverlaySvg` as plain data.
 
 ### Whole-card rotation
 

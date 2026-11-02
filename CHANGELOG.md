@@ -1,5 +1,8 @@
 # Changelog
 
+## Unreleased
+
+
 ## 0.4.0 - 2026-11-02
 
 - New: `material` attribute (and `material` in `CardOptions`): 13 materials with a thickness and edge colour, each thickness from a maker or a standard and cited in `docs/materials.md`: card stock (250, 310 black core, 350 gsm), a plastic bank-size card, thick trading cards (35, 55, 75, 100, 130, 180 pt), a 175 pt booklet card, anodised aluminium and stainless steel. The edge takes the material's colour. `thickness` overrides it. Left out for want of a source: a patch or relic card, a graded slab, a plastic playing card, other metals.

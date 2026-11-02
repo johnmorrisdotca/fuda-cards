@@ -22,6 +22,15 @@ export interface CardOptions {
   stackSeed?: number;
   /** How many cards under the top one are laid out nudged and turned, at most 52. Default 10. */
   stackDepth?: number;
+  /** A card that is not perfect: a preset's id (`mint`, `near-mint`, `lightly-played`, `moderately-played`, `heavily-played`, `damaged`) or a number from 0 to 1. Default: perfect, nothing drawn. */
+  wear?: string | number;
+  /** The wear's seed: the same seed draws the same marks the same way. Default 1. */
+  wearSeed?: number;
+  /** One level of the wear on its own, from 0 to 1, over the preset's. */
+  wearCorners?: number;
+  wearEdges?: number;
+  wearSurface?: number;
+  wearCreases?: number;
   flipped?: boolean;
   motion?: 'still' | 'pan';
   playing?: boolean;
@@ -39,3 +48,5 @@ export { cardMaterials, cardMaterial, stackPresets, stackHeightMm, mmPerPoint } 
 export type { CardMaterial, CardMaterialGroup, CardMaterialSource, StackPreset } from './materials.js';
 export { stackLayout } from './stack.js';
 export type { StackPlace, StackLayoutOptions } from './stack.js';
+export { wearPresets, wearPreset, wearLevels, wearLayout, wearOutline, wearOverlaySvg } from './wear.js';
+export type { WearPreset, WearLevels, WearOptions, WearFeatures, WearCorner, CornerKind } from './wear.js';

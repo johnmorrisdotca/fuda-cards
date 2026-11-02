@@ -10,7 +10,7 @@ let focusedCard: FudaCard | null = null;
 const reducedMotion = () => typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
 document.addEventListener('pointerdown', event => { if (focusedCard && !event.composedPath().includes(focusedCard)) focusedCard.setFocused(false); }, true);
 export class FudaCard extends HTMLElement {
- static observedAttributes=['title','category','subtitle','description','number','rarity','motion','playing','thickness','autoplay','material','stack','stack-messiness','stack-seed','stack-depth'];
+ static observedAttributes=['title','category','subtitle','description','number','rarity','motion','playing','thickness','autoplay','material','stack','stack-messiness','stack-seed','stack-depth','wear','wear-seed','wear-corners','wear-edges','wear-surface','wear-creases'];
  private focused=false;
  private hushed=false;
  private focusedAtPress?: boolean;
@@ -57,6 +57,23 @@ export class FudaCard extends HTMLElement {
  get stackCount(): number {const n=Math.floor(Number.parseFloat(this.getAttribute('stack')??''));return n>=1?Math.min(1000,n):1;}
  /** Height of the stack in millimetres: the count times a card's thickness. */
  get stackHeight(): number {return stackHeightMm(this.stackCount,this.cardThicknessMm);}
+
+ private wearKey='';
+ private wearToken=0;
+ private wearModule?: typeof import('./wear.js');
+ /** Wear (an imperfect card) is drawn by a module that is loaded only when a card asks for it; a perfect card never loads it. */
+ private applyWear(): void {
+  const num=(name:string)=>{const v=this.getAttribute(name);return v===null||v.trim()===''?undefined:Number(v)};
+  const key=['wear','wear-seed','wear-corners','wear-edges','wear-surface','wear-creases'].map(n=>this.getAttribute(n)??'').join('|');
+  const w=this.getAttribute('wear')??'',asked=(w!==''&&w!=='perfect'&&w!=='0')||['wear-corners','wear-edges','wear-surface','wear-creases'].some(n=>this.hasAttribute(n));
+  if(key===this.wearKey||(!asked&&!this.wearModule))return;
+  this.wearKey=key;const token=++this.wearToken;
+  const draw=(m:typeof import('./wear.js'))=>{if(token!==this.wearToken||!this.shadowRoot)return;this.wearModule=m;m.applyWear(this.shadowRoot,{wear:this.getAttribute('wear'),seed:num('wear-seed'),corners:num('wear-corners'),edges:num('wear-edges'),surface:num('wear-surface'),creases:num('wear-creases')});this.dispatchEvent(new CustomEvent('fuda-wear',{detail:{key}}))};
+  if(this.wearModule)draw(this.wearModule);else void import('./wear.js').then(draw);
+ }
+ /** The wear the card is drawn with: a preset's id, a number, or an empty string when it is perfect. */
+ get wear(): string {return this.getAttribute('wear')??'';}
+ set wear(value: string) {if(value)this.setAttribute('wear',value);else this.removeAttribute('wear');}
  private stillsKey='';
  /** The cards under the top one that are laid out nudged and turned; the rest of the stack is one block with a line for each card on its edge. */
  private drawStills(card: HTMLElement, count: number): void {
@@ -68,6 +85,6 @@ export class FudaCard extends HTMLElement {
   const holder=card.querySelector('.stills');
   if(holder)holder.innerHTML=places.map((p,at)=>`<i class="still" style="--x:${p.x};--y:${p.y};--r:${p.rotate};--k:${count-places.length+at}"></i>`).join('');
  }
- render(): void {const card=this.shadowRoot?.querySelector<HTMLElement>('.card');if(card){const mm=this.cardThicknessMm,count=this.stackCount,material=cardMaterial(this.getAttribute('material'));card.style.setProperty('--mm',String(mm*count));card.style.setProperty('--mm1',String(mm));card.classList.toggle('stacked',count>1);if(material)card.style.setProperty('--edge',material.edge);else card.style.removeProperty('--edge');this.drawStills(card,count);}const button=this.shadowRoot?.querySelector<HTMLButtonElement>('.motion-button');if(button){button.hidden=this.getAttribute('motion')!=='pan';const active=this.isMoving;this.toggleAttribute('moving',active);button.setAttribute('aria-pressed',String(active));}for(const key of FudaCard.observedAttributes){const node=this.shadowRoot?.getElementById(key);if(node)node.textContent=this.getAttribute(key)||(defaults[key] ?? '');}}
+ render(): void {const card=this.shadowRoot?.querySelector<HTMLElement>('.card');if(card){const mm=this.cardThicknessMm,count=this.stackCount,material=cardMaterial(this.getAttribute('material'));card.style.setProperty('--mm',String(mm*count));card.style.setProperty('--mm1',String(mm));card.classList.toggle('stacked',count>1);if(material)card.style.setProperty('--edge',material.edge);else card.style.removeProperty('--edge');this.drawStills(card,count);}this.applyWear();const button=this.shadowRoot?.querySelector<HTMLButtonElement>('.motion-button');if(button){button.hidden=this.getAttribute('motion')!=='pan';const active=this.isMoving;this.toggleAttribute('moving',active);button.setAttribute('aria-pressed',String(active));}for(const key of FudaCard.observedAttributes){const node=this.shadowRoot?.getElementById(key);if(node)node.textContent=this.getAttribute(key)||(defaults[key] ?? '');}}
 }
 if(typeof customElements !== 'undefined' && !customElements.get('fuda-card'))customElements.define('fuda-card',FudaCard);
