@@ -277,6 +277,40 @@ test('a lost context: the card shows its picture and draws again when it comes b
   } finally { await browser.close(); server.close(); }
 });
 
+test('every display of the collection goes live on the card in focus, on the one context, and every move keeps it at one', skip, async () => {
+  const browser = await launch(), server = serve(PORT);
+  try {
+    const context = await browser.newContext({ viewport: { width: 1280, height: 900 } }), page = await context.newPage(), problems = [];
+    page.on('pageerror', (e) => problems.push(e.message));
+    await page.addInitScript(COUNT_SCRIPT);
+    await page.goto(`${origin}/demo/live-3d.html`);
+    await page.waitForFunction(() => window.fudaLive);
+    for (const view of ['binder', 'deck', 'rolodex', 'case', 'random', 'story', 'wall', 'spotlight', 'atlas', 'fan']) {
+      const result = await page.evaluate(async (view) => {
+        const binder = document.querySelector('#binder'), root = binder.shadowRoot;
+        binder.setAttribute('view', view);
+        const visible = () => [...root.querySelectorAll('.card[data-i]')].filter((c) => !c.classList.contains('ghost') && c.getBoundingClientRect().width > 0 && c.querySelector('.fuda-live'));
+        const end = performance.now() + 3000;
+        while (!visible().length && performance.now() < end) await new Promise((r) => setTimeout(r, 30));
+        const cards = visible(), card = cards[cards.length - 1];
+        if (!card) return { view, cards: 0 };
+        const ok = await fudaLive.focus(card), canvases = root.querySelectorAll('.card canvas').length;
+        const size = card.querySelector('canvas')?.getBoundingClientRect();
+        fudaLive.blur();
+        return { view, cards: cards.length, ok, canvases, width: size?.width ?? 0, contexts: window.__kazokuCount.contexts };
+      }, view);
+      console.log(`LIVE ${JSON.stringify(result)}`);
+      assert.ok(result.cards > 0, `${view}: no card took a live view`);
+      assert.equal(result.ok, true, `${view}: the card did not go live`);
+      assert.equal(result.canvases, 1, `${view}: one canvas in the card in focus`);
+      assert.ok(result.width > 10, `${view}: the canvas has a size`);
+      assert.equal(result.contexts, 1, `${view}: one context`);
+    }
+    assert.deepEqual(problems, []);
+    await context.close();
+  } finally { await browser.close(); server.close(); }
+});
+
 test('a card with no picture of its own gets one only when it comes near the view, one at a time from the one context', skip, async () => {
   const browser = await launch(), server = serve(PORT);
   try {
