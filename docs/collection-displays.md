@@ -62,12 +62,9 @@ Options
 - Support a responsive alternative for small displays and large collections; avoid rendering a separate active 3D viewer per card at once. The host controls the collection and card content.
 - Research: [angled modular display risers](https://boxboy.co/products/modular-display-risers), [staggered rear rows](https://dhoptcg.com/?product=glass-display-shelves), and [a 13-column, 7-row cabinet](https://www.jz-shop.com.tw/en/graded-card-display-case-slim). These examples show different capacities, so dimensions and overlap should remain adjustable.
 
-## Jukebox-style display
+## Jukebox-style display (dropped in 0.8.0)
 
-- Present the collection inside a jukebox-like device. Browse cards in the device, then select a card to bring it into a focused view.
-- Provide a clear way back to browsing and preserve the selected card and collection position.
-- Keep card flip and interactive content controls separate from the device navigation; make browse and selection usable by keyboard, touch, and pointer.
-- Allow the host to configure device styling and the cards supplied. Support a reduced-motion alternative to mechanical animations.
+A jukebox plays records, not cards, and the display drew the deck's pile of three cards, so it was removed (see the real-life audit above). `view="jukebox"` still opens the deck.
 
 ## Feeling lucky
 

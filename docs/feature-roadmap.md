@@ -29,7 +29,7 @@ Each needs genuine distinct presentation, responsive layout, selection and keybo
 - [~] Random draw: filter by name and sample matching cards; empty and single-match logic tested. Browser interaction verification remains.
 - [~] Vertical story scroll.
 - [~] Sliding gallery wall.
-- [~] Flip tower.
+- [x] Flip tower: dropped in 0.8.0 (no real counterpart; `view="tower"` opens the deck).
 - [~] Spotlight carousel.
 - [~] Card atlas: infinite-feeling plane, pan, pinch/scroll zoom and selection; virtualize large collections.
 - [~] Zoom, Fit and move in every display view (F22): the eleven `<fuda-collection>` views, the standalone rolodex and the Pokémon binder demo use `@johnmorrisdotca/kazoku-ui` view controls; Fit shows every card; Ctrl or Command with the wheel, pinch, drag and arrows work; flat views only (none turns in 3D). Tested in headless Chromium at desk and phone size; no real phone, Safari or Firefox.
