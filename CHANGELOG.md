@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Fixed (MODULES-98): **the Vertical Story Scroll's Fit shows every card.** Its cards were as tall as their pictures once those loaded, and 90 percent of the view before, so Fit was measured on a layout that then grew (cards 117 px outside the view on a desk). Its cards keep the 90 percent (`min-height:0`), so the layout does not change when the pictures arrive.
+- Tests: the autoplay tests read the pan animation's name from the computed style (Chromium 147 hands a shadow-style animation back with no `animationName`, so they counted no motion); the zoom test waits for the glide back to Fit to end before it measures.
+
 ## 0.9.0 - 2026-11-02
 
 - Fixed (MODULES-145): **a card is never see-through while it flips.** Every card of a 3D scene is drawn by its depth. A card taken off a pile started level with the pile it left, so it began half hidden by the cards of that pile and, while it turned, was cut by the cards it passed and showed them (and the background) through itself. The flight now starts above the pile it leaves, stays above both piles and is lifted while it turns by half its width times the sine of the turn, which is exactly what keeps its lowest corner clear, and is level and down on the pile at the end. This covers a card taken off a pile and put back (both landings, off an open fan and after a turn) in the collection's deck and in `<fuda-card stack>`. The binder's turning leaf had a hairline seam between its slices that showed the page behind; the slices now overlap by a pixel and a half. The single card's own flip was checked and has no fault.

@@ -17,7 +17,7 @@ button:focus-visible,input:focus-visible,.card:focus-visible{outline:3px solid v
 .grid{display:grid;grid-template-columns:repeat(var(--columns,3),minmax(0,1fr));gap:1rem;padding:1rem;align-content:start}.grid .card{height:clamp(130px,24vw,220px)}
 .v.case{perspective:800px}.stage.case{background:linear-gradient(#4a3f33,#1d1914);border:10px solid #6b5436;box-shadow:inset 0 0 26px #000a}.stage.case::after{content:'';position:absolute;inset:0;pointer-events:none;z-index:2;background:linear-gradient(115deg,#ffffff30 0,#ffffff00 28%,#ffffff12 55%,#ffffff00 78%,#ffffff22 100%)}.case .card{transform:perspective(600px) rotateX(-15deg);box-shadow:0 12px 0 -3px #2c251d,0 18px 8px -4px #000a}.case .card img{box-shadow:0 4px 10px #0009}
 .wall{display:flex;gap:1rem;align-items:center;padding:1rem}.wall .card{height:90%;flex:0 0 190px}
-.story{display:flex;flex-direction:column;align-items:center;gap:1rem;padding:1rem}.story .card{width:min(75%,300px);flex:0 0 90%}
+.story{display:flex;flex-direction:column;align-items:center;gap:1rem;padding:1rem}.story .card{width:min(75%,300px);flex:0 0 90%;min-height:0}
 .plane{position:absolute;left:0;top:0;display:grid;gap:18px;grid-template-columns:repeat(var(--atlas-cols,5),140px);padding:30px}.plane .card{height:195px}
 .stage.spotlight{background:radial-gradient(ellipse at center,#e5ce99,#454054 40%,#171822 78%)}
 .stage:is(.deck,.random,.fan){perspective:1800px}.v.deck{--w:200px;--gap:56px;--fl:0;--fr:0;--ft:0;--fb:0;--ease:cubic-bezier(.2,.8,.2,1);transform-style:preserve-3d}

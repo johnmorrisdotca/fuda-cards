@@ -111,6 +111,7 @@ async function exercise(p, name, spec) {
     assert.ok((await geo()).zoom > zoomed, here('moving on must keep the zoom'));
   }
   await bar('Fit').click();
+  await p.waitForFunction(({ stage, find }) => new Function('stage', `${find} return q(stage).getAnimations({ subtree: true }).length === 0;`)(stage), { stage, find }); // Fit after moving on glides back: measured where it ends, not on the way
   const end = await geo();
   assert.ok(end.outside <= 2 && end.zoom === 1, here('the last Fit does not show everything'));
   assert.ok(end.scrollWidth <= end.innerWidth, here('the page is wider than the window'));
