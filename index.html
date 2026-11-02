@@ -1,20 +1,161 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><style>fuda-card:where(:not(:defined)){display:inline-block;width:300px;aspect-ratio:2.5/3.5;overflow:hidden;visibility:hidden}fuda-collection:where(:not(:defined)){display:block;min-height:calc(var(--fuda-stage-height,clamp(300px,calc(100svh - 440px),620px)) + 200px)}</style><title>Fuda — Card Studio</title><style>body{margin:0;background:#10151e;color:#f3f0e9;font:15px system-ui,sans-serif}main{max-width:1200px;margin:auto;padding:40px 24px}h1{font:48px Georgia;margin:5px 0}p{color:#aeb9c4;line-height:1.5}header{display:flex;justify-content:space-between;align-items:end;gap:20px;flex-wrap:wrap}.tag{color:#d8b77d;letter-spacing:.22em;font-size:11px;font-weight:bold}.layout{display:grid;grid-template-columns:1fr 340px;gap:45px;margin-top:36px}.viewer{min-width:0;display:grid;gap:12px;align-content:start}.stage{position:relative;overflow:hidden;height:clamp(380px,calc(100svh - 330px),640px);background:radial-gradient(ellipse,#334250,#171e29 65%);border:1px solid #35404a;border-radius:16px}.stage:focus-visible{outline:2px solid #d8b77d;outline-offset:3px}.zoomer{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;transform-origin:50% 50%}.zoomer fuda-card{flex:none;--fuda-perspective:2400px}.controls{display:grid;gap:14px;align-content:start;min-width:0}select{min-width:0;max-width:100%;text-overflow:ellipsis}label{display:grid;gap:6px;color:#c5ccd1;font-size:12px;font-weight:bold}input,select,textarea,button{font:inherit;border-radius:7px;border:1px solid #46515b;padding:10px;background:#202a35;color:white}button{cursor:pointer;background:#d3b276;color:#171717;border:0;font-weight:bold}button:hover{background:#f0d094}.note{font-size:12px}kazoku-view-controls:not(:defined){display:block;min-height:56px}@media(max-width:760px){kazoku-view-controls:not(:defined){min-height:200px}.layout{grid-template-columns:1fr}.stage{height:clamp(380px,calc(100svh - 520px),480px)}h1{font-size:38px}}</style></head><body><main><header><div><div class="tag">FUDA / CARD STUDIO</div><h1>Make it collectible.</h1><p>A frame for the things you want to show off.</p></div><nav aria-label="Demos"><a href="demo/collections-component.html" style="color:#e1c082">Explore collection views →</a> &nbsp; <a href="demo/tcgdex.html" style="color:#e1c082">Explore the Pokémon binder →</a></nav></header><div class="layout"><div class="viewer"><section class="stage" id="stage" tabindex="0" role="group" aria-label="Card preview"><div class="zoomer" id="zoomer"><fuda-card id="card" motion="pan" card-spin="center" card-view title="Starship Block 3" category="ROCKET" subtitle="Starship + Super Heavy" description="Height: 124.4 m · Diameter: 9 m · 33 Raptor 3 booster engines." number="NO. 001" rarity="✦ RARE"><img id="art" alt="Starship Block 3 from Uchusen Rockets" src="assets/starship-v3-preview.jpg"></fuda-card></div></section><kazoku-view-controls id="view" for="stage" address zoom="1" zoom-min="0.5" theme="dark"></kazoku-view-controls></div><section class="controls" aria-label="Card controls"><label>Card style<select id="variant"><option value="classic">Classic collectible</option><option value="sport">Silver sport</option><option value="cosmic">Cosmic violet</option></select></label><label>Material<select id="material"><option value="">Standard card (0.3 mm, 12 pt)</option></select></label><label>Thickness<select id="thickness"><option value="">From the material</option><option value="0">Flat (0 mm)</option><option value="0.5">0.5 mm</option><option value="1">1 mm</option><option value="2">2 mm</option><option value="5">5 mm</option></select></label><label>Stack of cards<select id="stack-preset"><option value="1">One card</option></select></label><label>Cards in the stack<input id="stack" type="number" min="1" max="1000" step="1" value="1" inputmode="numeric"></label><label>Messiness<select id="stack-messiness"><option value="0">Neat</option><option value="0.15">Tidy</option><option value="0.3" selected>Slightly messy</option><option value="0.6">Messy</option><option value="1">Very messy</option></select></label><label>Shuffle seed<input id="stack-seed" type="number" min="0" step="1" value="1" inputmode="numeric"></label><p class="note" id="stack-info" aria-live="polite"></p><label>Wear<select id="wear"><option value="">Perfect</option></select></label><label>Wear seed<input id="wear-seed" type="number" min="0" step="1" value="1" inputmode="numeric"></label><p class="note" id="wear-info" aria-live="polite"></p><label>Finish<select id="finish"><option value="foil">Foil</option><option value="matte">Matte</option></select></label><label>Image motion<select id="motion"><option value="pan">Pan vertically</option><option value="still">Still</option></select></label><label>Starting view<select id="initial-motion"><option value="still">Focused still</option><option value="playing">Animated</option></select></label><label>Autoplay<select id="autoplay"><option value="off">Off (use the button)</option><option value="focus">When the card is in focus</option></select></label>
-<label>Pan direction<select id="pan-direction"><option value="down">Top to bottom</option><option value="up">Bottom to top</option></select></label><label>Card rotation<select id="card-spin"><option value="center">Rotate around center</option><option value="corner">Spin around bottom corner</option></select></label><label>Rotation speed<select id="spin-speed"><option value="180s">Slow (3 minutes per turn)</option><option value="30s">Medium (30 seconds)</option><option value="8s">Fast (8 seconds)</option></select></label><label>Rotation direction<select id="card-spin-direction"><option value="normal">Forward</option><option value="reverse">Reverse</option></select></label><label>Title<input id="title" value="Starship Block 3"></label><label>Category<input id="category" value="ROCKET"></label><label>Subtitle<input id="subtitle" value="Starship + Super Heavy"></label><label>Description<textarea id="description" rows="3">Height: 124.4 m · Diameter: 9 m · 33 Raptor 3 booster engines.</textarea></label><label>Image<input id="upload" type="file" accept="image/*"></label><button id="flip" type="button">Flip card</button><p class="note">Choose an image to preview your own content. Files stay in this browser session. Use the view controls under the card to turn, tip, zoom and move it. Auto-turn stays off when your device requests reduced motion.</p></section></div></main><script type="importmap">{"imports":{"@johnmorrisdotca/kazoku-ui/view-controls/define":"./node_modules/@johnmorrisdotca/kazoku-ui/dist/view-controls/define.js"}}</script><script type="module">import './dist/element.js';import {cardMaterials,stackPresets,wearPresets} from './dist/index.js';import '@johnmorrisdotca/kazoku-ui/view-controls/define';const card=document.querySelector('#card');for(const id of ['variant','finish','material','thickness','stack','stack-messiness','stack-seed','wear','wear-seed','motion','pan-direction','title','category','subtitle','description']){const el=document.getElementById(id);el.addEventListener('input',()=>card.setAttribute(id,el.value));}
-const wearSelect=document.querySelector('#wear'),wearInfo=document.querySelector('#wear-info');for(const w of wearPresets.filter(w=>w.id!=='perfect'))wearSelect.append(new Option(w.name,w.id));wearSelect.addEventListener('input',()=>{const w=wearPresets.find(w=>w.id===wearSelect.value);wearInfo.textContent=w?w.says:''});
-const groups={paper:'Paper card stock',plastic:'Plastic','thick-card':'Thick trading cards',metal:'Metal'},materialSelect=document.querySelector('#material'),presetSelect=document.querySelector('#stack-preset'),countInput=document.querySelector('#stack'),info=document.querySelector('#stack-info');
-for(const [group,label] of Object.entries(groups)){const og=document.createElement('optgroup');og.label=label;for(const m of cardMaterials.filter(m=>m.group===group)){const o=new Option(`${m.name} (${m.thicknessMm} mm)`,m.id);og.append(o)}materialSelect.append(og)}
-for(const p of stackPresets)presetSelect.append(new Option(p.name,String(p.count)));presetSelect.append(new Option('Another number','custom'));
-function showInfo(){const n=card.stackCount;info.textContent=n>1?`${n} cards x ${card.cardThicknessMm} mm = ${card.stackHeight} mm high`:`One card, ${card.cardThicknessMm} mm thick`}
-presetSelect.addEventListener('change',()=>{if(presetSelect.value==='custom'){countInput.focus();return}countInput.value=presetSelect.value;card.setAttribute('stack',presetSelect.value);showInfo()});
-countInput.addEventListener('input',()=>{const known=[...presetSelect.options].find(o=>o.value===countInput.value);presetSelect.value=known?known.value:'custom'});
-for(const el of [materialSelect,document.querySelector('#thickness'),countInput,document.querySelector('#stack-messiness'),document.querySelector('#stack-seed')])el.addEventListener('input',showInfo);showInfo();
-document.querySelector('#autoplay').addEventListener('change',e=>e.target.value==='focus'?card.setAttribute('autoplay','focus'):card.removeAttribute('autoplay'));
-document.querySelector('#initial-motion').addEventListener('change',e=>card.toggleAttribute('playing',e.target.value==='playing'));
-const stage=document.querySelector('#stage'),zoomer=document.querySelector('#zoomer'),view=document.querySelector('#view'),spinSelect=document.querySelector('#card-spin'),speedSelect=document.querySelector('#spin-speed'),directionSelect=document.querySelector('#card-spin-direction'),P=2400;let fit=1,last={yaw:0,tilt:0,zoom:1,panX:0,panY:0};
-function measure(){const w=card.offsetWidth,h=card.offsetHeight,m=16,corner=card.getAttribute('card-spin')==='corner',k=P/(P-(corner?w:w/2)),ex=corner?w*1.1:w/2*k,ey=corner?h*k:h/2*k;fit=Math.min(1,(stage.clientWidth/2-m)/ex,(stage.clientHeight/2-m)/ey);view.setFitScale(fit);draw(last);}
-function draw(s){last=s;zoomer.style.transform=`translate(${s.panX}px,${s.panY}px) scale(${fit*s.zoom})`;card.style.setProperty('--fuda-yaw',s.yaw+'deg');card.style.setProperty('--fuda-tilt',s.tilt+'deg');}
-view.addEventListener('kazoku-viewchange',e=>{draw(e.detail)});new ResizeObserver(measure).observe(stage);
-spinSelect.addEventListener('change',()=>{card.setAttribute('card-spin',spinSelect.value);measure();openFull()});
-function speed(){view.setAttribute('speed',String((directionSelect.value==='reverse'?-1:1)*360/parseFloat(speedSelect.value)))}
-speedSelect.addEventListener('change',speed);directionSelect.addEventListener('change',speed);speed();
-document.querySelector('#flip').addEventListener('click',()=>card.toggleAttribute('flipped'));let url;document.querySelector('#upload').addEventListener('change',e=>{const file=e.target.files[0];if(!file)return;if(url)URL.revokeObjectURL(url);url=URL.createObjectURL(file);const art=document.querySelector('#art');art.src=url;art.alt=file.name;});</script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>fuda-card:where(:not(:defined)){display:inline-block;width:300px;aspect-ratio:2.5/3.5;overflow:hidden;visibility:hidden}fuda-collection:where(:not(:defined)){display:block;min-height:calc(var(--fuda-stage-height,clamp(300px,calc(100svh - 440px),620px)) + 200px)}</style>
+<title>Fuda — Card Studio</title>
+<style>
+body{margin:0}
+main{max-width:1200px;margin:auto;padding:32px 24px}
+h1{font:48px Georgia,serif;margin:5px 0}
+p{color:var(--fc-muted);line-height:1.5}
+header{display:flex;justify-content:space-between;align-items:end;gap:20px;flex-wrap:wrap}
+.tag{color:var(--link);letter-spacing:.22em;font-size:11px;font-weight:bold}
+nav a{display:inline-flex;align-items:center;min-height:48px;margin-right:1rem}
+.layout{display:grid;grid-template-columns:1fr 360px;gap:40px;margin-top:24px}
+.viewer{min-width:0;display:grid;gap:12px;align-content:start}
+.stage{position:relative;overflow:hidden;height:clamp(380px,calc(100svh - 330px),640px);background:radial-gradient(ellipse,var(--fc-stage-1),var(--fc-stage-2) 65%);border:1px solid var(--line);border-radius:16px}
+.stage:focus-visible{outline:3px solid var(--fc-focus);outline-offset:3px}
+.zoomer{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;transform-origin:50% 50%}
+.zoomer fuda-card{flex:none;--fuda-perspective:2400px}
+.controls{display:grid;gap:16px;align-content:start;min-width:0}
+.note{font-size:12px;margin:0}
+kazoku-view-controls:not(:defined){display:block;min-height:56px}
+@media(max-width:760px){kazoku-view-controls:not(:defined){min-height:200px}.layout{grid-template-columns:1fr}.stage{height:clamp(380px,calc(100svh - 520px),480px)}h1{font-size:38px}main{padding:20px 16px}}
+</style>
+</head>
+<body>
+<main>
+<header>
+  <div><div class="tag">FUDA / CARD STUDIO</div><h1>Make it collectible.</h1><p>A frame for the things you want to show off.</p></div>
+  <nav aria-label="Demos"><a href="demo/collections-component.html">Explore collection views →</a><a href="demo/tcgdex.html">Explore the Pokémon binder →</a><a href="demo/vintage.html">Explore vintage cards →</a></nav>
+</header>
+<div class="layout">
+  <div class="viewer">
+    <section class="stage" id="stage" tabindex="0" role="group" aria-label="Card preview"><div class="zoomer" id="zoomer"><fuda-card id="card" motion="pan" card-spin="center" card-view title="Starship Block 3" category="ROCKET" subtitle="Starship + Super Heavy" description="Height: 124.4 m · Diameter: 9 m · 33 Raptor 3 booster engines." number="NO. 001" rarity="✦ RARE"><img id="art" alt="Starship Block 3 from Uchusen Rockets" src="assets/starship-v3-preview.jpg"></fuda-card></div></section>
+    <kazoku-view-controls id="view" for="stage" address zoom="1" zoom-min="0.5"></kazoku-view-controls>
+  </div>
+  <section class="controls" aria-label="Card controls">
+    <label class="demo-field">Card style<select id="variant" data-choice><option value="classic">Classic collectible</option><option value="sport">Silver sport</option><option value="cosmic">Cosmic violet</option></select></label>
+    <label class="demo-field">Wear<select id="wear" data-choice="tiles"><option value="">Perfect</option></select></label>
+    <p class="note" id="wear-info" aria-live="polite"></p>
+    <label class="demo-field">Wear seed<input id="wear-seed" type="number" min="0" step="1" value="1" inputmode="numeric"></label>
+    <label class="demo-field">Material<select id="material"><option value="">Standard card (0.3 mm, 12 pt)</option></select></label>
+    <label class="demo-field">Thickness<select id="thickness" data-choice><option value="">From the material</option><option value="0">Flat (0 mm)</option><option value="0.5">0.5 mm</option><option value="1">1 mm</option><option value="2">2 mm</option><option value="5">5 mm</option></select></label>
+    <label class="demo-field">Stack of cards<select id="stack-preset"><option value="1">One card</option></select></label>
+    <label class="demo-field">Cards in the stack<input id="stack" type="number" min="1" max="1000" step="1" value="1" inputmode="numeric"></label>
+    <label class="demo-field">Messiness<select id="stack-messiness" data-choice><option value="0">Neat</option><option value="0.15">Tidy</option><option value="0.3" selected>Slightly messy</option><option value="0.6">Messy</option><option value="1">Very messy</option></select></label>
+    <label class="demo-field">Shuffle seed<input id="stack-seed" type="number" min="0" step="1" value="1" inputmode="numeric"></label>
+    <p class="note" id="stack-info" aria-live="polite"></p>
+    <label class="demo-field">Finish<select id="finish" data-choice><option value="foil">Foil</option><option value="matte">Matte</option></select></label>
+    <label class="demo-field">Image motion<select id="motion" data-choice><option value="pan">Pan vertically</option><option value="still">Still</option></select></label>
+    <label class="demo-field">Starting view<select id="initial-motion" data-choice><option value="still">Focused still</option><option value="playing">Animated</option></select></label>
+    <label class="demo-field">Autoplay<select id="autoplay" data-choice><option value="off">Off (use the button)</option><option value="focus">When the card is in focus</option></select></label>
+    <label class="demo-field">Pan direction<select id="pan-direction" data-choice><option value="down">Top to bottom</option><option value="up">Bottom to top</option></select></label>
+    <label class="demo-field">Card rotation<select id="card-spin" data-choice><option value="center">Rotate around center</option><option value="corner">Spin around bottom corner</option></select></label>
+    <label class="demo-field">Rotation speed<select id="spin-speed" data-choice><option value="180s">Slow (3 minutes per turn)</option><option value="30s">Medium (30 seconds)</option><option value="8s">Fast (8 seconds)</option></select></label>
+    <label class="demo-field">Rotation direction<select id="card-spin-direction" data-choice><option value="normal">Forward</option><option value="reverse">Reverse</option></select></label>
+    <label class="demo-field">Title<input id="title" value="Starship Block 3"></label>
+    <label class="demo-field">Category<input id="category" value="ROCKET"></label>
+    <label class="demo-field">Subtitle<input id="subtitle" value="Starship + Super Heavy"></label>
+    <label class="demo-field">Description<textarea id="description" rows="3">Height: 124.4 m · Diameter: 9 m · 33 Raptor 3 booster engines.</textarea></label>
+    <span class="btn file-btn">Choose your own image<input id="upload" type="file" accept="image/*" aria-label="Image"></span>
+    <button class="btn primary" id="flip" type="button">Flip card</button>
+    <p class="note">Choose an image to preview your own content. Files stay in this browser session. Use the view controls under the card to turn, tip, zoom and move it. Auto-turn stays off when your device requests reduced motion. Your choices are kept in the page address.</p>
+  </section>
+</div>
+</main>
+<script type="importmap">{"imports":{"@johnmorrisdotca/kazoku-ui/view-controls/define":"./node_modules/@johnmorrisdotca/kazoku-ui/dist/view-controls/define.js"}}</script>
+<script type="module">
+import './dist/element.js';
+import { cardMaterials, stackPresets, wearPresets } from './dist/index.js';
+import '@johnmorrisdotca/kazoku-ui/view-controls/define';
+import { setupPage, choiceFromSelect, keepInAddress } from './demo/ui.js';
+setupPage();
+
+const $ = (selector) => document.querySelector(selector);
+const card = $('#card');
+for (const id of ['variant', 'finish', 'material', 'thickness', 'stack', 'stack-messiness', 'stack-seed', 'wear', 'wear-seed', 'motion', 'pan-direction', 'title', 'category', 'subtitle', 'description']) {
+  const el = document.getElementById(id);
+  el.addEventListener('input', () => card.setAttribute(id, el.value));
+}
+
+// Options that come from the package.
+const wearSelect = $('#wear'), wearInfo = $('#wear-info');
+for (const w of wearPresets.filter((w) => w.id !== 'perfect')) wearSelect.append(new Option(w.name, w.id));
+wearSelect.addEventListener('input', () => { const w = wearPresets.find((w) => w.id === wearSelect.value); wearInfo.textContent = w ? w.says : ''; });
+const groups = { paper: 'Paper card stock', plastic: 'Plastic', 'thick-card': 'Thick trading cards', metal: 'Metal' };
+const materialSelect = $('#material'), presetSelect = $('#stack-preset'), countInput = $('#stack'), info = $('#stack-info');
+for (const [group, label] of Object.entries(groups)) {
+  const og = document.createElement('optgroup');
+  og.label = label;
+  for (const m of cardMaterials.filter((m) => m.group === group)) og.append(new Option(`${m.name} (${m.thicknessMm} mm)`, m.id));
+  materialSelect.append(og);
+}
+for (const p of stackPresets) presetSelect.append(new Option(p.name, String(p.count)));
+presetSelect.append(new Option('Another number', 'custom'));
+function showInfo() {
+  const n = card.stackCount;
+  info.textContent = n > 1 ? `${n} cards x ${card.cardThicknessMm} mm = ${card.stackHeight} mm high` : `One card, ${card.cardThicknessMm} mm thick`;
+}
+presetSelect.addEventListener('change', () => {
+  if (presetSelect.value === 'custom') { countInput.focus(); return; }
+  countInput.value = presetSelect.value;
+  card.setAttribute('stack', presetSelect.value);
+  showInfo();
+});
+countInput.addEventListener('input', () => {
+  const known = [...presetSelect.options].find((o) => o.value === countInput.value);
+  presetSelect.value = known ? known.value : 'custom';
+});
+for (const el of [materialSelect, $('#thickness'), countInput, $('#stack-messiness'), $('#stack-seed')]) el.addEventListener('input', showInfo);
+showInfo();
+$('#autoplay').addEventListener('change', (e) => e.target.value === 'focus' ? card.setAttribute('autoplay', 'focus') : card.removeAttribute('autoplay'));
+$('#initial-motion').addEventListener('change', (e) => card.toggleAttribute('playing', e.target.value === 'playing'));
+
+// The short lists become rows of buttons; the long ones stay drop-downs, in the same style.
+for (const select of document.querySelectorAll('select[data-choice]')) choiceFromSelect(select, { layout: select.dataset.choice === 'tiles' ? 'tiles' : 'row' });
+
+// The stage: the card turns, tips and zooms with the shared view controls.
+const stage = $('#stage'), zoomer = $('#zoomer'), view = $('#view'), spinSelect = $('#card-spin'), speedSelect = $('#spin-speed'), directionSelect = $('#card-spin-direction'), P = 2400;
+let fit = 1, last = { yaw: 0, tilt: 0, zoom: 1, panX: 0, panY: 0 };
+function measure() {
+  const w = card.offsetWidth, h = card.offsetHeight, m = 16, corner = card.getAttribute('card-spin') === 'corner';
+  const k = P / (P - (corner ? w : w / 2)), ex = corner ? w * 1.1 : w / 2 * k, ey = corner ? h * k : h / 2 * k;
+  fit = Math.min(1, (stage.clientWidth / 2 - m) / ex, (stage.clientHeight / 2 - m) / ey);
+  view.setFitScale(fit);
+  draw(last);
+}
+function draw(s) {
+  last = s;
+  zoomer.style.transform = `translate(${s.panX}px,${s.panY}px) scale(${fit * s.zoom})`;
+  card.style.setProperty('--fuda-yaw', s.yaw + 'deg');
+  card.style.setProperty('--fuda-tilt', s.tilt + 'deg');
+}
+view.addEventListener('kazoku-viewchange', (e) => draw(e.detail));
+new ResizeObserver(measure).observe(stage);
+spinSelect.addEventListener('change', () => { card.setAttribute('card-spin', spinSelect.value); measure(); });
+function speed() { view.setAttribute('speed', String((directionSelect.value === 'reverse' ? -1 : 1) * 360 / parseFloat(speedSelect.value))); }
+speedSelect.addEventListener('change', speed);
+directionSelect.addEventListener('change', speed);
+speed();
+$('#flip').addEventListener('click', () => card.toggleAttribute('flipped'));
+let url;
+$('#upload').addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  if (url) URL.revokeObjectURL(url);
+  url = URL.createObjectURL(file);
+  const art = $('#art');
+  art.src = url;
+  art.alt = file.name;
+});
+
+// Every choice is kept in the address (`?wear=damaged&finish=matte`), and a link to it opens the same card.
+keepInAddress(['variant', 'wear', 'wear-seed', 'material', 'thickness', 'stack', 'stack-messiness', 'stack-seed', 'finish', 'motion', 'initial-motion', 'autoplay', 'pan-direction', 'card-spin', 'spin-speed', 'card-spin-direction', 'title', 'category', 'subtitle', 'description']);
+showInfo();
+measure();
+</script>
+</body>
+</html>

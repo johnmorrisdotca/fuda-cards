@@ -1,14 +1,60 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>fuda-card:where(:not(:defined)){display:inline-block;width:300px;aspect-ratio:2.5/3.5;overflow:hidden;visibility:hidden}fuda-collection:where(:not(:defined)){display:block;min-height:calc(var(--fuda-stage-height,clamp(300px,calc(100svh - 440px),620px)) + 200px)}</style><title>Fuda collection views</title><style>body{margin:0;background:#14151d;color:#f5f2eb;font:16px system-ui}main{max-width:1100px;margin:auto;padding:1rem}h1{font-size:1.4rem;margin:.2rem 0}.top{margin:.3rem 0 .7rem}p{color:#c7c4ce}label{display:block;margin:1rem 0}input{font:inherit}</style></head><body><main><h1>Fuda collection views</h1><p class="top"><a href="../index.html" style="color:#e1c082">← Card studio</a> · Choose a display, browse, select a card to inspect it. Zoom, Fit and move work in every view.</p><fuda-collection address></fuda-collection><section aria-label="Collection tools"><label>Demo user: <select id="demo-user" aria-label="Demo user"></select></label><p id="demo-collection"></p><label>Load your collection (JSON): <input type="file" id="file" accept=".json,application/json"></label><label>Saved collection: <select id="saved"><option value="">Choose a collection</option></select> <button id="save" type="button">Save current collection</button> <button id="load" type="button">Load</button> <button id="delete" type="button">Delete</button> <button id="legacy" type="button">Import older saved collections</button> <button id="export" type="button">Export current collection</button></label><p id="status" role="status"></p><p>Sample images come from TCGdex and Hako Devices.</p></section></main><script type="importmap">{"imports":{"@johnmorrisdotca/kazoku-ui/view-controls/define":"../node_modules/@johnmorrisdotca/kazoku-ui/dist/view-controls/define.js"}}</script><script type="module">
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>fuda-card:where(:not(:defined)){display:inline-block;width:300px;aspect-ratio:2.5/3.5;overflow:hidden;visibility:hidden}fuda-collection:where(:not(:defined)){display:block;min-height:calc(var(--fuda-stage-height,clamp(300px,calc(100svh - 440px),620px)) + 200px)}</style>
+<title>Fuda collection views</title>
+<style>
+main{max-width:1100px;margin:auto;padding:1rem}
+h1{font-size:1.4rem;margin:.2rem 0}
+.top{margin:.3rem 0 .8rem;color:var(--fc-muted)}
+.top a{display:inline-flex;align-items:center;min-height:48px}
+fuda-collection{--fuda-stage-height:clamp(260px,calc(100svh - 620px),620px)}
+@media(max-width:600px){.long{display:none}.top{margin:.1rem 0 .4rem}}
+@media(min-width:700px){fuda-collection{--fuda-stage-height:clamp(300px,calc(100svh - 520px),620px)}}
+.tools{display:grid;gap:1rem;margin-top:1.2rem}
+.row{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center}
+#demo-collection,#status{margin:0;color:var(--fc-muted)}
+small{color:var(--fc-muted)}
+</style>
+</head>
+<body>
+<main>
+<h1>Fuda collection views</h1>
+<p class="top"><a href="../index.html">← Card studio</a> · Choose a display, browse, select a card to inspect it. <span class="long">Zoom, Fit and move work in every view; the deck also turns in 3D, and a card flipped off it lands on the pile beside it.</span></p>
+<fuda-collection address></fuda-collection>
+<section class="tools" aria-label="Collection tools">
+  <label class="demo-field">Demo collector<select id="demo-user" aria-label="Demo user"></select></label>
+  <p id="demo-collection"></p>
+  <label class="demo-field">Saved collection<select id="saved"><option value="">Choose a collection</option></select></label>
+  <div class="row">
+    <button class="btn" id="save" type="button">Save current collection</button>
+    <button class="btn" id="load" type="button">Load</button>
+    <button class="btn" id="delete" type="button">Delete</button>
+    <button class="btn" id="legacy" type="button">Import older saved collections</button>
+    <button class="btn" id="export" type="button">Export current collection</button>
+    <span class="btn file-btn">Load your collection (JSON)<input type="file" id="file" accept=".json,application/json" aria-label="Load your collection (JSON)"></span>
+  </div>
+  <p id="status" role="status"></p>
+  <small>Sample images come from TCGdex and Hako Devices. Pokémon card images belong to their owners; this demo is not affiliated with Pokémon or TCGdex. For cards whose pictures are free to use, see <a href="vintage.html">the vintage cards</a>.</small>
+</section>
+</main>
+<script type="importmap">{"imports":{"@johnmorrisdotca/kazoku-ui/view-controls/define":"../node_modules/@johnmorrisdotca/kazoku-ui/dist/view-controls/define.js"}}</script>
+<script type="module">
 import '../dist/collection-element.js';
 import {demoUsers} from './users.js';
 import {listCollections,saveCollection,deleteCollection,importLegacy} from './storage.js';
+import {setupPage,choiceFromSelect} from './ui.js';
+setupPage();
 const viewer=document.querySelector('fuda-collection');
 const userSelect=document.querySelector('#demo-user');
-for (const user of demoUsers) userSelect.add(new Option(user.name,user.id));
-function selectUser(){const user=demoUsers.find(item=>item.id===userSelect.value);if(!user)return;viewer.cards=user.cards;document.querySelector('#demo-collection').textContent=`${user.name}’s collection: ${user.collection} · ${user.cards.length} cards`;document.querySelector('#status').textContent='Demo user selected.';updateSaved();}
-userSelect.addEventListener('change',selectUser);
+for (const user of demoUsers) userSelect.add(new Option(`${user.name}: ${user.collection} (${user.cards.length} cards)`,user.id));
 const status=document.querySelector('#status'),saved=document.querySelector('#saved');
+function selectUser(){const user=demoUsers.find(item=>item.id===userSelect.value);if(!user)return;viewer.cards=user.cards;document.querySelector('#demo-collection').textContent=`${user.name}’s collection: ${user.collection} · ${user.cards.length} cards`;status.textContent='Demo user selected.';updateSaved();}
+userSelect.addEventListener('change',selectUser);
 function updateSaved(selected=''){try{const data=listCollections(localStorage,userSelect.value);saved.replaceChildren(new Option('Choose a collection',''));Object.keys(data).sort().forEach(name=>saved.add(new Option(name,name)));saved.value=selected}catch(error){saved.replaceChildren(new Option('Choose a collection',''));status.textContent=`Could not read collections: ${error.message}`}}
+choiceFromSelect(userSelect,{layout:'row',label:'Demo collector'});
 selectUser();
 document.querySelector('#save').onclick=()=>{const name=prompt('Name this collection:');if(!name||!name.trim())return;try{const trimmed=name.trim();const all=listCollections(localStorage,userSelect.value);if(Object.hasOwn(all,trimmed)&&!confirm(`Replace “${trimmed}”?`))return;saveCollection(localStorage,userSelect.value,trimmed,viewer.cards);updateSaved(trimmed);status.textContent='Collection saved for this demo user in this browser.'}catch(error){status.textContent=`Could not save collection: ${error.message}`}};
 document.querySelector('#load').onclick=()=>{if(!saved.value){status.textContent='Choose a saved collection first.';return}try{viewer.cards=listCollections(localStorage,userSelect.value)[saved.value];document.querySelector('#demo-collection').textContent=`Saved collection: ${saved.value} · ${viewer.cards.length} cards`;status.textContent=`Loaded ${saved.value}.`}catch(error){status.textContent=`Could not load collection: ${error.message}`}};
@@ -16,4 +62,6 @@ document.querySelector('#delete').onclick=()=>{const name=saved.value;if(!name){
 document.querySelector('#legacy').onclick=()=>{try{const count=importLegacy(localStorage,userSelect.value);updateSaved();status.textContent=`Imported ${count} older collections. Existing names were kept.`}catch(error){status.textContent=`Could not import older collections: ${error.message}`}};
 document.querySelector('#export').onclick=()=>{const blob=new Blob([JSON.stringify(viewer.cards,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const link=document.createElement('a');link.href=url;link.download='fuda-collection.json';link.click();setTimeout(()=>URL.revokeObjectURL(url),0)};
 document.querySelector('#file').onchange=async e=>{const file=e.target.files?.[0];if(!file)return;try{viewer.cards=JSON.parse(await file.text());document.querySelector('#demo-collection').textContent=`Imported collection · ${viewer.cards.length} cards`;status.textContent=`Loaded ${viewer.cards.length} cards.`}catch(error){status.textContent=`Could not load collection: ${error.message}`}finally{e.target.value=''}};
-</script></body></html>
+</script>
+</body>
+</html>
