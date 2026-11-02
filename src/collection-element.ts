@@ -1,4 +1,4 @@
-import {collectionViewAliases, collectionViews, parseCollection, randomDrawIndex, movePage, type CollectionCard, type CollectionView} from './collection.js';
+import {collectionViewAliases, collectionViews, isCard, parseCollection, randomDrawIndex, movePage, type CollectionCard, type CollectionView} from './collection.js';
 import {BINDER_CSS, binderCovers, binderLayout, buildLeaf, buildSide, sideCount, spreadCount, spreadOf, spreadSides, type BinderLayout} from './binder.js';
 import {deckLandings, fanBounds, fanLayout, fanShift, flight, normalizeLanding, timing, type FanPlace} from './pile.js';
 import {zoomView, type ZoomView} from './zoom.js';
@@ -29,7 +29,7 @@ button:focus-visible,input:focus-visible,.card:focus-visible{outline:3px solid v
 .fan-open .deck-pile .card{transform-origin:50% 165%;transform:translate3d(calc(var(--fx,0) * var(--w)),0,calc(var(--k,0) * .9px)) rotate(calc(var(--fa,0) * 1deg));transition-delay:calc(var(--i,0) * var(--stag,28ms));pointer-events:auto;cursor:pointer}.fan-open .deck-pile .card:hover,.fan-open .deck-pile .card:focus-visible{translate:0 -14px}
 .fly,.turn{position:absolute;inset:0;transform-style:preserve-3d}.face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:5%;overflow:hidden}.face img{display:block;width:100%;height:100%;object-fit:contain;border-radius:3%;box-shadow:0 4px 10px #0008}.face.back{transform:rotateY(180deg)}
 .generic-back{display:grid;place-items:center;background:radial-gradient(ellipse at center,#b78745 0 12%,#152d46 13% 27%,#386988 28% 31%,#10233b 32% 62%,#d2b074 63% 66%,#182c45 67%);border:6px solid #b39158;color:#f7e9bf;font:bold 18px Georgia;letter-spacing:.12em;box-shadow:0 4px 10px #0008}
-.pile.discard[data-land=face-down] .card .turn{transform:rotateY(180deg)}.ghost{pointer-events:none}
+.pile.discard[data-land=face-down] .card:not(.flat) .turn{transform:rotateY(180deg)}.card.flat .turn{transform:rotateY(calc(var(--fuda-yaw,0) * -1deg)) rotateX(calc(var(--fuda-tilt,0) * -1deg))}.ghost{pointer-events:none}
 dialog{color:var(--fc-text);background:var(--fc-dialog);border:1px solid var(--fc-btn-border);border-radius:1rem;text-align:center;max-width:95vw;max-height:95vh}dialog::backdrop{background:#000c}.detail{display:block;height:min(70vh,600px);max-width:80vw;object-fit:contain;margin:1rem auto}.empty{text-align:center;padding:3rem}
 @media(max-width:600px){.stage{height:var(--fuda-stage-height,clamp(220px,calc(100svh - 570px),620px))}}@media(max-width:500px){.opts{grid-template-columns:repeat(2,minmax(0,1fr))}.opts .speed{grid-column:1/-1}.v.deck{--gap:28px}.grid{grid-template-columns:repeat(min(2,var(--columns,3)),minmax(0,1fr))}.shell{padding:.7rem}.v.deck{--w:150px}}@media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>`;
@@ -83,7 +83,9 @@ export class FudaCollection extends HTMLElement {
   private get fanOpen(){return this.getAttribute('fan')==='open'}
   private get stacked(){return ![...pages,...scrolling].includes(this.currentView)}
   private get piled(){return pileViews.includes(this.currentView)}
-  private get turnable(){return this.piled||this.currentView==='fan'}
+  /** Only a card turns: a collection of objects (no card in it) never turns, and in a mixed one the objects stay square to the reader while the cards turn. */
+  private get hasCards(){return this.data.some(isCard)}
+  private get turnable(){return (this.piled||this.currentView==='fan')&&this.hasCards}
   private q<T extends HTMLElement=HTMLElement>(selector: string){return this.root.querySelector(selector) as T}
   /** With `address`, the display, the fan, the landing, the animation and its speed are kept in the page's address (`?view=fan&fan=open&land=face-down&animate=off`), and a link to it opens the same. */
   private readAddress(){try{const params=new URLSearchParams(location.search);for(const key of ADDRESS_KEYS){const value=params.get(key);if(value===null)continue;const attr=NAMES[key]??key;if(this.getAttribute(attr)!==value)this.setAttribute(attr,value)}}catch{}}
@@ -135,15 +137,18 @@ export class FudaCollection extends HTMLElement {
     const places=stackLayout(positions.length,{messiness:messy,seed,depth});
     shown.forEach((at,j)=>{
       const top=j===shown.length-1,c=this.data[at],place=places[j];
-      const el=document.createElement('div');el.className=`card${top?' top':''}`;el.dataset.i=String(at);
+      const el=document.createElement('div');const flat=!isCard(c);el.className=`card${top?' top':''}${flat?' flat':''}`;el.dataset.i=String(at);
       if(place&&!top){el.style.setProperty('--x',String(place.x));el.style.setProperty('--y',String(place.y));el.style.setProperty('--r',String(place.rotate))}
       el.style.setProperty('--k',String(j));el.style.setProperty('--j',String(shown.length-1-j));
       const f=fan[shown.length-1-j];if(f){el.style.setProperty('--fx',String(f.x));el.style.setProperty('--fa',String(f.angle));el.style.setProperty('--i',String(shown.length-1-j))}
       const fly=document.createElement('div');fly.className='fly';const turn=document.createElement('div');turn.className='turn';
       const front=document.createElement('div');front.className='face front';const img=document.createElement('img');img.src=c.image;img.alt=top?c.name:'';img.loading='lazy';img.onerror=()=>{img.replaceWith(document.createTextNode(`Image unavailable: ${c.name}`))};front.append(img);
-      const back=document.createElement('div');back.className='face back';
-      if(c.backImage){const b=document.createElement('img');b.src=c.backImage;b.alt='';b.loading='lazy';back.append(b)}else{back.classList.add('generic-back');back.textContent='FUDA'}
-      turn.append(front,back);fly.append(turn);el.append(fly);
+      turn.append(front);
+      // An object has no back to show: only a card gets the picture of its back (or the package's own).
+      if(!flat){const back=document.createElement('div');back.className='face back';
+        if(c.backImage){const b=document.createElement('img');b.src=c.backImage;b.alt='';b.loading='lazy';back.append(b)}else{back.classList.add('generic-back');back.textContent='FUDA'}
+        turn.append(back)}
+      fly.append(turn);el.append(fly);
       el.onclick=()=>this.open(c);
       if(top){el.setAttribute('role','button');el.setAttribute('aria-label',`Inspect ${c.name}`);el.tabIndex=0;el.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();this.open(c)}}}
       pile.append(el)
@@ -198,8 +203,10 @@ export class FudaCollection extends HTMLElement {
     const lead=this.fanOpen&&this.fanPlaces.length>1?this.fanPlaces[0]:null,shift=lead?fanShift(lead):{x:0,y:0};
     const away={x:shift.x*w,y:shift.y*w},spin=lead?lead.angle:0;
     // Taking a card off an open fan starts it where the fan holds it; bringing it back ends there.
-    const from=direction==='off'?{x:-dx+away.x,y:-dy+away.y}:{x:dx-away.x,y:dy-away.y};
-    flight(fly,turn,from,this.land,direction,ms,direction==='off'?spin:-spin)
+    // The piles' cards lie 0.9 px apart in depth (ten at most), so the flying card starts just above the higher of them and ends at its own place.
+    const z=9.6-(Number.parseFloat(moved.style.getPropertyValue('--k'))||0)*0.9;
+    const from=direction==='off'?{x:-dx+away.x,y:-dy+away.y,z}:{x:dx-away.x,y:dy-away.y,z};
+    flight(fly,turn,from,moved.classList.contains('flat')?'face-up':this.land,direction,ms,direction==='off'?spin:-spin)
   }
   private renderFan(v:HTMLElement){this.renderDeck(v,true)}
   /** Where every card is on screen now, by data index. */
@@ -273,11 +280,11 @@ export class FudaCollection extends HTMLElement {
     const t=this.timeVars(),playing=t.on&&how&&this.data.length>0;
     const before=playing?this.snapshot(v):new Map<string,DOMRect>(),left=playing&&how!.kind==='move'&&gliding.includes(view)?Array.from(v.querySelectorAll<HTMLElement>('.card:not(.ghost)')):[];
     this.syncBinder(view);this.tiles!.set(view);this.landing!.set(this.land);this.fanChoice!.set(this.fanOpen?'open':'closed');this.syncChoices();
-    this.landing!.hidden=!this.piled;this.fanChoice!.hidden=!(this.piled||view==='fan');
+    this.landing!.hidden=!this.piled||!this.hasCards;this.fanChoice!.hidden=!(this.piled||view==='fan');
     this.q('.count').textContent=this.data.length?(view==='binder'?this.binderCount():pages.includes(view)?`Page ${Math.floor(this.index/this.pageSize)+1} / ${Math.ceil(this.data.length/this.pageSize)}`:`${this.index+1} / ${this.data.length}`):'No cards';
     for(const selector of ['.prev','.next'])this.q<HTMLButtonElement>(selector).disabled=!this.data.length;
     const random=view==='random';this.q('.draw-filter').hidden=!random;this.q('.draw').hidden=!random;this.q<HTMLInputElement>('.draw-filter input').value=this.drawFilter;this.q<HTMLButtonElement>('.draw').disabled=!this.canDraw();
-    stage.className=`stage ${view}`;v.className='v';v.replaceChildren();v.style.removeProperty('--columns');for(const k of ['--fl','--fr','--ft','--fb'])v.style.removeProperty(k);this.zoom!.minOpen=scrolling.includes(view)?.5:0;this.zoom!.setTurnable(this.turnable&&this.data.length>0);
+    stage.className=`stage ${view}`;v.className='v';v.replaceChildren();v.style.removeProperty('--columns');for(const k of ['--fl','--fr','--ft','--fb'])v.style.removeProperty(k);this.zoom!.minOpen=scrolling.includes(view)?.5:0;this.zoom!.setTurnable(this.turnable&&this.data.length>0,this.data.length>0&&!this.hasCards);
     this.zoom!.items=this.piled||view==='fan'?'.extent':view==='binder'?'.book':'.card,.slot';
     if(!this.data.length){v.innerHTML='<p class="empty">No cards in this collection.</p>'}
     else if(this.piled)this.renderDeck(v);

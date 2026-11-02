@@ -28,8 +28,8 @@ export interface ZoomView {
   /** Go back to the opening view. */
   reset(): void;
   zoomed(): boolean;
-  /** Let the reader turn the view in 3D (angle, tilt, Auto-turn) or only zoom and move it. Off by default. */
-  setTurnable(on: boolean): void;
+  /** Let the reader turn the view in 3D (angle, tilt, Auto-turn) or only zoom and move it. Off by default. `never` says nothing in the view can turn, so an angle in the address is dropped too. */
+  setTurnable(on: boolean, never?: boolean): void;
   /** The selector of the items that must be visible at Fit. It can change with the display. */
   items: string;
   /** Run a change that moves the view (a refit, a pan) so that the view glides to its new place over `ms` instead of jumping; 0 jumps. */
@@ -93,11 +93,14 @@ export function zoomView(stage: HTMLElement, view: HTMLElement, options: ZoomOpt
     const scale = fit * state.zoom;
     view.style.transformOrigin = `${box.cx}px ${box.cy}px`;
     const turn = turnable ? ` rotateX(${state.tilt ?? 0}deg) rotateY(${state.yaw ?? 0}deg)` : '';
+    // The turn, for the items that must stay square to the reader (they turn the other way by this much).
+    view.style.setProperty('--fuda-yaw', turnable ? String(state.yaw ?? 0) : '0'); view.style.setProperty('--fuda-tilt', turnable ? String(state.tilt ?? 0) : '0');
     view.style.transform = `translate(${box.w / 2 - box.cx + state.panX}px,${box.h / 2 - box.cy + state.panY}px) scale(${scale})${turn}`;
   }
 
-  function setTurnable(on: boolean) {
-    if (on === turnable) return;
+  function setTurnable(on: boolean, never = false) {
+    // A view whose items can never turn (`never`) keeps no angle either, whatever the address says.
+    if (on === turnable) { if (never && !on && (controls.state.yaw || controls.state.tilt)) controls.set({ yaw: 0, tilt: 0 }); return; }
     turnable = on;
     if (!on) controls.set({ yaw: 0, tilt: 0 });
     controls.toggleAttribute('flat', !on);

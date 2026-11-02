@@ -6,7 +6,17 @@ export interface CollectionMetadata {
   set?: string; year?: number; number?: string; edition?: string;
   condition?: string; grade?: string; quantity?: number; notes?: string;
 }
-export interface CollectionCard { id: string; name: string; image: string; backImage?: string; metadata?: CollectionMetadata }
+/**
+ * What an item is. A `card` (the default, so every collection written before this field existed is still cards) is a flat, thin card with a back: it
+ * turns in 3D, can be seen from behind and lands turned over when taken off a pile. An `object` is a picture of a thing that is not a card, such as a
+ * games console: it has no back and no thickness, so it never turns over, is never seen from behind or edge-on, and always lands facing up. (A real 3D
+ * object would be a third kind; none can be given as an image yet.)
+ */
+export type CollectionKind = 'card' | 'object';
+export const collectionKinds: ReadonlyArray<CollectionKind> = ['card', 'object'];
+export interface CollectionCard { id: string; name: string; image: string; backImage?: string; kind?: CollectionKind; metadata?: CollectionMetadata }
+/** True for an item that is a card: anything that does not say it is an object. Only a card turns, has a back and lands turned over. */
+export const isCard = (card: Pick<CollectionCard, 'kind'>): boolean => card.kind !== 'object';
 /** The displays, in the order the buttons show them. `jukebox` and `tower` were two more names for the deck's pile of cards (no real counterpart for cards, and the same drawing), so they are no longer offered; see `collectionViewAliases`. */
 export const collectionViews: ReadonlyArray<{id: CollectionView; label: string}> = [
   {id:'deck',label:'Overlapping Deck'}, {id:'rolodex',label:'Rolodex'}, {id:'binder',label:'Binder Pages'},
@@ -27,6 +37,7 @@ export function parseCollection(value: unknown): CollectionCard[] {
     const id = typeof c.id === 'string' && c.id ? c.id : String(i);
     if (ids.has(id)) throw new Error(`Duplicate card id: ${id}`); ids.add(id);
     if (c.backImage !== undefined && typeof c.backImage !== 'string') throw new Error(`Card ${i+1} backImage must be a URL.`);
+    if (c.kind !== undefined && !collectionKinds.includes(c.kind as CollectionKind)) throw new Error(`Card ${i+1} kind must be "card" or "object".`);
     let metadata: CollectionMetadata | undefined;
     if (c.metadata !== undefined) {
       if (!c.metadata || typeof c.metadata !== 'object' || Array.isArray(c.metadata)) throw new Error(`Card ${i+1} metadata must be an object.`);
@@ -37,7 +48,7 @@ export function parseCollection(value: unknown): CollectionCard[] {
       for (const key of ['set','number','edition','condition','grade','notes'] as const) if (typeof m[key] === 'string') metadata[key]=m[key];
       for (const key of ['year','quantity'] as const) if (typeof m[key] === 'number') metadata[key]=m[key];
     }
-    return {id,name:c.name,image:c.image, ...(c.backImage ? {backImage:c.backImage as string} : {}), ...(metadata ? {metadata} : {})};
+    return {id,name:c.name,image:c.image, ...(c.backImage ? {backImage:c.backImage as string} : {}), ...(c.kind === 'object' ? {kind:'object' as const} : {}), ...(metadata ? {metadata} : {})};
   });
 }
 

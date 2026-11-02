@@ -6,5 +6,5 @@ const range = (from, to) => Array.from({ length: to - from + 1 }, (_, i) => from
 export const demoUsers = [
  { id: 'alex', name: 'Alex', collection: 'First partners', cards: makeCards(range(1, 25)) },
  { id: 'sam', name: 'Sam', collection: 'A fresh pack of 10', cards: makeCards([10, 6, 8, 11, 3, 14, 16, 9, 12, 7]) },
- { id: 'riley', name: 'Riley', collection: 'Retro gaming consoles', cards: [['Game Boy', 'game-boy-dmg-01'], ['Game Boy Advance', 'game-boy-advance-agb-001'], ['Nintendo 64', 'nintendo-64'], ['PlayStation 2', 'playstation-2-fat'], ['Nintendo DS', 'nintendo-ds-ntr-001']].map(([name, key]) => ({ id: `hako-${key}`, name, image: `https://cdn.jsdelivr.net/npm/@johnmorrisdotca/hako-devices@0.5.0/dist/assets/${key}.svg` })) }
+ { id: 'riley', name: 'Riley', collection: 'Retro gaming consoles', cards: [['Game Boy', 'game-boy-dmg-01'], ['Game Boy Advance', 'game-boy-advance-agb-001'], ['Nintendo 64', 'nintendo-64'], ['PlayStation 2', 'playstation-2-fat'], ['Nintendo DS', 'nintendo-ds-ntr-001']].map(([name, key]) => ({ id: `hako-${key}`, name, kind: 'object', image: `https://cdn.jsdelivr.net/npm/@johnmorrisdotca/hako-devices@0.5.0/dist/assets/${key}.svg` })) }
 ];

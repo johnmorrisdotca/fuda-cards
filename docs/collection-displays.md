@@ -11,6 +11,15 @@ Fuda supplies reusable frames for a caller's cards and reusable ways to display 
 - **Animate (0.7.0).** `animate="off"` and `speed` for every move: the fan, a card taken off, Next in the carousels, a binder page turn, a switch of display, a pan to the card in the wall, story and atlas. On when the attribute is missing; reduced motion always wins. One shared timing, CSS transforms and one-shot animations, nothing running when idle. Moves with it on and off end in exactly the same place.
 - Not done: dealing more than one card at a time, a pile that fills up with the whole discard history (the pile shows the last ten), wear on the cards of a fan.
 
+## Items that are not cards (0.9.0)
+
+An item says what it is with `kind` (`"card"`, the default, or `"object"`; see `docs/collection-input.md`). A card is flat and thin with a back, so everything that turns it, shows its back or lands it turned over applies to it, exactly as before. An object (a picture of a games console, say) has no back and no thickness, so none of that applies:
+
+- a collection with no card in it offers no Angle, Tilt, Auto-turn or Front, ignores `yaw` and `tilt` in the address and in the controls, and does not offer the "turned over" landing;
+- in a mixed collection the controls are there for the cards; each object stays square to the reader (it turns the other way by as much as the view turns) and lands facing up whatever `deck-land` says;
+- a flight never turns an object over, and no card back is drawn for it;
+- fanning open and taking one off a pile are kept for objects: a fan is a flat layout (each item leans in the plane of the page, nothing turns over) and taking one off only moves it across, so both stay true to a console on a table.
+
 ## Zoom, Fit and move (every view)
 
 Every view has the shared view controls (`@johnmorrisdotca/kazoku-ui`) on the view: zoom out, 2×, zoom in, **Fit**, and, zoomed in, an arrow pad. Ctrl or Command with the wheel, a trackpad pinch and a two-finger pinch zoom about the pointer; zoomed in, a drag or the wheel moves the view. The views are flat, so none turns in 3D and the angle, tilt and auto-turn controls are hidden.

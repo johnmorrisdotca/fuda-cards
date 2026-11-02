@@ -106,14 +106,26 @@ export function timing(host: Element, dflt: boolean): Timing {
 /**
  * A card taken off a pile flies to the pile at its side, and turns over sideways on the way if it lands face down; coming back it
  * does the same in reverse. `fly` carries the card across, `turn` carries the turn. `from` is how far the card is from where it ends.
+ *
+ * The card must never pass through another card: every card of a 3D scene is drawn by its depth, so a card that turns while it is level
+ * with the piles is cut by them and shows the cards behind it. So the card starts above the pile it leaves (`from.z`, in pixels, is how
+ * much higher than its landing place that is), stays above both piles all the way, and while it turns it is lifted by half its width times the
+ * sine of the turn, which is exactly what keeps its lowest corner above the cards it passes. It is level again, and down on the pile, at the end.
  */
 export function flight(fly: HTMLElement, turn: HTMLElement, from: {x: number; y: number; z?: number}, land: 'face-up' | 'face-down', direction: 'off' | 'back', ms: number, spin = 0): Animation[] {
   const options: KeyframeAnimationOptions = {duration: ms, easing: 'cubic-bezier(.3,.1,.2,1)'};
-  const out = [fly.animate([
-    {transform: `translate3d(${from.x}px,${from.y}px,${from.z ?? 0}px) rotate(${spin}deg)`},
-    {transform: `translate3d(${from.x / 2}px,${from.y / 2 - 34}px,${(from.z ?? 0) / 2 + 80}px) rotate(${spin / 2}deg) scale(1.07)`, offset: 0.5},
-    {transform: 'translate3d(0,0,0) rotate(0deg)'}
-  ], options)];
-  if (land === 'face-down') out.push(turn.animate(direction === 'off' ? [{transform: 'none'}, {transform: 'rotateY(180deg)'}] : [{transform: 'rotateY(180deg)'}, {transform: 'none'}], options));
+  const turns = land === 'face-down', half = (fly.offsetWidth || 200) / 2, z0 = from.z ?? 0, STEPS = 16, MARGIN = 1.5;
+  const fly3d: Keyframe[] = [], turn3d: Keyframe[] = [];
+  for (let k = 0; k <= STEPS; k++) {
+    const p = k / STEPS, q = 1 - p, arc = Math.sin(Math.PI * p);
+    // Over the pile it leaves the card stays as high as that pile until half way, then comes down to where it lands.
+    const base = Math.max(0, z0 * Math.min(1, 2 * q)) + MARGIN * arc;
+    const lift = (turns ? half + 6 : 80) * arc;
+    const z = k === STEPS ? 0 : base + lift;
+    fly3d.push({offset: p, transform: `translate3d(${from.x * q}px,${from.y * q - 136 * p * q}px,${z}px) rotate(${spin * q}deg) scale(${1 + 0.07 * arc})`});
+    if (turns) turn3d.push({offset: p, transform: `rotateY(${(direction === 'off' ? p : q) * 180}deg)`});
+  }
+  const out = [fly.animate(fly3d, options)];
+  if (turns) out.push(turn.animate(turn3d, options));
   return out;
 }

@@ -37,3 +37,13 @@ test('the fan is one of the displays, two landings and a layout that closes to a
   assert.deepEqual(fanLayout(0), []);
   assert.equal(fanLayout(1)[0].angle, 0);
 });
+
+import { isCard, collectionKinds } from '../dist/collection.js';
+test('an item says what it is: a card (the default) or an object, and an old collection that does not say stays cards', () => {
+  assert.deepEqual(collectionKinds, ['card', 'object']);
+  const [none, card, thing] = parseCollection([{ name: 'A', image: 'a' }, { name: 'B', image: 'b', kind: 'card' }, { name: 'C', image: 'c', kind: 'object' }]);
+  assert.equal(none.kind, undefined, 'data that does not say keeps no kind');
+  assert.deepEqual([isCard(none), isCard(card), isCard(thing)], [true, true, false]);
+  assert.equal(thing.kind, 'object');
+  assert.throws(() => parseCollection([{ name: 'A', image: 'a', kind: 'console' }]), /kind/);
+});

@@ -59,8 +59,10 @@ export const BINDER_CSS = `
 .pocket.empty{opacity:.55}
 .leaf{position:absolute;left:50%;top:0;width:var(--sw);height:var(--sh);transform-origin:0 50%;transform-style:preserve-3d;pointer-events:none;z-index:2}
 .slice{position:absolute;top:0;height:100%;transform-origin:0 50%;transform-style:preserve-3d}
-.slice>.f,.slice>.b{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;overflow:hidden}.slice>.b{transform:rotateY(180deg)}
+.slice>.f,.slice>.b{position:absolute;inset:0 -1.5px;backface-visibility:hidden;-webkit-backface-visibility:hidden;overflow:hidden}.slice>.b{transform:rotateY(180deg)}
 .slice .sf{position:absolute;top:0;height:100%}
+/* The slices overlap their neighbours by a pixel and a half, so no seam between them lets the page behind show; the outer edges of the leaf stay where they are. */
+.slice.first>.f,.slice.last>.b{left:0}.slice.first>.b,.slice.last>.f{right:0}
 `;
 
 /** The cards a side holds, as indexes into the collection (or -1 for an empty pocket), in reading order. */
@@ -98,7 +100,7 @@ export function buildLeaf(front: number, back: number, sheet: BinderSheet, layou
   let parent: HTMLElement = leaf, offset = 0;
   widths.forEach((w, k) => {
     const slice = document.createElement('div');
-    slice.className = 'slice';
+    slice.className = k === 0 ? 'slice first' : k === widths.length - 1 ? 'slice last' : 'slice';
     slice.style.width = `${w}px`;
     slice.style.left = k === 0 ? '0' : '100%';
     const f = document.createElement('div'), b = document.createElement('div');
