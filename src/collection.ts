@@ -7,12 +7,15 @@ export interface CollectionMetadata {
   condition?: string; grade?: string; quantity?: number; notes?: string;
 }
 export interface CollectionCard { id: string; name: string; image: string; backImage?: string; metadata?: CollectionMetadata }
+/** The displays, in the order the buttons show them. `jukebox` and `tower` were two more names for the deck's pile of cards (no real counterpart for cards, and the same drawing), so they are no longer offered; see `collectionViewAliases`. */
 export const collectionViews: ReadonlyArray<{id: CollectionView; label: string}> = [
   {id:'deck',label:'Overlapping Deck'}, {id:'rolodex',label:'Rolodex'}, {id:'binder',label:'Binder Pages'},
-  {id:'case',label:'Convention Display Case'}, {id:'jukebox',label:'Jukebox Carousel'}, {id:'random',label:'Random Draw'},
-  {id:'story',label:'Vertical Story Scroll'}, {id:'wall',label:'Sliding Gallery Wall'}, {id:'tower',label:'Flip Tower'},
-  {id:'spotlight',label:'Spotlight Carousel'}, {id:'atlas',label:'Infinite Card Atlas'}, {id:'fan',label:'Fan of Cards'}
+  {id:'case',label:'Convention Display Case'}, {id:'random',label:'Random Draw'},
+  {id:'story',label:'Vertical Story Scroll'}, {id:'wall',label:'Sliding Gallery Wall'},
+  {id:'spotlight',label:'Spotlight Carousel'}, {id:'atlas',label:'Card Table'}, {id:'fan',label:'Fan of Cards'}
 ];
+/** Display names that earlier versions accepted and that now open another display, so a page that sets them keeps working. */
+export const collectionViewAliases: Readonly<Record<string, CollectionView>> = {jukebox:'deck', tower:'deck'};
 export function parseCollection(value: unknown): CollectionCard[] {
   if (value && typeof value === 'object' && !Array.isArray(value) && 'cards' in value) value = (value as {cards: unknown}).cards;
   if (!Array.isArray(value)) throw new Error('Collection must be an array or an object containing a cards array.');

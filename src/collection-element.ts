@@ -1,4 +1,5 @@
-import {collectionViews, parseCollection, randomDrawIndex, movePage, type CollectionCard, type CollectionView} from './collection.js';
+import {collectionViewAliases, collectionViews, parseCollection, randomDrawIndex, movePage, type CollectionCard, type CollectionView} from './collection.js';
+import {BINDER_CSS, binderCovers, binderLayout, buildLeaf, buildSide, sideCount, spreadCount, spreadOf, spreadSides, type BinderLayout} from './binder.js';
 import {deckLandings, fanBounds, fanLayout, fanShift, flight, normalizeLanding, timing, type FanPlace} from './pile.js';
 import {zoomView, type ZoomView} from './zoom.js';
 import {createChoice, CHOICE_CSS, CHOICE_VARS, type ChoiceHandle} from './choice.js';
@@ -8,18 +9,18 @@ const STYLE=`<style>
 :host{display:block;${CHOICE_VARS.dark};color:var(--fc-text);font:16px system-ui}@media(prefers-color-scheme:light){:host(:not([theme="dark"])){${CHOICE_VARS.light}}}:host([theme="light"]){${CHOICE_VARS.light}}:host([theme="dark"]){${CHOICE_VARS.dark}}
 *{box-sizing:border-box}.shell{background:var(--fc-surface);padding:1rem;border-radius:1rem;display:grid;gap:.9rem}.nav{display:flex;gap:.6rem;align-items:center;justify-content:center;flex-wrap:wrap}.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,13.5rem),1fr));gap:.9rem}.opts:not(:has(.choice:not([hidden]))){display:none}.opts .choice{--choice-min:4.6rem}
 button,input{font:inherit;color:inherit}.nav button,dialog button{min-height:48px;min-width:48px;background:var(--fc-btn);border:2px solid var(--fc-btn-border);border-radius:.7rem;padding:.5rem 1rem;cursor:pointer}.nav button:disabled{opacity:.45;cursor:default}.nav input{min-height:48px;background:var(--fc-btn);border:2px solid var(--fc-btn-border);border-radius:.7rem;padding:.5rem .8rem}
-button:focus-visible,input:focus-visible,.card:focus-visible{outline:3px solid var(--fc-focus);outline-offset:3px}${CHOICE_CSS}
+button:focus-visible,input:focus-visible,.card:focus-visible{outline:3px solid var(--fc-focus);outline-offset:3px}${CHOICE_CSS}${BINDER_CSS}
 .displays .choice-list{grid-template-columns:repeat(3,minmax(0,1fr))}@media(min-width:340px){.displays .choice-list{grid-template-columns:repeat(4,minmax(0,1fr))}.displays .choice-list button{min-height:50px;padding:.3rem .25rem;font-size:.7rem}.displays .choice-list svg{width:28px;height:18px}}@media(min-width:800px){.displays .choice-list{grid-template-columns:repeat(6,minmax(0,1fr))}.displays .choice-list button{min-height:56px;padding:.45rem .7rem;font-size:.8rem}.displays .choice-list svg{width:34px;height:22px}}
 .stage{position:relative;height:var(--fuda-stage-height,clamp(300px,calc(100svh - 440px),620px));overflow:hidden;border-radius:1rem;background:radial-gradient(ellipse,var(--fc-stage-1),var(--fc-stage-2) 68%)}.stage:focus-visible{outline:3px solid var(--fc-focus);outline-offset:2px}.v{position:absolute;inset:0}kazoku-view-controls{display:block}
 .card{padding:0;border:0;background:transparent;line-height:0}.card img{width:100%;height:100%;object-fit:contain;border-radius:5%;box-shadow:0 6px 16px #0009}
 .stack .card{position:absolute;width:min(64vw,300px);height:86%;top:7%;left:50%;transition:transform .25s}
 .grid{display:grid;grid-template-columns:repeat(var(--columns,3),minmax(0,1fr));gap:1rem;padding:1rem;align-content:start}.grid .card{height:clamp(130px,24vw,220px)}
-.v.case{perspective:800px}.stage.case{background:linear-gradient(#615346,#222)}.case .card{transform:perspective(600px) rotateX(-15deg)}
+.v.case{perspective:800px}.stage.case{background:linear-gradient(#4a3f33,#1d1914);border:10px solid #6b5436;box-shadow:inset 0 0 26px #000a}.stage.case::after{content:'';position:absolute;inset:0;pointer-events:none;z-index:2;background:linear-gradient(115deg,#ffffff30 0,#ffffff00 28%,#ffffff12 55%,#ffffff00 78%,#ffffff22 100%)}.case .card{transform:perspective(600px) rotateX(-15deg);box-shadow:0 12px 0 -3px #2c251d,0 18px 8px -4px #000a}.case .card img{box-shadow:0 4px 10px #0009}
 .wall{display:flex;gap:1rem;align-items:center;padding:1rem}.wall .card{height:90%;flex:0 0 190px}
 .story{display:flex;flex-direction:column;align-items:center;gap:1rem;padding:1rem}.story .card{width:min(75%,300px);flex:0 0 90%}
 .plane{position:absolute;left:0;top:0;display:grid;gap:18px;grid-template-columns:repeat(var(--atlas-cols,5),140px);padding:30px}.plane .card{height:195px}
-.stage.jukebox{border:12px solid #aa7147;box-shadow:inset 0 0 20px #fbb579}.stage.spotlight{background:radial-gradient(ellipse at center,#e5ce99,#454054 40%,#171822 78%)}
-.stage:is(.deck,.random,.jukebox,.tower,.fan){perspective:1800px}.v.deck{--w:200px;--gap:56px;--fl:0;--fr:0;--ft:0;--fb:0;--ease:cubic-bezier(.2,.8,.2,1);transform-style:preserve-3d}
+.stage.spotlight{background:radial-gradient(ellipse at center,#e5ce99,#454054 40%,#171822 78%)}
+.stage:is(.deck,.random,.fan){perspective:1800px}.v.deck{--w:200px;--gap:56px;--fl:0;--fr:0;--ft:0;--fb:0;--ease:cubic-bezier(.2,.8,.2,1);transform-style:preserve-3d}
 .v.deck .pile,.v.deck .slot{position:absolute;left:50%;top:50%;width:var(--w);aspect-ratio:2.5/3.5;margin:calc(var(--w) * -.7) 0 0 calc(var(--w) * -.5);transform-style:preserve-3d}.slot{border:2px dashed var(--fc-btn-border);border-radius:5%;opacity:.55}
 .v.deck .deck-pile{translate:calc(((var(--fl) - var(--fr) - 1) * var(--w) - var(--gap)) / 2) 0}.v.deck .discard-pile,.v.deck .slot{translate:calc(((var(--fl) + var(--fr) + 1) * var(--w) + var(--gap)) / 2) 0}.v.deck.fanonly .deck-pile{translate:calc((var(--fl) - var(--fr)) * var(--w) / 2) 0}
 .v.deck .deck-pile,.v.deck .discard-pile,.v.deck .slot{transition:translate var(--t,0s) var(--ease)}
@@ -36,7 +37,7 @@ const SHELL=`<section class="shell"><div class="displays"></div><div class="stag
 const pages: CollectionView[]=['binder','case'];
 const scrolling: CollectionView[]=['wall','story','atlas'];
 /** The displays that draw a pile of cards: they turn in 3D, fan open and closed, and a card comes off them onto a pile at their side. The Fan of Cards is the same pile with only the fan. */
-const pileViews: CollectionView[]=['deck','random','jukebox','tower'];
+const pileViews: CollectionView[]=['deck','random'];
 /** The displays whose cards sit on top of each other: moving to another card glides the cards that stay and lets the one that leaves go. */
 const gliding: CollectionView[]=['rolodex','spotlight','fan'];
 const rects=(cols:number,rows:number,w:number,h:number,gx:number,gy:number,x0=1,y0=1)=>Array.from({length:cols*rows},(_,k)=>`<rect x="${x0+(k%cols)*gx}" y="${y0+Math.floor(k/cols)*gy}" width="${w}" height="${h}" rx="1" opacity="${0.55+((k%cols+Math.floor(k/cols))%2)*0.4}"/>`).join('');
@@ -55,14 +56,14 @@ const ICONS: Record<CollectionView,string>={
   fan:[-30,-15,0,15,30].map((a,i)=>`<rect x="14" y="1" width="7" height="13" rx="1.2" transform="rotate(${a} 17.5 21)" opacity="${0.45+i*0.1}"/>`).join('')
 };
 const icon=(view:CollectionView)=>`<svg viewBox="0 0 34 22" aria-hidden="true">${ICONS[view]}</svg>`;
-const ADDRESS_KEYS=['view','fan','land','animate','speed'] as const;
+const ADDRESS_KEYS=['view','fan','land','animate','speed','binder','cover','sheet','pockets'] as const;
 const NAMES:Record<string,string>={land:'deck-land'};
 
 export class FudaCollection extends HTMLElement {
   private root = this.attachShadow({mode:'open'}); private data: CollectionCard[]=[]; private index=0; private pageSize=9; private selected: CollectionCard | null=null; private back=false; private drawFilter=""; private zoom: ZoomView | null=null;
-  private tiles?: ChoiceHandle; private landing?: ChoiceHandle; private fanChoice?: ChoiceHandle; private animateChoice?: ChoiceHandle; private speedChoice?: ChoiceHandle; private flip: 'off' | 'back' | null=null; private addressTimer=0;
+  private tiles?: ChoiceHandle; private landing?: ChoiceHandle; private fanChoice?: ChoiceHandle; private animateChoice?: ChoiceHandle; private speedChoice?: ChoiceHandle; private binderChoices: Record<string,ChoiceHandle>={}; private turn: {from:number;to:number}|null=null; private flip: 'off' | 'back' | null=null; private addressTimer=0;
   private fanPlaces: FanPlace[]=[];
-  static get observedAttributes(){return ['view','page-size','columns','fan','fan-size','deck-land','deck-messiness','deck-seed','theme','animate','speed']}
+  static get observedAttributes(){return ['view','page-size','columns','fan','fan-size','deck-land','deck-messiness','deck-seed','theme','animate','speed','binder','cover','sheet','pockets']}
   set cards(value: CollectionCard[]){this.data=parseCollection(value);this.index=Math.min(this.index,Math.max(0,this.data.length-1));this.flip=null;this.render()}
   get cards(){return this.data.map(c=>({...c, ...(c.metadata ? {metadata:{...c.metadata}} : {})}))}
   /** The card on top of the deck, or the first card of the page or fan (counting from 0). */
@@ -76,7 +77,7 @@ export class FudaCollection extends HTMLElement {
     if(name==='view'||name==='page-size'||name==='columns'){this.index=0;this.flip=null}
     this.render(name==='view',name==='view'?{kind:'view',dir:1}:undefined)
   }
-  private get currentView(): CollectionView {let v=this.getAttribute('view');return collectionViews.some(x=>x.id===v)?v as CollectionView:'deck'}
+  private get currentView(): CollectionView {let v=this.getAttribute('view')??'';v=collectionViewAliases[v]??v;return collectionViews.some(x=>x.id===v)?v as CollectionView:'deck'}
   /** How a card taken off lands: still facing up, or turned over sideways. The 0.6.0 value `upside-down` is still accepted and means turned over. */
   private get land(): 'face-up'|'face-down' {return normalizeLanding(this.getAttribute('deck-land'))}
   private get fanOpen(){return this.getAttribute('fan')==='open'}
@@ -86,13 +87,17 @@ export class FudaCollection extends HTMLElement {
   private q<T extends HTMLElement=HTMLElement>(selector: string){return this.root.querySelector(selector) as T}
   /** With `address`, the display, the fan, the landing, the animation and its speed are kept in the page's address (`?view=fan&fan=open&land=face-down&animate=off`), and a link to it opens the same. */
   private readAddress(){try{const params=new URLSearchParams(location.search);for(const key of ADDRESS_KEYS){const value=params.get(key);if(value===null)continue;const attr=NAMES[key]??key;if(this.getAttribute(attr)!==value)this.setAttribute(attr,value)}}catch{}}
-  private writeAddress(){if(!this.hasAttribute('address'))return;clearTimeout(this.addressTimer);this.addressTimer=window.setTimeout(()=>{try{const url=new URL(location.href);const want:Record<string,string|null>={view:this.currentView==='deck'?null:this.currentView,fan:this.fanOpen?'open':null,land:this.land==='face-up'?null:this.land,animate:this.getAttribute('animate')==='off'?'off':null,speed:['slow','quick'].includes(this.getAttribute('speed')??'')?this.getAttribute('speed'):null};for(const [k,v] of Object.entries(want)){if(v===null)url.searchParams.delete(k);else url.searchParams.set(k,v)}history.replaceState(history.state,'',url)}catch{}},250)}
+  private writeAddress(){if(!this.hasAttribute('address'))return;clearTimeout(this.addressTimer);this.addressTimer=window.setTimeout(()=>{try{const url=new URL(location.href);const want:Record<string,string|null>={view:this.currentView==='deck'?null:this.currentView,fan:this.fanOpen?'open':null,land:this.land==='face-up'?null:this.land,animate:this.getAttribute('animate')==='off'?'off':null,speed:['slow','quick'].includes(this.getAttribute('speed')??'')?this.getAttribute('speed'):null,binder:this.getAttribute('binder')==='zip'?'zip':null,cover:binderCovers.some(c=>c.id===this.getAttribute('cover'))&&this.getAttribute('cover')!=='green'?this.getAttribute('cover'):null,sheet:this.getAttribute('sheet')==='black'?'black':null,pockets:['4','12'].includes(this.getAttribute('pockets')??'')?this.getAttribute('pockets'):null};for(const [k,v] of Object.entries(want)){if(v===null)url.searchParams.delete(k);else url.searchParams.set(k,v)}history.replaceState(history.state,'',url)}catch{}},250)}
   private move(n:number){
     if(!this.data.length)return;const view=this.currentView;
-    if(pages.includes(view)){this.index=movePage(this.index,this.data.length,this.pageSize,n)}
+    if(view==='binder'){const per=this.binderLay().per,spreads=spreadCount(sideCount(this.data.length,per)),from=spreadOf(this.index,per),to=(from+n+spreads*Math.abs(n))%spreads;this.turn={from,to};this.index=this.spreadFirst(to)}
+    else if(pages.includes(view)){this.index=movePage(this.index,this.data.length,this.pageSize,n)}
     else{const next=(this.index+n+this.data.length)%this.data.length;this.flip=this.piled&&Math.abs(n)===1&&next===this.index+n?(n>0?'off':'back'):null;this.index=next}
     this.render(false,{kind:'move',dir:n>0?1:-1})
   }
+  private binderLay():BinderLayout{return binderLayout(this.getAttribute('pockets'),this.getAttribute('columns'),this.getAttribute('page-size'))}
+  /** The first card of an opening of the binder: the right-hand page's first card, or the left-hand page's when the right-hand page is past the end. */
+  private spreadFirst(spread:number){const per=this.binderLay().per,sides=sideCount(this.data.length,per);return Math.min(this.data.length-1,(2*spread<sides?2*spread:2*spread-1)*per)}
   private image(c:CollectionCard,at:number):HTMLButtonElement {let button=document.createElement('button');button.className='card';button.dataset.i=String(at);button.setAttribute('aria-label',`Inspect ${c.name}`);let img=document.createElement('img');img.src=c.image;img.alt=c.name;img.loading='lazy';img.onerror=()=>{img.replaceWith(document.createTextNode(`Image unavailable: ${c.name}`))};button.append(img);button.onclick=()=>this.open(c);return button}
   private open(c:CollectionCard){this.selected=c;this.back=false;this.renderDialog()}
   private renderDialog(){let dlg=this.q<HTMLDialogElement>('dialog');dlg.replaceChildren();let close=document.createElement('button');close.textContent='Close';close.onclick=()=>dlg.close();dlg.append(close);if(this.selected){let img=document.createElement('img');img.className='detail';img.src=this.back&&this.selected.backImage?this.selected.backImage:this.selected.image;img.alt=`${this.selected.name}, ${this.back?'back':'front'}`;let label=document.createElement('p');label.textContent=this.selected.name;dlg.append(img,label);if(this.selected.backImage){let flip=document.createElement('button');flip.textContent=this.back?'Show front':'Show back';flip.onclick=()=>{this.back=!this.back;this.renderDialog()};dlg.append(flip)}}if(!dlg.open)dlg.showModal()}
@@ -110,7 +115,8 @@ export class FudaCollection extends HTMLElement {
     this.fanChoice=createChoice({label:'Fan',value:this.fanOpen?'open':'closed',options:[{value:'closed',label:'Closed'},{value:'open',label:'Open'}],onChange:value=>{if(value==='open')this.setAttribute('fan','open');else this.removeAttribute('fan');this.writeAddress()}});
     this.animateChoice=createChoice({label:'Animate',value:'on',options:[{value:'on',label:'On'},{value:'off',label:'Off'}],onChange:value=>keep('animate',value==='off'?'off':'on')});
     this.speedChoice=createChoice({label:'Speed',value:'normal',options:[{value:'slow',label:'Slow'},{value:'normal',label:'Normal'},{value:'quick',label:'Quick'}],onChange:value=>keep('speed',value)});
-    this.q('.opts').append(this.landing.element,this.fanChoice.element,this.animateChoice.element,this.speedChoice.element);this.speedChoice.element.classList.add('speed');
+    const bin=(attr:string,label:string,value:string,options:{value:string;label:string}[])=>{const h=createChoice({label,value,options,onChange:v=>{this.setAttribute(attr,v);this.writeAddress()}});this.binderChoices[attr]=h;return h.element};
+    this.q('.opts').append(this.landing.element,this.fanChoice.element,bin('binder','Binder','ring',[{value:'ring',label:'Ring'},{value:'zip',label:'Zip'}]),bin('cover','Cover','green',binderCovers.map(c=>({value:c.id,label:c.label}))),bin('sheet','Sheet','clear',[{value:'clear',label:'Clear'},{value:'black',label:'Black'}]),bin('pockets','Pockets','9',[{value:'4',label:'4'},{value:'9',label:'9'},{value:'12',label:'12'}]),this.animateChoice.element,this.speedChoice.element);this.speedChoice.element.classList.add('speed');
     this.q('.prev').onclick=()=>this.move(-1);this.q('.next').onclick=()=>this.move(1);
     const input=this.q<HTMLInputElement>('.draw-filter input'),draw=this.q<HTMLButtonElement>('.draw');
     input.oninput=()=>{this.drawFilter=input.value;draw.disabled=!this.canDraw()};
@@ -223,21 +229,60 @@ export class FudaCollection extends HTMLElement {
       old.animate([{opacity:1,translate:'0 0',offset:0},{opacity:0,translate:`${-how.dir*60}px 0`,offset:1}],{duration:ms*0.8,easing:'ease-in'}).finished.then(done,done)
     }
   }
+  private syncBinder(view:CollectionView){
+    const show=view==='binder',cur=(attr:string,dflt:string,ok:string[])=>{const v=this.getAttribute(attr);return v&&ok.includes(v)?v:dflt};
+    const vals:Record<string,string>={binder:cur('binder','ring',['ring','zip']),cover:cur('cover','green',binderCovers.map(c=>c.id)),sheet:cur('sheet','clear',['clear','black']),pockets:cur('pockets','9',['4','9','12'])};
+    for(const [k,h] of Object.entries(this.binderChoices)){h.hidden=!show;h.set(vals[k])}
+  }
+  private binderCount(){const per=this.binderLay().per,sides=sideCount(this.data.length,per),[l,r]=spreadSides(spreadOf(this.index,per),sides);const a=(l<0?r:l)+1,b=(r<0?l:r)+1;return a===b?`Page ${a} / ${sides}`:`Pages ${a}–${b} / ${sides}`}
+  /** The binder: a ring or zip binder open on two facing sheets of pockets. A page turn swings the leaf about the spine, bending as it goes, and shows the pockets on its back. */
+  private renderBinder(v:HTMLElement,t:{on:boolean;ms:number}){
+    const layout=this.binderLay(),n=this.data.length,sides=sideCount(n,layout.per),spread=spreadOf(this.index,layout.per);
+    const sheet=this.getAttribute('sheet')==='black'?'black':'clear',zip=this.getAttribute('binder')==='zip',cover=binderCovers.find(c=>c.id===this.getAttribute('cover'))??binderCovers[0];
+    v.classList.add('binder');v.style.setProperty('--cover',cover.color);
+    const pocket=(index:number,live:boolean)=>{const c=this.data[index],el=document.createElement('div');el.className='pocket';if(live)el.append(this.image(c,index));else{const img=document.createElement('img');img.src=c.image;img.alt='';img.style.cssText='width:86%;height:92%;object-fit:contain;border-radius:3%;box-shadow:0 2px 5px #0007';el.append(img)}return el};
+    const [L,R]=spreadSides(spread,sides),turn=this.turn;this.turn=null;
+    const flat=turn&&t.on&&Math.abs(turn.to-turn.from)===1?turn:null;
+    const [oldL,oldR]=flat?spreadSides(flat.from,sides):[L,R],[newL,newR]=flat?spreadSides(flat.to,sides):[L,R];
+    const forward=!!flat&&flat.to>flat.from;
+    const book=document.createElement('div');book.className=`book ${zip?'b-zip':'b-ring'}`;
+    const inside=document.createElement('div');inside.className='inside';
+    const left=document.createElement('div'),right=document.createElement('div');left.className='half';right.className='half';
+    const put=(half:HTMLElement,side:number,where:'l'|'r')=>{half.replaceChildren();if(side>=0)half.append(buildSide(side,where,sheet,layout,n,pocket))};
+    // While a leaf swings the half it has not reached yet shows the page it is leaving; the other half already shows the page it uncovers.
+    put(left,flat?(forward?oldL:newL):L,'l');put(right,flat?(forward?newR:oldR):R,'r');
+    const spine=document.createElement('div');spine.className='spine';for(const y of [18,50,82]){const ring=document.createElement('i');ring.className='ring';ring.style.top=`${y}%`;spine.append(ring)}
+    inside.append(left,right,spine);
+    const tab=document.createElement('i');tab.className='tab';book.append(inside,tab);v.append(book);
+    if(flat){
+      const w=300,strip=34,{leaf,slices}=buildLeaf(forward?oldR:newR,forward?newL:oldL,sheet,layout,n,pocket,w,strip);
+      inside.append(leaf);
+      const ms=Math.round(t.ms*1.4),ease='cubic-bezier(.45,.05,.3,1)',a=forward?[0,-180]:[-180,0];
+      leaf.style.transform=`rotateY(${a[1]}deg)`;
+      const swing=leaf.animate([{transform:`rotateY(${a[0]}deg)`},{transform:`rotateY(${a[1]}deg)`}],{duration:ms,easing:ease,fill:'forwards'});
+      // Each slice leans on the one before it, so the sheet bends as it swings (the free edge trails) and straightens at the end.
+      const bend=forward?8:-8;
+      slices.forEach((s,k)=>{if(k)s.animate([{transform:'rotateY(0deg)'},{transform:`rotateY(${bend}deg)`,offset:.5},{transform:'rotateY(0deg)'}],{duration:ms,easing:ease})});
+      const finish=()=>{if(!leaf.isConnected)return;put(left,newL,'l');put(right,newR,'r');leaf.remove()};
+      swing.finished.then(finish,finish)
+    }
+  }
   private render(reset=false,how?:{kind:'move'|'view';dir:number}){
     if(!this.isConnected)return;this.build();
     let view=this.currentView,stage=this.q('.stage'),v=this.q('.v');
     const t=this.timeVars(),playing=t.on&&how&&this.data.length>0;
     const before=playing?this.snapshot(v):new Map<string,DOMRect>(),left=playing&&how!.kind==='move'&&gliding.includes(view)?Array.from(v.querySelectorAll<HTMLElement>('.card:not(.ghost)')):[];
-    this.tiles!.set(view);this.landing!.set(this.land);this.fanChoice!.set(this.fanOpen?'open':'closed');this.syncChoices();
+    this.syncBinder(view);this.tiles!.set(view);this.landing!.set(this.land);this.fanChoice!.set(this.fanOpen?'open':'closed');this.syncChoices();
     this.landing!.hidden=!this.piled;this.fanChoice!.hidden=!(this.piled||view==='fan');
-    this.q('.count').textContent=this.data.length?(pages.includes(view)?`Page ${Math.floor(this.index/this.pageSize)+1} / ${Math.ceil(this.data.length/this.pageSize)}`:`${this.index+1} / ${this.data.length}`):'No cards';
+    this.q('.count').textContent=this.data.length?(view==='binder'?this.binderCount():pages.includes(view)?`Page ${Math.floor(this.index/this.pageSize)+1} / ${Math.ceil(this.data.length/this.pageSize)}`:`${this.index+1} / ${this.data.length}`):'No cards';
     for(const selector of ['.prev','.next'])this.q<HTMLButtonElement>(selector).disabled=!this.data.length;
     const random=view==='random';this.q('.draw-filter').hidden=!random;this.q('.draw').hidden=!random;this.q<HTMLInputElement>('.draw-filter input').value=this.drawFilter;this.q<HTMLButtonElement>('.draw').disabled=!this.canDraw();
     stage.className=`stage ${view}`;v.className='v';v.replaceChildren();v.style.removeProperty('--columns');for(const k of ['--fl','--fr','--ft','--fb'])v.style.removeProperty(k);this.zoom!.minOpen=scrolling.includes(view)?.5:0;this.zoom!.setTurnable(this.turnable&&this.data.length>0);
-    this.zoom!.items=this.piled||view==='fan'?'.extent':'.card,.slot';
+    this.zoom!.items=this.piled||view==='fan'?'.extent':view==='binder'?'.book':'.card,.slot';
     if(!this.data.length){v.innerHTML='<p class="empty">No cards in this collection.</p>'}
     else if(this.piled)this.renderDeck(v);
     else if(view==='fan')this.renderFan(v);
+    else if(view==='binder')this.renderBinder(v,t);
     else if(pages.includes(view)){v.classList.add('grid',view);const columns=Math.min(10,Math.max(1,Math.floor(Number(this.getAttribute('columns'))||3)));v.style.setProperty('--columns',String(columns));let start=Math.floor(this.index/this.pageSize)*this.pageSize;this.data.slice(start,start+this.pageSize).forEach((c,k)=>v.append(this.image(c,start+k)))}
     else if(view==='wall'||view==='story'){v.classList.add(view);this.data.forEach((c,k)=>v.append(this.image(c,k)))}
     else if(view==='atlas'){v.classList.add('atlas');let plane=document.createElement('div');plane.className='plane';this.data.forEach((c,k)=>plane.append(this.image(c,k)));v.append(plane)}
