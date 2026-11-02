@@ -15,11 +15,13 @@ body{margin:0;background:var(--page);color:var(--fc-text);font:16px/1.5 system-u
 .file-btn{position:relative;display:inline-flex;align-items:center}.file-btn input{position:absolute;inset:0;width:100%;opacity:0;cursor:pointer}.file-btn:focus-within{outline:3px solid var(--fc-focus);outline-offset:3px}
 ${CHOICE_CSS}`;
 
-/** Put the colours on the page. Call once, before anything is drawn. */
+/** `demo/ui.css` is PAGE_CSS as a file, linked from each page's head so nothing is restyled (and nothing shifts) when the script arrives; a test keeps the two equal. */
 export function setupPage() {
-  const style = document.createElement('style');
-  style.textContent = PAGE_CSS;
-  document.head.append(style);
+  if (!document.querySelector('link[href$="ui.css"]')) {
+    const style = document.createElement('style');
+    style.textContent = PAGE_CSS;
+    document.head.append(style);
+  }
   try {
     const theme = new URLSearchParams(location.search).get('theme');
     if (theme === 'light' || theme === 'dark') document.documentElement.dataset.theme = theme;

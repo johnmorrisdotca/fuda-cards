@@ -17,3 +17,9 @@ test('invalid data and storage failures do not silently replace saved data',()=>
  assert.throws(()=>saveCollection({getItem:()=>null,setItem:()=>{throw Error('quota')}},'alex','Cards',cards),/quota/);
  assert.throws(()=>saveCollection(store,'alex','',cards),/name/);
 });
+
+import { readFile as readCss } from 'node:fs/promises';
+import { PAGE_CSS } from '../demo/ui.js';
+test('demo/ui.css is the page CSS of demo/ui.js, so the pages can link it from the head', async () => {
+  assert.equal(await readCss(new URL('../demo/ui.css', import.meta.url), 'utf8'), PAGE_CSS.trim() + '\n');
+});

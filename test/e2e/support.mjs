@@ -5,7 +5,7 @@ import { readFile } from 'node:fs/promises';
 import { resolve, extname } from 'node:path';
 
 export const root = resolve(import.meta.dirname, '../..');
-const types = { '.html': 'text/html', '.js': 'text/javascript', '.jpg': 'image/jpeg', '.svg': 'image/svg+xml' };
+const types = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.jpg': 'image/jpeg', '.svg': 'image/svg+xml' };
 export let chromium, webkit;
 try {
   const require = createRequire(process.env.PLAYWRIGHT_FROM ?? import.meta.url);
@@ -30,7 +30,7 @@ export const cardSvg = (label) => {
 
 /** Answer every outside request from the page with local stand-ins, so the tests need no network. */
 export async function offline(page) {
-  await page.route(/^https:\/\/(assets\.tcgdex\.net|cdn\.jsdelivr\.net)\//, (route) => {
+  await page.route(/^https:\/\/(assets\.tcgdex\.net|cdn\.jsdelivr\.net|commons\.wikimedia\.org|images\.metmuseum\.org)\//, (route) => {
     const id = route.request().url().match(/base1\/(\d+)/)?.[1] ?? route.request().url().length;
     route.fulfill({ contentType: 'image/svg+xml', body: cardSvg(`No. ${id}`) });
   });

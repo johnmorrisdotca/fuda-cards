@@ -7,7 +7,7 @@ import { readFile } from 'node:fs/promises';
 import { resolve, extname } from 'node:path';
 
 const root = resolve(import.meta.dirname, '../..');
-const types = { '.html': 'text/html', '.js': 'text/javascript', '.jpg': 'image/jpeg' };
+const types = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.jpg': 'image/jpeg' };
 let chromium;
 try {
   const require = createRequire(process.env.PLAYWRIGHT_FROM ?? import.meta.url);

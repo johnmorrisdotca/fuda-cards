@@ -9,6 +9,7 @@
 - New: the demo pages use the same buttons for their short choices, follow the reader's light or dark setting and keep their choices in the address (`?wear=damaged&stack=52`); every button, field and select is at least 48 px high; `?theme=light|dark` chooses a theme. Demo collectors have more cards: Alex 25 (a 5 by 5 binder page) and Sam 10 (a pack).
 - Changed: `<fuda-collection>` is bigger: `collection-element.js` 26.6 KB (8.0 KB gzipped, was 10.7 KB and 3.8 KB), plus `choice.js` 4.6 KB (1.8 KB), `collection.js` 4.7 KB (1.6 KB, was 3.8 KB and 1.3 KB) and `zoom.js` 5.5 KB (2.1 KB, was 5.1 KB and 1.9 KB); it also imports `stack.js` (1.7 KB). `<fuda-card>` is unchanged.
 - New demo: `demo/vintage.html`, real hockey (1910 to 1911, 36 cards) and baseball (T206, 24 cards) cards whose pictures are public domain, read item by item from Wikimedia Commons and The Met's Open Access, loaded from their sources and not shipped. `docs/card-images.md` records what card-picture sources exist, their terms and what was left out.
+- Changed: the one CSS line for the page head reserves more room for an undefined `<fuda-collection>` (its view plus 380 px, was 200 px), because the Display buttons and options make the component taller; update the line in your page (README, "No flash before the card is ready"). The demos link `demo/ui.css` from the head for the same reason.
 - Not changed: `<fuda-card>`, `element.js` and its stack do not fan or flip cards off.
 
 

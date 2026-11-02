@@ -192,7 +192,7 @@ test('the displays are buttons, not a drop-down: all twelve on screen, at least 
 test('no control in the demo pages is left in the browser style: every visible button, field and select is at least 44 px high with a rounded border', { skip: !chromium && 'Playwright not installed' }, async () => {
   const browser = await chromium.launch({ executablePath: process.env.PLAYWRIGHT_CHROMIUM }), server = serve(PORT);
   try {
-    for (const path of ['/index.html', '/demo/collections-component.html']) {
+    for (const path of ['/index.html', '/demo/collections-component.html', '/demo/vintage.html']) {
       for (const [name, size] of sizes) {
         const context = await browser.newContext({ viewport: size }), p = await context.newPage();
         await offline(p);
