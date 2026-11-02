@@ -1,6 +1,6 @@
 # Fuda Cards
 
-Reusable collectible card frames for caller-provided images and interactive 3D viewers. The core is a standards-based web component, suitable for plain HTML, Angular, React, Vue, Svelte, and other frameworks that support custom elements. No framework or 3D engine is required by the component.
+Reusable collectible card frames for caller-provided images and interactive 3D viewers. The core is a standards-based web component, suitable for plain HTML, Angular, React, Vue, Svelte, and other frameworks that support custom elements. No framework or 3D engine is required by the component. `<fuda-card>` imports nothing; `<fuda-collection>` uses [`@johnmorrisdotca/kazoku-ui`](https://github.com/johnmorrisdotca/kazoku-ui) for its zoom controls (see Collection viewer).
 
 This is an early prototype: classic, sport and cosmic are exploratory CSS designs, not yet historically researched recreations or photorealistic materials. The demo uses a still from Uchusen Rockets; see [assets/README.md](assets/README.md) for its model credit.
 
@@ -67,11 +67,19 @@ Planned JSON, API, scanned-card and interactive-content inputs are outlined in [
 
 ## Pokémon binder demo
 
-Open `demo/tcgdex.html` through the local server to browse the Pokémon Base Set as full-card images supplied by [TCGdex](https://tcgdex.dev/). Search by name or number, change pages and select a card to enlarge it. This standalone demo fetches public set data and remote images in the browser; it requires an internet connection. No API key, personal collection storage, or image hosting by Fuda is involved. A missing image or failed request is reported in the UI. Card images and metadata are provided by TCGdex; consult provider terms before deploying a public demo.
+Open `demo/tcgdex.html` through the local server to browse the Pokémon Base Set as full-card images supplied by [TCGdex](https://tcgdex.dev/). Search by name or number, change pages and select a card to enlarge it. The view controls under the binder page zoom in and out (−, 2×, +), **Fit** shows the whole page, and zoomed in you drag, use the arrows or the wheel to move. This standalone demo fetches public set data and remote images in the browser; it requires an internet connection. No API key, personal collection storage, or image hosting by Fuda is involved. A missing image or failed request is reported in the UI. Card images and metadata are provided by TCGdex; consult provider terms before deploying a public demo.
 
 ## Collection viewer
 
 Run `pnpm dev` and open `/demo/collections-component.html`. Import `@johnmorrisdotca/fuda-cards/collection-element` to register the element, then set its `cards` property to an array of `{ id, name, image, backImage? }`. Image URLs are loaded by the viewer's browser. `id` is optional on input (the position is used if omitted); IDs must be unique. Set `view` to `deck`, `rolodex`, `binder`, `case`, `jukebox`, `random`, `story`, `wall`, `tower`, `spotlight`, or `atlas`. Set `page-size` for the binder and case (1–100 cards) and `columns` (1–10) for their grid; small screens use at most two columns. In random view, filter card names to limit the draw; the draw button is disabled when no cards match.
+
+**Zoom, Fit and move in every view.** Under each view sit the `@johnmorrisdotca/kazoku-ui` view controls: **−**, **2×**, **+** and **Fit**, and, once zoomed in, four arrows to move the view. Ctrl or Command with the wheel (or a trackpad pinch) and a two-finger pinch zoom about the pointer; zoomed in, a drag or the wheel moves the view, even when the drag starts on a card; the keys `+`, `−` and `0` work with the view focused. **Fit** shows every card the view draws (the whole binder or case page, every card of the wall, the story and the atlas). The wall, story and atlas open at half size or larger so a card can be read, and the others open at Fit. A tap or click on a card still opens it, and zooming, moving or paging never resets the other: turning to the next card or page keeps your zoom, and zooming keeps the card or page you are on. No view turns in 3D, so all eleven use zoom and move only. Nothing animates the zoom, so reduced motion needs no special case. Add the boolean `address` attribute to keep the zoom in the page address (`?zoom=2`). Set `--fuda-stage-height` on the element to change the height of the view (default: the window height less 440 px, between 300 and 620 px) so the controls stay on screen.
+
+`@johnmorrisdotca/kazoku-ui` is a runtime dependency of the package (it was a development dependency until 0.2.0). A bundler resolves it. On a plain HTML page without a bundler, add an import map next to the module script, with the package served from `node_modules` or a copy of its `dist`:
+
+```html
+<script type="importmap">{"imports":{"@johnmorrisdotca/kazoku-ui/view-controls/define":"/node_modules/@johnmorrisdotca/kazoku-ui/dist/view-controls/define.js"}}</script>
+```
 
 ```html
 <fuda-collection view="deck"></fuda-collection>
@@ -83,7 +91,7 @@ Run `pnpm dev` and open `/demo/collections-component.html`. Import `@johnmorrisd
 </script>
 ```
 
-These are early display prototypes: the case and rotating displays use CSS perspective rather than fully modeled 3D devices; the atlas is a draggable, zoomable plane rather than an unbounded or virtualized canvas. The demo can save and load named collections in the current browser using localStorage; this is not account-based sync or a backup. Configurable case geometry, integrated 3D content, and full browser and accessibility testing remain to be completed. Atlas supports drag, a zoom slider, and a basic two-finger pinch; touch behaviour still needs browser testing.
+These are early display prototypes: the case and rotating displays use CSS perspective rather than fully modeled 3D devices; the atlas is a zoomable, movable plane rather than an unbounded or virtualized canvas. The demo can save and load named collections in the current browser using localStorage; this is not account-based sync or a backup. Configurable case geometry, integrated 3D content, and full browser and accessibility testing remain to be completed. Zoom, Fit, move and pinch are tested in headless Chromium at a desk and a phone size (pinch with synthetic pointer events); a real phone, Safari and Firefox are not tested.
 
 Saved demo collections are scoped to the selected profile. Use “Import older saved collections” to copy pre-profile saves without overwriting same-named collections; the originals remain intact. The demo supports JSON export and deletion, and storage stays local to this browser.
 

@@ -1,4 +1,5 @@
 import {fetchSet} from './tcgdex-data.js';
+import {zoomView} from '../dist/zoom.js';
 const grid = document.querySelector('#cards');
 const status = document.querySelector('#status');
 const search = document.querySelector('#search');
@@ -8,6 +9,7 @@ const dialogTitle = dialog.querySelector('h2');
 const previous = document.querySelector('#previous');
 const next = document.querySelector('#next');
 const pageSize = 9;
+const zoom = zoomView(document.querySelector('#stage'), document.querySelector('#stage .v'), {address: true});
 let cards = [], page = 0, active = null;
 const filtered = () => { const q = search.value.trim().toLowerCase(); return cards.filter(c => `${c.name} ${c.number}`.toLowerCase().includes(q)); };
 function render() {
@@ -21,6 +23,7 @@ function render() {
  }
  document.querySelector('#page').textContent=`Page ${page+1} of ${pages} · ${list.length} cards`;
  previous.disabled=page===0; next.disabled=page>=pages-1;
+ zoom.refresh();
 }
 dialogImage.addEventListener('error',()=>{dialogImage.hidden=true;document.querySelector('#image-error').hidden=false;});
 dialog.querySelector('button').addEventListener('click',()=>dialog.close());dialog.addEventListener('close',()=>active?.focus());

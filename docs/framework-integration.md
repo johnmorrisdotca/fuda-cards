@@ -14,7 +14,7 @@ Build with `pnpm build`, then install or link the package in the host applicatio
 <fuda-collection view="binder"></fuda-collection>
 ```
 
-For an unbundled page, replace the bare import with the URL of `dist/collection-element.js` and serve the complete `dist` directory.
+For an unbundled page, replace the bare import with the URL of `dist/collection-element.js` and serve the complete `dist` directory. `<fuda-collection>` imports `@johnmorrisdotca/kazoku-ui/view-controls/define` for its zoom controls, so also add an import map for that name pointing at `node_modules/@johnmorrisdotca/kazoku-ui/dist/view-controls/define.js` (or a copy of it); see the demos in `demo/`.
 
 ## React
 

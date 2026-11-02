@@ -2,6 +2,15 @@
 
 Fuda supplies reusable frames for a caller's cards and reusable ways to display collections on websites. The hosting site supplies the card data and artwork or interactive content. Initial versions of eleven layouts now exist in `<fuda-collection>`. They are prototypes; the detailed capabilities below remain design goals unless described as implemented in the README.
 
+## Zoom, Fit and move (every view)
+
+Every view has the shared view controls (`@johnmorrisdotca/kazoku-ui`) on the view: zoom out, 2×, zoom in, **Fit**, and, zoomed in, an arrow pad. Ctrl or Command with the wheel, a trackpad pinch and a two-finger pinch zoom about the pointer; zoomed in, a drag or the wheel moves the view. The views are flat, so none turns in 3D and the angle, tilt and auto-turn controls are hidden.
+
+- The controls take every press on the view, including one that starts on a card, so a drag or a pinch works over the cards. A tap that did not move is passed to the card as a click, and the keyboard still opens a focused card with Enter.
+- **Fit** shows every card the view draws, at most at natural size. The wall, story and atlas open at half size or larger and start at their first card; the other views open at Fit. Zoom out goes to 0.4 of Fit.
+- Changing the card, the page or the view type is separate from zoom: paging keeps the zoom and the position, zooming keeps the page, and choosing another view type starts that view at its opening size.
+- The controls sit under the view. Keep what is above the viewer short so they are on the first screen; `--fuda-stage-height` sets the view's height.
+
 ## Binder and booklet
 
 - Configurable page grids, such as 3 columns by 4 rows or 4 by 4, and responsive alternatives for small screens.

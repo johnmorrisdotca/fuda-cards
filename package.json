@@ -48,8 +48,10 @@
     "dev": "pnpm build && node scripts/dev.mjs",
     "site": "pnpm build && node scripts/site.mjs"
   },
+  "dependencies": {
+    "@johnmorrisdotca/kazoku-ui": "^0.2.1"
+  },
   "devDependencies": {
-    "@johnmorrisdotca/kazoku-ui": "^0.2.1",
     "typescript": "5.9.3"
   },
   "publishConfig": {

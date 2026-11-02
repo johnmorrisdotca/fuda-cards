@@ -26,6 +26,7 @@ Each needs genuine distinct presentation, responsive layout, selection and keybo
 - [~] Flip tower.
 - [~] Spotlight carousel.
 - [~] Card atlas: infinite-feeling plane, pan, pinch/scroll zoom and selection; virtualize large collections.
+- [~] Zoom, Fit and move in every display view (F22): the eleven `<fuda-collection>` views, the standalone rolodex and the Pokémon binder demo use `@johnmorrisdotca/kazoku-ui` view controls; Fit shows every card; Ctrl or Command with the wheel, pinch, drag and arrows work; flat views only (none turns in 3D). Tested in headless Chromium at desk and phone size; no real phone, Safari or Firefox.
 - [ ] Preserve position and independent controls across selection, flipping, and 3D interaction.
 
 ## Collection data and users

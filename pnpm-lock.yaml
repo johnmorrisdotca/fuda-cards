@@ -7,10 +7,11 @@ settings:
 importers:
 
   .:
-    devDependencies:
+    dependencies:
       '@johnmorrisdotca/kazoku-ui':
         specifier: ^0.2.1
         version: 0.2.1
+    devDependencies:
       typescript:
         specifier: 5.9.3
         version: 5.9.3
