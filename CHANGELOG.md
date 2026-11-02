@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.0 - 2026-11-02
+
+- New: `material` attribute (and `material` in `CardOptions`): 13 materials with a thickness and edge colour, each thickness from a maker or a standard and cited in `docs/materials.md`: card stock (250, 310 black core, 350 gsm), a plastic bank-size card, thick trading cards (35, 55, 75, 100, 130, 180 pt), a 175 pt booklet card, anodised aluminium and stainless steel. The edge takes the material's colour. `thickness` overrides it. Left out for want of a source: a patch or relic card, a graded slab, a plastic playing card, other metals.
+- New: `stack` attribute: N cards (1 to 1000) as a stack N times a card's thickness high, to scale, with a line for each card on its edge. `stack-messiness`, `stack-seed` and `stack-depth` (the idea and parameters of toranpu's pile): the cards under the top one are drawn as flat stills, nudged and turned from the seed. The top card stays the live card; one 3D scene however many cards; nothing animates at rest (e2e checks that a 52-card stack requests no frames at rest).
+- New: exports `cardMaterials`, `cardMaterial`, `stackPresets` (52 playing cards, 54 with two jokers, a 60-card Pokémon deck, a booster pack of 10, each sourced), `stackHeightMm`, `stackLayout`; `card.stackCount` and `card.stackHeight`.
+- Changed: the Card Studio's Thickness choice no longer offers unsourced "metal card 0.8 mm" and "patch or relic 1.5 mm" presets; it has a Material choice and the Thickness choice is an override. New Stack choices (preset, count, messiness, seed) and a height readout. `<fuda-card>` now imports its own two small modules.
+
 ## 0.3.0 - 2026-11-02
 
 - Changed: the Animate button over the art is icon-only and quieter. A small play or pause mark (26 px) in the corner of the art at half strength, full strength on hover, focus or while it is on; the hit target stays 48 px square, the accessible name is "Animate the picture" with `aria-pressed`. The "Animate" and "Stop" text is gone.
