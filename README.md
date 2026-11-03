@@ -392,7 +392,9 @@ Vue 3 (`:cards.prop`), Svelte, Angular (`CUSTOM_ELEMENTS_SCHEMA`) and server ren
 
 ## Theming
 
-A collection follows the reader's light or dark setting; `theme="light"` or `theme="dark"` chooses for them. The card is sized by its width and styled through custom properties (`--fuda-edge`, `--fuda-perspective`, `--fuda-pan-duration`, `--fuda-card-spin-duration`, `--fuda-yaw`, `--fuda-tilt`, `--fuda-focus-x`, `--fuda-focus-y`) and a collection's view height by `--fuda-stage-height`. The frame's look is `variant` and `finish`. ```html
+A collection follows the reader's light or dark setting; `theme="light"` or `theme="dark"` chooses for them. The card is sized by its width and styled through custom properties (`--fuda-edge`, `--fuda-perspective`, `--fuda-pan-duration`, `--fuda-card-spin-duration`, `--fuda-yaw`, `--fuda-tilt`, `--fuda-focus-x`, `--fuda-focus-y`) and a collection's view height by `--fuda-stage-height`. The frame's look is `variant` and `finish`.
+
+```html
 <script type="module">import '@johnmorrisdotca/fuda-cards/element';</script>
 <style>fuda-card.brass { width: 220px; --fuda-edge: linear-gradient(90deg, #d9b45a, #8a6a22 50%, #d9b45a); --fuda-perspective: 1600px; }</style>
 <fuda-card class="brass" title="Brass edge" thickness="2"></fuda-card>
