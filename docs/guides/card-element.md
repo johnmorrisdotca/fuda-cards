@@ -26,7 +26,7 @@ The default slot holds the art: an `<img>`, or any HTML, including an existing i
 ```ts
 import { cardFinishes, cardVariants, type CardOptions } from '@johnmorrisdotca/fuda-cards';
 
-const options: CardOptions = { title: 'Explorer One', variant: cardVariants[2], finish: cardFinishes[0], thickness: 0.3 };
+const options: CardOptions = { title: 'Explorer One', variant: cardVariants[2], finish: cardFinishes[0], thickness: 0.325 };
 console.log(options.variant, options.finish);
 // cosmic foil
 ```
@@ -48,7 +48,7 @@ The perspective for 3D turns is `--fuda-perspective` (default `1000px`). The edg
 | Member | What it gives |
 |---|---|
 | `card.wear` | The wear preset, as the attribute. Setting an empty string removes it. |
-| `card.cardThicknessMm` | The thickness in use: `thickness`, else the material's, else 0.3. |
+| `card.cardThicknessMm` | The thickness in use: `thickness`, else the material's, else 0.325. |
 | `card.stackCount` | How many cards the stack holds, 1 to 1000. |
 | `card.stackHeight` | The stack's height in millimetres. |
 | `card.heldCount` | How many cards are still in the stack, after any taken off. |

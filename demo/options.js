@@ -1,0 +1,635 @@
+// Every setting of <fuda-card> and <fuda-collection>, in one table: the Card Studio and the Builder both draw their controls from it, the Builder writes
+// its code from it, and a test holds it to the attributes the elements watch. A row is { id, group, kind, names, default, choices | range, say } as the
+// family's embed builder reads it: `names` says what the setting is called for each maker, `say` its label and help in both languages.
+import { cardMaterials, stackPresets, wearPresets } from "../dist/index.js";
+
+const row = (id, group, kind, names, en, ja, extra = {}) => ({
+  id,
+  group,
+  kind,
+  names,
+  say: { en: { label: en[0], help: en[1] }, ja: { label: ja[0], help: ja[1] } },
+  ...extra,
+});
+const card = (name) => ({ card: name });
+const both = (name) => ({ card: name, collection: name });
+
+/** The groups, in the order their tabs show, for each maker. */
+export const GROUPS = {
+  look: { en: "Look", ja: "見た目" },
+  text: { en: "Words", ja: "文字" },
+  material: { en: "Material", ja: "素材" },
+  stack: { en: "Stack", ja: "山" },
+  wear: { en: "Wear", ja: "傷み" },
+  motion: { en: "Motion", ja: "動き" },
+  pile: { en: "Pile", ja: "カードの山" },
+  display: { en: "Display", ja: "表示" },
+  deck: { en: "Deck", ja: "デッキ" },
+  binder: { en: "Binder", ja: "バインダー" },
+};
+
+/** The groups each maker shows. */
+export const MAKER_GROUPS = {
+  card: ["look", "text", "material", "stack", "wear", "motion", "pile"],
+  collection: ["display", "deck", "binder", "motion"],
+};
+
+const materialChoices = cardMaterials.map((material) => material.id);
+const materialLabels = Object.fromEntries(
+  cardMaterials.map((material) => [
+    material.id,
+    `${material.name.replace(/ \(.*\)$/, "")} (${material.thicknessMm} mm)`,
+  ]),
+);
+
+export const OPTIONS = [
+  // Look
+  row(
+    "variant",
+    "look",
+    "choice",
+    card("variant"),
+    ["Style", "The frame: classic gold, silver sport or cosmic violet."],
+    ["スタイル", "枠の色合いです。金のクラシック、銀のスポーツ、紫のコスミックから選びます。"],
+    {
+      default: "classic",
+      choices: ["classic", "sport", "cosmic"],
+      choiceLabels: {
+        en: { classic: "Classic gold", sport: "Silver sport", cosmic: "Cosmic violet" },
+        ja: { classic: "クラシック（金）", sport: "スポーツ（銀）", cosmic: "コスミック（紫）" },
+      },
+    },
+  ),
+  row(
+    "finish",
+    "look",
+    "choice",
+    card("finish"),
+    ["Finish", "Foil catches the light and shows a rainbow in its frame; matte does not."],
+    ["仕上げ", "箔は光を受けて枠に虹色が出ます。つや消しは出ません。"],
+    {
+      default: "foil",
+      choices: ["foil", "matte"],
+      choiceLabels: { en: { foil: "Foil", matte: "Matte" }, ja: { foil: "箔", matte: "つや消し" } },
+    },
+  ),
+  row(
+    "flipped",
+    "look",
+    "boolean",
+    card("flipped"),
+    ["Show the back", "Turns the card over to its back."],
+    ["裏を見せる", "カードを裏返します。"],
+    { default: false },
+  ),
+  // Words
+  row(
+    "title",
+    "text",
+    "text",
+    card("title"),
+    ["Title", "The name at the top of the card."],
+    ["タイトル", "カードの上に出る名前です。"],
+    {},
+  ),
+  row(
+    "category",
+    "text",
+    "text",
+    card("category"),
+    ["Category", "The small word at the top right."],
+    ["分類", "右上に出る小さな言葉です。"],
+    {},
+  ),
+  row(
+    "subtitle",
+    "text",
+    "text",
+    card("subtitle"),
+    ["Subtitle", "The line under the picture."],
+    ["サブタイトル", "絵の下の一行です。"],
+    {},
+  ),
+  row(
+    "description",
+    "text",
+    "text",
+    card("description"),
+    ["Description", "The text in the lower half."],
+    ["説明", "下半分に出る文章です。"],
+    {},
+  ),
+  row(
+    "number",
+    "text",
+    "text",
+    card("number"),
+    ["Number", "The number at the bottom left."],
+    ["番号", "左下に出る番号です。"],
+    {},
+  ),
+  row(
+    "rarity",
+    "text",
+    "text",
+    card("rarity"),
+    ["Rarity", "The mark at the bottom right."],
+    ["レア度", "右下に出る印です。"],
+    {},
+  ),
+  // Material
+  row(
+    "material",
+    "material",
+    "choice",
+    card("material"),
+    ["Material", "A real card stock or metal: it sets the thickness and the colour of the edge."],
+    ["素材", "実際の紙や金属の厚みと縁の色になります。"],
+    {
+      choices: materialChoices,
+      control: "select",
+      choiceLabels: { en: materialLabels, ja: materialLabels },
+    },
+  ),
+  row(
+    "thickness",
+    "material",
+    "number",
+    card("thickness"),
+    ["Thickness (mm)", "At the 63 mm wide card; 0 is a flat card. It beats the material's."],
+    ["厚み（mm）", "幅63 mmのカードでの厚みです。0は平らなカードで、素材の厚みより優先されます。"],
+    {
+      default: 0.325,
+      range: { min: 0, max: 5, step: 0.025 },
+    },
+  ),
+  // Stack
+  row(
+    "stack",
+    "stack",
+    "number",
+    card("stack"),
+    [
+      "Cards in the stack",
+      "As high as the count times the thickness. A deck is 52, a Pokémon deck 60, a booster pack about 10.",
+    ],
+    [
+      "山の枚数",
+      "枚数と厚みをかけた高さになります。トランプは52枚、ポケモンのデッキは60枚、ブースターパックは約10枚です。",
+    ],
+    {
+      default: 1,
+      range: { min: 1, max: 1000, step: 1 },
+      presets: stackPresets.map((preset) => ({ value: preset.count, label: preset.name })),
+    },
+  ),
+  row(
+    "stack-messiness",
+    "stack",
+    "number",
+    card("stack-messiness"),
+    ["Messiness", "0 is squared up; 1 is very messy."],
+    ["乱れ", "0はきれいに揃い、1は大きく乱れます。"],
+    {
+      default: 0.3,
+      range: { min: 0, max: 1, step: 0.05 },
+    },
+  ),
+  row(
+    "stack-seed",
+    "stack",
+    "number",
+    card("stack-seed"),
+    ["Seed", "The same seed lays the same stack the same way."],
+    ["シード", "同じシードなら、同じ山になります。"],
+    {
+      default: 1,
+      range: { min: 0, max: 1000000, step: 1 },
+    },
+  ),
+  row(
+    "stack-depth",
+    "stack",
+    "number",
+    card("stack-depth"),
+    ["Cards laid out", "How many cards under the top one are nudged and turned."],
+    ["乱れを描く枚数", "一番上の下で、ずらして回す枚数です。"],
+    {
+      default: 10,
+      range: { min: 0, max: 52, step: 1 },
+    },
+  ),
+  // Wear
+  row(
+    "wear",
+    "wear",
+    "choice",
+    card("wear"),
+    ["Wear", "How worn the card is: corners, edges, surface and creases."],
+    ["傷み", "角、縁、表面、折れ目の傷み具合です。"],
+    {
+      choices: wearPresets.filter((preset) => preset.id !== "perfect").map((preset) => preset.id),
+      choiceLabels: {
+        en: Object.fromEntries(wearPresets.map((preset) => [preset.id, preset.name])),
+        ja: {
+          mint: "ミント",
+          "near-mint": "ニアミント",
+          "lightly-played": "軽いプレイ傷",
+          "moderately-played": "中程度のプレイ傷",
+          "heavily-played": "大きなプレイ傷",
+          damaged: "破損",
+        },
+      },
+    },
+  ),
+  row(
+    "wear-seed",
+    "wear",
+    "number",
+    card("wear-seed"),
+    ["Wear seed", "The same seed draws the same marks."],
+    ["傷みのシード", "同じシードなら、同じ傷になります。"],
+    {
+      default: 1,
+      range: { min: 0, max: 1000000, step: 1 },
+    },
+  ),
+  row(
+    "wear-corners",
+    "wear",
+    "number",
+    card("wear-corners"),
+    ["Corners", "Worn corners on their own, from 0 to 1."],
+    ["角", "角の傷みだけを0から1で決めます。"],
+    { range: { min: 0, max: 1, step: 0.05 } },
+  ),
+  row(
+    "wear-edges",
+    "wear",
+    "number",
+    card("wear-edges"),
+    ["Edges", "Worn edges on their own, from 0 to 1."],
+    ["縁", "縁の傷みだけを0から1で決めます。"],
+    { range: { min: 0, max: 1, step: 0.05 } },
+  ),
+  row(
+    "wear-surface",
+    "wear",
+    "number",
+    card("wear-surface"),
+    ["Surface", "Scratches and scuffs on their own, from 0 to 1."],
+    ["表面", "引っかき傷やこすれだけを0から1で決めます。"],
+    { range: { min: 0, max: 1, step: 0.05 } },
+  ),
+  row(
+    "wear-creases",
+    "wear",
+    "number",
+    card("wear-creases"),
+    ["Creases", "Creases on their own, from 0 to 1."],
+    ["折れ目", "折れ目だけを0から1で決めます。"],
+    { range: { min: 0, max: 1, step: 0.05 } },
+  ),
+  // Motion
+  row(
+    "motion",
+    "motion",
+    "choice",
+    card("motion"),
+    ["Picture", "Still, or panned slowly over a tall picture."],
+    ["絵の動き", "動かさないか、縦長の絵をゆっくり動かします。"],
+    {
+      default: "still",
+      choices: ["still", "pan"],
+      choiceLabels: { en: { still: "Still", pan: "Pan" }, ja: { still: "動かさない", pan: "ゆっくり動かす" } },
+    },
+  ),
+  row(
+    "playing",
+    "motion",
+    "boolean",
+    card("playing"),
+    ["Playing now", "The picture is moving from the start (needs Picture: Pan)."],
+    ["最初から動かす", "絵を最初から動かします（絵の動きを「ゆっくり動かす」にします）。"],
+    { default: false },
+  ),
+  row(
+    "autoplay",
+    "motion",
+    "choice",
+    card("autoplay"),
+    ["Autoplay", "Only the card in focus moves its picture."],
+    ["自動再生", "フォーカスしているカードだけが絵を動かします。"],
+    {
+      choices: ["focus"],
+      choiceLabels: { en: { focus: "When in focus" }, ja: { focus: "フォーカス時" } },
+    },
+  ),
+  row(
+    "pan-direction",
+    "motion",
+    "choice",
+    card("pan-direction"),
+    ["Pan direction", "Which way the picture moves."],
+    ["動く向き", "絵が動く向きです。"],
+    {
+      default: "down",
+      choices: ["down", "up"],
+      choiceLabels: {
+        en: { down: "Top to bottom", up: "Bottom to top" },
+        ja: { down: "上から下へ", up: "下から上へ" },
+      },
+    },
+  ),
+  row(
+    "pan-loop",
+    "motion",
+    "choice",
+    card("pan-loop"),
+    ["Pan loop", "Back and forth, or start again each time."],
+    ["動きの繰り返し", "行き来するか、毎回はじめから動かします。"],
+    {
+      default: "alternate",
+      choices: ["alternate", "restart"],
+      choiceLabels: {
+        en: { alternate: "Back and forth", restart: "Start again" },
+        ja: { alternate: "行き来する", restart: "はじめから" },
+      },
+    },
+  ),
+  row(
+    "card-spin",
+    "motion",
+    "choice",
+    card("card-spin"),
+    ["Turn by itself", "The card turns round its centre or round a corner."],
+    ["自動で回す", "カードを中心または角のまわりで回します。"],
+    {
+      choices: ["center", "corner"],
+      choiceLabels: {
+        en: { center: "Round the centre", corner: "Round a corner" },
+        ja: { center: "中心で回す", corner: "角で回す" },
+      },
+    },
+  ),
+  row(
+    "card-spin-direction",
+    "motion",
+    "choice",
+    card("card-spin-direction"),
+    ["Turn direction", "Forward or reverse."],
+    ["回る向き", "順方向か逆方向です。"],
+    {
+      default: "normal",
+      choices: ["normal", "reverse"],
+      choiceLabels: { en: { normal: "Forward", reverse: "Reverse" }, ja: { normal: "順方向", reverse: "逆方向" } },
+    },
+  ),
+  row(
+    "card-spin-paused",
+    "motion",
+    "boolean",
+    card("card-spin-paused"),
+    ["Pause the turn", "Holds the card where it is."],
+    ["回転を止める", "カードをその場で止めます。"],
+    { default: false },
+  ),
+  // Pile
+  row(
+    "fan",
+    "pile",
+    "choice",
+    both("fan"),
+    ["Fan", "A stack of more than one card fans open like a hand."],
+    ["扇", "2枚以上の山を、手札のように扇形に開きます。"],
+    {
+      choices: ["open"],
+      choiceLabels: { en: { open: "Open" }, ja: { open: "開く" } },
+    },
+  ),
+  row(
+    "taken-off",
+    "pile",
+    "number",
+    card("taken-off"),
+    ["Cards on the pile", "How many cards have been taken off the stack and lie beside it."],
+    ["山札から出した枚数", "山から取って横に置いた枚数です。"],
+    {
+      default: 0,
+      range: { min: 0, max: 999, step: 1 },
+    },
+  ),
+  row(
+    "deck-land",
+    "pile",
+    "choice",
+    both("deck-land"),
+    ["A card taken off lands", "Still facing up, or turned over sideways on the way."],
+    ["取ったカードの置き方", "表向きのままか、途中で裏返して置くかです。"],
+    {
+      default: "face-up",
+      choices: ["face-up", "face-down"],
+      choiceLabels: {
+        en: { "face-up": "Facing up", "face-down": "Turned over" },
+        ja: { "face-up": "表向き", "face-down": "裏返し" },
+      },
+    },
+  ),
+  row(
+    "pile-controls",
+    "pile",
+    "boolean",
+    card("pile-controls"),
+    ["Buttons under the stack", "Fan, Take a card off and Put it back."],
+    ["山の下のボタン", "「扇」「カードを取る」「元に戻す」のボタンです。"],
+    { default: false },
+  ),
+  row(
+    "animate",
+    "pile",
+    "choice",
+    both("animate"),
+    ["Animate", "Off ends every move at once."],
+    ["アニメーション", "オフにすると、動きはすぐに終わります。"],
+    {
+      default: "on",
+      choices: ["on", "off"],
+      choiceLabels: { en: { on: "On", off: "Off" }, ja: { on: "オン", off: "オフ" } },
+    },
+  ),
+  row(
+    "speed",
+    "pile",
+    "choice",
+    both("speed"),
+    ["Speed", "How long a move takes."],
+    ["速さ", "動きにかかる時間です。"],
+    {
+      default: "normal",
+      choices: ["slow", "normal", "quick"],
+      choiceLabels: {
+        en: { slow: "Slow", normal: "Normal", quick: "Quick" },
+        ja: { slow: "ゆっくり", normal: "ふつう", quick: "はやい" },
+      },
+    },
+  ),
+  // Collection
+  row(
+    "view",
+    "display",
+    "choice",
+    { collection: "view" },
+    ["Display", "How the collection is shown."],
+    ["表示", "コレクションの見せ方です。"],
+    {
+      default: "deck",
+      choices: ["deck", "rolodex", "binder", "case", "random", "story", "wall", "spotlight", "atlas", "fan"],
+      control: "select",
+      choiceLabels: {
+        en: {
+          deck: "Overlapping Deck",
+          rolodex: "Rolodex",
+          binder: "Binder Pages",
+          case: "Convention Display Case",
+          random: "Random Draw",
+          story: "Vertical Story Scroll",
+          wall: "Sliding Gallery Wall",
+          spotlight: "Spotlight Carousel",
+          atlas: "Card Table",
+          fan: "Fan of Cards",
+        },
+        ja: {
+          deck: "重ねたデッキ",
+          rolodex: "ローロデックス",
+          binder: "バインダーのページ",
+          case: "展示ケース",
+          random: "ランダムに引く",
+          story: "縦スクロール",
+          wall: "ギャラリーの壁",
+          spotlight: "スポットライト",
+          atlas: "カードテーブル",
+          fan: "カードの扇",
+        },
+      },
+    },
+  ),
+  row(
+    "theme",
+    "display",
+    "choice",
+    { collection: "theme" },
+    ["Colours", "Light or dark; left alone, it follows the reader's device."],
+    ["色", "明るいか暗いかです。指定しなければ読む人の端末に合わせます。"],
+    {
+      choices: ["light", "dark"],
+      choiceLabels: { en: { light: "Light", dark: "Dark" }, ja: { light: "明るい", dark: "暗い" } },
+    },
+  ),
+  row(
+    "columns",
+    "display",
+    "number",
+    { collection: "columns" },
+    ["Columns", "Across, in the flat displays."],
+    ["列の数", "平らな表示で横に並べる数です。"],
+    { default: 3, range: { min: 1, max: 10, step: 1 } },
+  ),
+  row(
+    "page-size",
+    "display",
+    "number",
+    { collection: "page-size" },
+    ["Cards a page", "How many cards a page of a flat display holds."],
+    ["1ページの枚数", "平らな表示の1ページに入る枚数です。"],
+    { default: 9, range: { min: 1, max: 100, step: 1 } },
+  ),
+  row(
+    "fan-size",
+    "deck",
+    "number",
+    { collection: "fan-size" },
+    ["Cards in the fan", "How many cards the Fan of Cards shows, from 2 to 10."],
+    ["扇の枚数", "「カードの扇」に出す枚数で、2から10です。"],
+    { default: 10, range: { min: 2, max: 10, step: 1 } },
+  ),
+  row(
+    "deck-messiness",
+    "deck",
+    "number",
+    { collection: "deck-messiness" },
+    ["Messiness", "0 is squared up; 1 is very messy."],
+    ["乱れ", "0はきれいに揃い、1は大きく乱れます。"],
+    { default: 0.3, range: { min: 0, max: 1, step: 0.05 } },
+  ),
+  row(
+    "deck-seed",
+    "deck",
+    "number",
+    { collection: "deck-seed" },
+    ["Seed", "The same seed lays the deck the same way."],
+    ["シード", "同じシードなら、同じデッキになります。"],
+    { default: 1, range: { min: 0, max: 1000000, step: 1 } },
+  ),
+  row(
+    "binder",
+    "binder",
+    "choice",
+    { collection: "binder" },
+    ["Binder", "Rings or a zip."],
+    ["バインダー", "リング式かジッパー式です。"],
+    {
+      default: "ring",
+      choices: ["ring", "zip"],
+      choiceLabels: { en: { ring: "Ring", zip: "Zip" }, ja: { ring: "リング", zip: "ジッパー" } },
+    },
+  ),
+  row(
+    "cover",
+    "binder",
+    "choice",
+    { collection: "cover" },
+    ["Cover", "The colour of the binder."],
+    ["表紙", "バインダーの色です。"],
+    {
+      default: "green",
+      choices: ["green", "black", "teal", "navy", "red"],
+      choiceLabels: {
+        en: { green: "Green", black: "Black", teal: "Teal", navy: "Navy", red: "Red" },
+        ja: { green: "緑", black: "黒", teal: "青緑", navy: "紺", red: "赤" },
+      },
+    },
+  ),
+  row(
+    "sheet",
+    "binder",
+    "choice",
+    { collection: "sheet" },
+    ["Sheet", "Clear pockets or black pages."],
+    ["ページ", "透明なポケットか、黒いページです。"],
+    {
+      default: "clear",
+      choices: ["clear", "black"],
+      choiceLabels: { en: { clear: "Clear", black: "Black" }, ja: { clear: "透明", black: "黒" } },
+    },
+  ),
+  row(
+    "pockets",
+    "binder",
+    "choice",
+    { collection: "pockets" },
+    ["Pockets", "How many pockets a sheet has."],
+    ["ポケットの数", "1ページのポケットの数です。"],
+    {
+      default: "9",
+      choices: ["4", "9", "12"],
+    },
+  ),
+];
+
+/** What the element watches that the builder does not draw a control for, and why. */
+export const LEFT_OUT = {
+  "card.card-view":
+    "The page turns the card with its own controls and two CSS variables, which a code snippet cannot carry.",
+  "collection.address":
+    "The address belongs to the page that holds the collection; the builder keeps its own setup there.",
+};

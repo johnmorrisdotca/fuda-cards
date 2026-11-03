@@ -1,0 +1,51 @@
+<!doctype html>
+<!-- The Card Studio's source. `pnpm site` fills each "family:" line from scripts/family-template.mjs, which every package of the family shares, and writes site/index.html; the paths
+     below are the paths of that page (the site's root), where demo/ and dist/ are folders beside it. scripts/pages.mjs does the same for the tests' server. -->
+<html lang="en">
+  <head>
+    <!-- family:head -->
+    <style>fuda-card:where(:not(:defined)){display:inline-block;width:300px;aspect-ratio:2.5/3.5;overflow:hidden;visibility:hidden}fuda-collection:where(:not(:defined)){display:block;min-height:calc(var(--fuda-stage-height,clamp(300px,calc(100svh - 440px),620px)) + 380px)}</style>
+    <!-- family:icon -->
+    <link rel="stylesheet" href="demo/family.css" />
+    <link rel="stylesheet" href="demo/studio.css" />
+    <!-- family:importmap -->
+  </head>
+  <body>
+    <main>
+      <!-- family:header -->
+      <div class="studio">
+        <section class="fam-felt studio-felt" aria-label="Card">
+          <div class="studio-stage" id="stage" tabindex="0" role="group">
+            <div class="studio-zoomer" id="zoomer">
+              <fuda-card id="card" card-view title="Starship Block 3" category="ROCKET" subtitle="Starship + Super Heavy" description="Height: 124.4 m · Diameter: 9 m · 33 Raptor 3 booster engines." motion="pan" card-spin="center">
+                <img id="art" src="assets/starship-v3-preview.jpg" alt="" />
+              </fuda-card>
+            </div>
+          </div>
+          <kazoku-view-controls id="view" for="stage" address zoom-min="0.5" layout="horizontal"></kazoku-view-controls>
+          <p class="fam-hint" id="note" aria-live="polite"></p>
+        </section>
+        <div class="studio-side">
+          <div class="fam-panels" id="controls" data-testid="controls"></div>
+          <div class="fam-panel studio-actions">
+            <div class="fam-actions">
+              <button class="fam-button" id="take-off" type="button" data-say="takeOff"></button>
+              <button class="fam-button" id="put-back" type="button" data-say="putBack"></button>
+            </div>
+            <p class="fam-fine" id="pile-note" aria-live="polite"></p>
+            <div class="fam-actions">
+              <span class="fam-button studio-file"><span data-say="uploadPicture"></span><input id="upload" type="file" accept="image/*" /></span>
+              <button class="fam-button" id="link" type="button" data-say="copyLink"></button>
+              <button class="fam-button" id="to-builder" type="button" data-primary="true" data-say="openBuilder"></button>
+            </div>
+            <p class="fam-fine" id="copied" aria-live="polite"></p>
+          </div>
+        </div>
+      </div>
+      <!-- family:unreviewed -->
+      <!-- family:footer -->
+    </main>
+    <!-- family:script -->
+    <script type="module" src="demo/studio.js"></script>
+  </body>
+</html>

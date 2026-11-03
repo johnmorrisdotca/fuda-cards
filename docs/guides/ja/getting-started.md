@@ -15,6 +15,8 @@ Fuda Cardsは、コレクション用のカードをWebコンポーネントと�
 npm install @johnmorrisdotca/fuda-cards
 ```
 
+このパッケージ自身のバージョンは`VERSION`として公開されているので、ページが実行中のバージョンを示せます。
+
 パッケージは`dist/`にあるふつうのESモジュールです。実行時の依存は[`@johnmorrisdotca/kazoku-ui`](https://github.com/johnmorrisdotca/kazoku-ui)が1つだけで、コレクションのズームバーを描くために使います。カード1枚だけなら、ほかに何も要りません。
 
 ## 最初のカード
@@ -32,7 +34,7 @@ npm install @johnmorrisdotca/fuda-cards
 
 `variant`は`classic`、`sport`、`cosmic`のいずれか、`finish`は`foil`か`matte`です。カードの幅は初期値で300 pxで、本物のカードと同じ2.5対3.5の比率を保ちます。CSSで要素の`width`を変えると、中身もいっしょに拡大・縮小します。
 
-バンドラーを使わないページでは、パッケージ名だけのインポートを`dist/element.js`のパスに置き換えて`dist`フォルダー全体を配信するか、インポートマップを使います（[フレームワークとバンドラー](frameworks.md)を参照）。
+バンドラーを使わないページでは、パッケージ名だけのインポートを`dist/element.js`のパスに置き換えて`dist`フォルダー全体を配信するか、インポートマップを使います（[HTMLとCDN](html-and-cdn.md)と[バンドラー](bundlers.md)を参照）。
 
 ## 裏返す、厚みを持たせる
 

@@ -26,7 +26,7 @@ description: fuda-card要素のすべての属性、プロパティ、CSS変数�
 ```ts
 import { cardFinishes, cardVariants, type CardOptions } from '@johnmorrisdotca/fuda-cards';
 
-const options: CardOptions = { title: 'Explorer One', variant: cardVariants[2], finish: cardFinishes[0], thickness: 0.3 };
+const options: CardOptions = { title: 'Explorer One', variant: cardVariants[2], finish: cardFinishes[0], thickness: 0.325 };
 console.log(options.variant, options.finish);
 // cosmic foil
 ```
@@ -48,7 +48,7 @@ console.log(options.variant, options.finish);
 | メンバー | 内容 |
 |---|---|
 | `card.wear` | 属性と同じ、摩耗のプリセット。空文字列を代入すると取り除かれる。 |
-| `card.cardThicknessMm` | 実際に使われる厚み。`thickness`、なければ素材の厚み、なければ0.3。 |
+| `card.cardThicknessMm` | 実際に使われる厚み。`thickness`、なければ素材の厚み、なければ0.325。 |
 | `card.stackCount` | 山の枚数。1から1000。 |
 | `card.stackHeight` | 山の高さ（ミリメートル）。 |
 | `card.heldCount` | 取り出した分を除いて、山に残っている枚数。 |

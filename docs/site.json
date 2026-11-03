@@ -1,0 +1,20 @@
+{
+  "job": "Collectible card frames for the web",
+  "pitch": {
+    "en": "Collectible card frames for images and live 3D: a true thickness, an edge, foil, stacks, wear and a binder, as two web components.",
+    "ja": "画像やライブ3Dを入れるコレクション用のカード枠です。本物の厚み、縁、箔、山、傷み、バインダーを、2つのWebコンポーネントで使えます。"
+  },
+  "name": {
+    "en": "Fuda is the Japanese word 札 for a card or a tag.",
+    "ja": "「札（ふだ）」は、カードや札を指す日本語です。"
+  },
+  "icon": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect x='24' y='16' width='56' height='72' rx='9' fill='%23ab742c'/%3E%3Crect x='18' y='10' width='56' height='72' rx='9' fill='%23fbdf87' stroke='%239c702d' stroke-width='4'/%3E%3Crect x='28' y='22' width='36' height='28' rx='3' fill='%23273c4c'/%3E%3C/svg%3E",
+  "entries": {
+    ".": { "en": "Options, materials, stacks and wear", "ja": "設定、素材、山、傷み", "platform": "node" },
+    "./element": { "en": "The <fuda-card> element", "ja": "<fuda-card> 要素", "platform": "browser" },
+    "./element/define": { "en": "Register both elements", "ja": "2つの要素を登録", "platform": "browser" },
+    "./collection": { "en": "Collections and piles: pure helpers", "ja": "コレクションと山：計算部分", "platform": "node" },
+    "./collection-element": { "en": "The <fuda-collection> element", "ja": "<fuda-collection> 要素", "platform": "browser" },
+    "./live-3d": { "en": "Live 3D in cards", "ja": "カードの中のライブ3D", "platform": "browser" }
+  }
+}

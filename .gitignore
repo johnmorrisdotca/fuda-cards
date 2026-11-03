@@ -2,3 +2,10 @@ node_modules/
 dist/
 .DS_Store
 site/
+test-results/
+playwright-report/
+*.tgz
+.cache/
+.usage/
+.readme-examples/
+.docs-examples/

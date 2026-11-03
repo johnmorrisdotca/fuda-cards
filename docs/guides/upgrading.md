@@ -41,7 +41,7 @@ The package is in early development (0.x), and each minor release can add to the
 
 ## To 0.2
 
-- **`@johnmorrisdotca/kazoku-ui` is a runtime dependency.** A page without a bundler needs an import map for `@johnmorrisdotca/kazoku-ui/view-controls/define`. See [Frameworks and bundlers](frameworks.md).
+- **`@johnmorrisdotca/kazoku-ui` is a runtime dependency.** A page without a bundler needs an import map for `@johnmorrisdotca/kazoku-ui/view-controls/define`. See [HTML and CDN](html-and-cdn.md) and [Bundlers](bundlers.md).
 - The `address` attribute on `<fuda-collection>` keeps the view's state in the page address.
 
 ## Checking an upgrade

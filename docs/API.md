@@ -4,15 +4,23 @@ Every export of @johnmorrisdotca/fuda-cards 0.10.1, one section for each entry p
 
 ## `@johnmorrisdotca/fuda-cards`
 
-14 values and 15 types.
+17 values and 15 types.
 
 ```js
-import { cardFinishes, cardMaterial, cardMaterials, cardVariants, mmPerPoint, stackHeightMm, stackLayout, stackPresets, wearLayout, wearLevels, wearOutline, wearOverlaySvg, wearPreset, wearPresets } from '@johnmorrisdotca/fuda-cards';
+import { cardAttributes, cardFinishes, cardMaterial, cardMaterials, cardVariants, DEFAULT_CARD_THICKNESS_MM, mmPerPoint, stackHeightMm, stackLayout, stackPresets, VERSION, wearLayout, wearLevels, wearOutline, wearOverlaySvg, wearPreset, wearPresets } from '@johnmorrisdotca/fuda-cards';
+```
+
+### cardAttributes
+
+*function*. The attributes of a `<fuda-card>` for these options, ready to set one by one (`element.setAttribute(name, value)`): names are the
+
+```ts
+function cardAttributes(options: CardOptions): Record<string, string>;
 ```
 
 ### cardFinishes
 
-*constant*
+*constant*. The two finishes, foil and matte.
 
 ```ts
 const cardFinishes: readonly CardFinish[];
@@ -20,7 +28,7 @@ const cardFinishes: readonly CardFinish[];
 
 ### cardMaterial
 
-*function*. The material with this id, or undefined.
+*function*. The material with this id.
 
 ```ts
 function cardMaterial(id: string | null | undefined): CardMaterial | undefined;
@@ -28,7 +36,7 @@ function cardMaterial(id: string | null | undefined): CardMaterial | undefined;
 
 ### cardMaterials
 
-*constant*
+*constant*. Every material the package knows, each with a thickness and the page it was read from. `docs/materials.md` lists them with their sources.
 
 ```ts
 const cardMaterials: readonly CardMaterial[];
@@ -36,15 +44,23 @@ const cardMaterials: readonly CardMaterial[];
 
 ### cardVariants
 
-*constant*
+*constant*. The three looks, in the order the studio offers them.
 
 ```ts
 const cardVariants: readonly CardVariant[];
 ```
 
+### DEFAULT_CARD_THICKNESS_MM
+
+*constant*. The thickness of a card that names no material or thickness: a playing card's black-core stock, 13 pt, 0.325 mm
+
+```ts
+const DEFAULT_CARD_THICKNESS_MM = 0.325;
+```
+
 ### mmPerPoint
 
-*constant*. One thousandth of an inch ("pt" in card and paper trade talk) in millimetres.
+*constant*. One thousandth of an inch ("pt" in card and paper trade talk) in millimetres, 0.0254: a 13 pt card is 13 × 0.0254 mm.
 
 ```ts
 const mmPerPoint = 0.0254;
@@ -52,7 +68,7 @@ const mmPerPoint = 0.0254;
 
 ### stackHeightMm
 
-*function*. Height of a stack of `count` cards `thicknessMm` thick, in millimetres.
+*function*. The height of a stack of cards, in millimetres: the count times the thickness of one, to a thousandth of a millimetre.
 
 ```ts
 function stackHeightMm(count: number, thicknessMm: number): number;
@@ -60,7 +76,7 @@ function stackHeightMm(count: number, thicknessMm: number): number;
 
 ### stackLayout
 
-*function*. The cards under the top one of a stack of `count`, bottom first: the top `depth` of them, as the top card is the live one
+*function*. Where the cards of a stack lie, from neat to messy, the same every time for the same seed: the cards under the top one, bottom first, at most
 
 ```ts
 function stackLayout(count: number, options?: StackLayoutOptions): StackPlace[];
@@ -68,15 +84,23 @@ function stackLayout(count: number, options?: StackLayoutOptions): StackPlace[];
 
 ### stackPresets
 
-*constant*
+*constant*. The usual sizes of a stack of cards, each with where the number comes from.
 
 ```ts
 const stackPresets: readonly StackPreset[];
 ```
 
+### VERSION
+
+*constant*. The version of this package, the same as `package.json`'s (a test holds the two together).
+
+```ts
+const VERSION = "0.10.1";
+```
+
 ### wearLayout
 
-*function*. Where every mark of a card lies. A pure function of the levels and the seed: no DOM, nothing at random.
+*function*. Where every mark of a card lies. A pure function of the levels and the seed: no DOM, nothing at random, so the same seed lays the same marks every time.
 
 ```ts
 function wearLayout(levels: WearLevels, seed?: number): WearFeatures;
@@ -84,7 +108,7 @@ function wearLayout(levels: WearLevels, seed?: number): WearFeatures;
 
 ### wearLevels
 
-*function*. The levels a card's wear asks for, or null when it asks for none (no wear, "perfect", an unknown name or all zero).
+*function*. The levels a card's wear asks for: the grade's or the number's, with any level named on its own laid over them.
 
 ```ts
 function wearLevels(options: WearOptions): WearLevels | null;
@@ -95,7 +119,7 @@ function wearLevels(options: WearOptions): WearLevels | null;
 *function*. The outline of a face as an SVG path in the 250 by 350 box, corners as worn.
 
 ```ts
-function wearOutline(features: WearFeatures, face?: 'front' | 'back'): string;
+function wearOutline(features: WearFeatures, face?: "front" | "back"): string;
 ```
 
 ### wearOverlaySvg
@@ -103,12 +127,12 @@ function wearOutline(features: WearFeatures, face?: 'front' | 'back'): string;
 *function*. The SVG laid over one face: whitening, folds, creases, scratches, specks, stain and toning. Markup only, no script.
 
 ```ts
-function wearOverlaySvg(features: WearFeatures, face?: 'front' | 'back'): string;
+function wearOverlaySvg(features: WearFeatures, face?: "front" | "back"): string;
 ```
 
 ### wearPreset
 
-*function*
+*function*. The grade with this id.
 
 ```ts
 function wearPreset(id: string | null | undefined): WearPreset | undefined;
@@ -116,7 +140,7 @@ function wearPreset(id: string | null | undefined): WearPreset | undefined;
 
 ### wearPresets
 
-*constant*. From perfect to damaged. The names are the plain grading terms; the numbers are this package's reading of them (docs/wear.md).
+*constant*. The seven grades, from perfect to damaged. The names are the plain grading terms; the numbers are this package's reading of them (docs/wear.md).
 
 ```ts
 const wearPresets: readonly WearPreset[];
@@ -124,15 +148,15 @@ const wearPresets: readonly WearPreset[];
 
 ### CardFinish
 
-*type*. A card's finish and visual family.
+*type*. A card's finish: foil catches the light and shows a rainbow in its frame, matte does not.
 
 ```ts
-type CardFinish = 'foil' | 'matte';
+type CardFinish = "foil" | "matte";
 ```
 
 ### CardMaterial
 
-*interface*
+*interface*. A card material: a stock or a metal with a thickness read from a maker or a standard, and the colour its edge is drawn in.
 
 ```ts
 interface CardMaterial {
@@ -149,15 +173,15 @@ interface CardMaterial {
 
 ### CardMaterialGroup
 
-*type*
+*type*. The kind of stock a material is: plain paper card, plastic, a thick trading-card stock or metal.
 
 ```ts
-type CardMaterialGroup = 'paper' | 'plastic' | 'thick-card' | 'metal';
+type CardMaterialGroup = "paper" | "plastic" | "thick-card" | "metal";
 ```
 
 ### CardMaterialSource
 
-*interface*. A card material with a thickness taken from a maker or a standard, and where it was read.
+*interface*. Where a number was read: the maker's or the standard's page, and what it says there.
 
 ```ts
 interface CardMaterialSource {
@@ -170,7 +194,7 @@ interface CardMaterialSource {
 
 ### CardOptions
 
-*interface*
+*interface*. Every setting of `<fuda-card>` as an object. `cardAttributes(options)` turns it into the element's attributes, so the same object
 
 ```ts
 interface CardOptions {
@@ -182,7 +206,7 @@ interface CardOptions {
     rarity?: string;
     variant?: CardVariant;
     finish?: CardFinish;
-    /** Card thickness in millimetres at the 63 mm wide card size; overrides the material's. Default 0.3, 0 for a flat card. */
+    /** Card thickness in millimetres at the 63 mm wide card size; overrides the material's. Default 0.325, 0 for a flat card. */
     thickness?: number;
     /** A material's id (see `cardMaterials`): its sourced thickness and edge colour. */
     material?: string;
@@ -203,38 +227,54 @@ interface CardOptions {
     wearEdges?: number;
     wearSurface?: number;
     wearCreases?: number;
+    /** The card shows its back. */
     flipped?: boolean;
-    motion?: 'still' | 'pan';
+    motion?: "still" | "pan";
+    /** The picture is moving now (needs `motion: "pan"`). */
     playing?: boolean;
     /** `focus`: the card in focus animates its art (needs `motion: 'pan'`); never with reduced motion. */
-    autoplay?: 'focus';
-    panDirection?: 'down' | 'up';
-    panLoop?: 'alternate' | 'restart';
-    cardSpin?: 'center' | 'corner';
-    cardSpinDirection?: 'normal' | 'reverse';
+    autoplay?: "focus";
+    panDirection?: "down" | "up";
+    panLoop?: "alternate" | "restart";
+    cardSpin?: "center" | "corner";
+    cardSpinDirection?: "normal" | "reverse";
     cardSpinPaused?: boolean;
+    /** The page turns the card with `--fuda-yaw` and `--fuda-tilt` instead of the built-in spin. */
+    cardView?: boolean;
+    /** `open`: a stack of more than one card fans open. */
+    fan?: "open";
+    /** How many cards are on the pile beside the stack. */
+    takenOff?: number;
+    /** How a card taken off lands: `face-up` or turned over (`face-down`). */
+    deckLand?: "face-up" | "face-down";
+    /** `off` ends every move at once. */
+    animate?: "on" | "off";
+    /** How long a move takes: `slow`, `normal` or `quick`. */
+    speed?: "slow" | "normal" | "quick";
+    /** The three buttons under a stack: Fan, Take a card off and Put it back. */
+    pileControls?: boolean;
 }
 ```
 
 ### CardVariant
 
-*type*
+*type*. A card's look: classic gold, silver sport or cosmic violet.
 
 ```ts
-type CardVariant = 'classic' | 'sport' | 'cosmic';
+type CardVariant = "classic" | "sport" | "cosmic";
 ```
 
 ### CornerKind
 
-*type*
+*type*. How a corner is worn: sharp, softened, rounded, chipped or folded.
 
 ```ts
-type CornerKind = 'sharp' | 'soft' | 'rounded' | 'chipped' | 'dog-eared';
+type CornerKind = "sharp" | "soft" | "rounded" | "chipped" | "dog-eared";
 ```
 
 ### StackLayoutOptions
 
-*interface*
+*interface*. How a stack is laid out: how messy, from which seed and how many cards deep.
 
 ```ts
 interface StackLayoutOptions {
@@ -249,7 +289,7 @@ interface StackLayoutOptions {
 
 ### StackPlace
 
-*interface*. Where the cards of a stack lie, from neat to messy, the same every time for the same seed.
+*interface*. Where one card of a stack lies, as the stack's layout says: how far it is nudged across and down, in card widths, and how far it is turned.
 
 ```ts
 interface StackPlace {
@@ -264,7 +304,7 @@ interface StackPlace {
 
 ### StackPreset
 
-*interface*. A count of cards for a stack, with where the number comes from.
+*interface*. A count of cards for a stack, with where the number comes from: a deck of 52, a Pokémon deck of 60, a booster pack of about 10.
 
 ```ts
 interface StackPreset {
@@ -277,7 +317,7 @@ interface StackPreset {
 
 ### WearCorner
 
-*interface*
+*interface*. One corner of a worn card: how it is worn and how far the damage reaches.
 
 ```ts
 interface WearCorner {
@@ -291,7 +331,7 @@ interface WearCorner {
 
 ### WearFeatures
 
-*interface*
+*interface*. Every mark of a worn card: its corners, its centring, and the creases, scratches, specks and stain of each face.
 
 ```ts
 interface WearFeatures {
@@ -327,7 +367,7 @@ interface WearLevels {
 
 ### WearOptions
 
-*interface*
+*interface*. What a card asks of its wear: a grade or a number, a seed, and any level on its own.
 
 ```ts
 interface WearOptions {
@@ -345,7 +385,7 @@ interface WearOptions {
 
 ### WearPreset
 
-*interface*
+*interface*. A grading term with the levels it stands for and what it means in a few words.
 
 ```ts
 interface WearPreset {
@@ -367,7 +407,7 @@ import { FudaCard } from '@johnmorrisdotca/fuda-cards/element';
 
 ### FudaCard
 
-*class*
+*class*. `<fuda-card>`: a collectible card frame around a picture you give it (or a live 3D view), drawn with a true thickness, an edge, a back, foil or matte,
 
 ```ts
 class FudaCard extends HTMLElement {
@@ -376,6 +416,8 @@ class FudaCard extends HTMLElement {
     private hushed;
     private focusedAtPress?;
     constructor();
+    /** The light follows the pointer over the card: a foil card shows its sheen where the pointer is (see `--fuda-sheen-x` and `--fuda-sheen-y`). */
+    private watchLight;
     /** With `autoplay="focus"` the card in focus animates its art; leaving it (pointer, keyboard or a tap elsewhere) stops it. */
     private watchFocus;
     /** Put this card in focus (or out of it); the card that had focus is put out, so only one is ever in focus. */
@@ -388,7 +430,7 @@ class FudaCard extends HTMLElement {
     connectedCallback(): void;
     disconnectedCallback(): void;
     attributeChangedCallback(name: string): void;
-    /** Millimetres thick: the `thickness` attribute, else the `material`'s, else 0.3. */
+    /** Millimetres thick: the `thickness` attribute, else the `material`'s, else the playing-card stock's 0.325 (`DEFAULT_CARD_THICKNESS_MM`). */
     get cardThicknessMm(): number;
     /** How many cards the stack holds: the `stack` attribute as a whole number from 1 (one card) to 1000. */
     get stackCount(): number;
@@ -428,6 +470,14 @@ class FudaCard extends HTMLElement {
 }
 ```
 
+## `@johnmorrisdotca/fuda-cards/element/define`
+
+0 values and 0 types.
+
+```js
+import { /* types only */ } from '@johnmorrisdotca/fuda-cards/element/define';
+```
+
 ## `@johnmorrisdotca/fuda-cards/live-3d`
 
 1 value and 5 types.
@@ -438,7 +488,7 @@ import { createLiveCards } from '@johnmorrisdotca/fuda-cards/live-3d';
 
 ### createLiveCards
 
-*function*
+*function*. Make the live cards of a page. Nothing 3D is loaded until a card is first in focus (or a card with no picture of its own comes near the view and needs its still made).
 
 ```ts
 function createLiveCards<T extends ThreeLike = ThreeLike>(options: LiveCardsOptions<T>): LiveCards<T>;
@@ -446,7 +496,7 @@ function createLiveCards<T extends ThreeLike = ThreeLike>(options: LiveCardsOpti
 
 ### AddOptions
 
-*interface*
+*interface*. What a card brings when it is added: the picture it already has.
 
 ```ts
 interface AddOptions {
@@ -457,7 +507,7 @@ interface AddOptions {
 
 ### LiveCards
 
-*interface*
+*interface*. The live cards of a page: add a card, put one in focus, let go. Only the card in focus turns in 3D, on the page's one WebGL context; the others stay pictures.
 
 ```ts
 interface LiveCards<T extends ThreeLike = ThreeLike> {
@@ -480,10 +530,10 @@ interface LiveCards<T extends ThreeLike = ThreeLike> {
 
 ### LiveCardsOptions
 
-*interface*
+*interface*. How the live cards behave: the shared renderer's options (kazoku-ui's), and how long a turn takes, how long the pointer rests before a card goes live and how far ahead a still is made.
 
 ```ts
-interface LiveCardsOptions<T extends ThreeLike = ThreeLike> extends Omit<SharedRendererOptions<T>, 'scheduler' | 'assets' | 'clock' | 'document'> {
+interface LiveCardsOptions<T extends ThreeLike = ThreeLike> extends Omit<SharedRendererOptions<T>, "scheduler" | "assets" | "clock" | "document"> {
     /** Seconds for one turn of the card in focus (12). 0 does not turn it. */
     turnSeconds?: number;
     /** How long the pointer has to rest on a card before it goes live, in milliseconds (150), so moving the pointer across a page of cards starts nothing. A press or the keyboard does not wait. */
@@ -506,7 +556,7 @@ interface LiveItem<T extends ThreeLike = ThreeLike> {
 
 ### LiveScene
 
-*interface*. A scene for a card. `object` is what turns about its upright axis while the card is in focus.
+*interface*. A scene for a card: kazoku-ui's scene, with `object`, the thing that turns about its upright axis while the card is in focus.
 
 ```ts
 interface LiveScene extends Scene3D {
@@ -528,7 +578,7 @@ import { collectionKinds, collectionViewAliases, collectionViews, deckLandings, 
 
 ### collectionKinds
 
-*constant*
+*constant*. The two kinds of item, `card` and `object`.
 
 ```ts
 const collectionKinds: ReadonlyArray<CollectionKind>;
@@ -544,7 +594,7 @@ const collectionViewAliases: Readonly<Record<string, CollectionView>>;
 
 ### collectionViews
 
-*constant*. The displays, in the order the buttons show them. `jukebox` and `tower` were two more names for the deck's pile of cards (no real counterpart for cards, and the same drawing), so they are no longer offered; see `collectionViewAliases`.
+*constant*. The ten displays, in the order the buttons show them, each with the label on its button. `jukebox` and `tower` were two more names for the deck's pile of cards (no real counterpart for cards, and the same drawing), so they are no longer offered; see {@link collectionViewAliases}.
 
 ```ts
 const collectionViews: ReadonlyArray<{
@@ -555,18 +605,18 @@ const collectionViews: ReadonlyArray<{
 
 ### deckLandings
 
-*constant*
+*constant*. The two ways a card can land, with the label on each button: `face-up` (still facing up) and `face-down` (turned over sideways on the way).
 
 ```ts
 const deckLandings: ReadonlyArray<{
-    id: 'face-up' | 'face-down';
+    id: "face-up" | "face-down";
     label: string;
 }>;
 ```
 
 ### fanLayout
 
-*function*. `step` is how far apart neighbouring cards lie across, in card widths; the angle does the rest of the spreading. A phone uses a smaller one.
+*function*. Where the cards of a fan lie: each card turns eleven degrees more than the one before, up to 110 degrees from the first to the last, centred on the pile.
 
 ```ts
 function fanLayout(count: number, seed?: number, step?: number): FanPlace[];
@@ -574,7 +624,7 @@ function fanLayout(count: number, seed?: number, step?: number): FanPlace[];
 
 ### isCard
 
-*constant*. True for an item that is a card: anything that does not say it is an object. Only a card turns, has a back and lands turned over.
+*constant*. Whether an item is a card: anything that does not say it is an object. Only a card turns, has a back and lands turned over.
 
 ```ts
 const isCard: (card: Pick<CollectionCard, "kind">) => boolean;
@@ -582,7 +632,7 @@ const isCard: (card: Pick<CollectionCard, "kind">) => boolean;
 
 ### movePage
 
-*function*. Return the first card index of a wrapped page.
+*function*. The first card of the page that is `delta` pages away, wrapping round at either end.
 
 ```ts
 function movePage(index: number, length: number, pageSize: number, delta: number): number;
@@ -593,20 +643,20 @@ function movePage(index: number, length: number, pageSize: number, delta: number
 *function*. The landing a value means: `face-down` (also `upside-down` and `turned-over`) is turned over; anything else is still facing up.
 
 ```ts
-function normalizeLanding(value: string | null | undefined): 'face-up' | 'face-down';
+function normalizeLanding(value: string | null | undefined): "face-up" | "face-down";
 ```
 
 ### parseCollection
 
-*function*
+*function*. Check a collection and make it the shape the element draws: an array of cards, or an object with a `cards` array. A card without an id is numbered by its place.
 
 ```ts
-function parseCollection(value: unknown): CollectionCard[];
+function parseCollection(input: unknown): CollectionCard[];
 ```
 
 ### randomDrawIndex
 
-*function*. Choose a matching card, avoiding the current card when another match exists.
+*function*. Choose a card whose name contains the filter, avoiding the current card when another match exists.
 
 ```ts
 function randomDrawIndex(cards: CollectionCard[], current: number, filter: string, random?: () => number): number | null;
@@ -614,7 +664,7 @@ function randomDrawIndex(cards: CollectionCard[], current: number, filter: strin
 
 ### CollectionCard
 
-*interface*
+*interface*. One item of a collection: an id, a name, the front's picture, optionally the back's, its kind and its metadata.
 
 ```ts
 interface CollectionCard {
@@ -632,12 +682,12 @@ interface CollectionCard {
 *type*. What an item is. A `card` (the default, so every collection written before this field existed is still cards) is a flat, thin card with a back: it
 
 ```ts
-type CollectionKind = 'card' | 'object';
+type CollectionKind = "card" | "object";
 ```
 
 ### CollectionMetadata
 
-*interface*
+*interface*. What a collector writes about a card: its set, year, number, edition, condition, grade, quantity and notes. All optional; `year` and `quantity` are whole numbers.
 
 ```ts
 interface CollectionMetadata {
@@ -654,10 +704,10 @@ interface CollectionMetadata {
 
 ### CollectionView
 
-*type*. Browser-native collection viewer. Import this module to register <fuda-collection>.
+*type*. The name of a display of `<fuda-collection>`: the `view` attribute's values. `jukebox` and `tower` are older names that open the deck (see
 
 ```ts
-type CollectionView = 'deck' | 'rolodex' | 'binder' | 'case' | 'jukebox' | 'random' | 'story' | 'wall' | 'tower' | 'spotlight' | 'atlas' | 'fan';
+type CollectionView = "deck" | "rolodex" | "binder" | "case" | "jukebox" | "random" | "story" | "wall" | "tower" | "spotlight" | "atlas" | "fan";
 ```
 
 ### DeckLanding
@@ -665,12 +715,12 @@ type CollectionView = 'deck' | 'rolodex' | 'binder' | 'case' | 'jukebox' | 'rand
 *type*. How a card taken off a pile lands on the pile at its side: still facing up, or turned over sideways (as a person turns a card, like a
 
 ```ts
-type DeckLanding = 'face-up' | 'face-down' | 'upside-down';
+type DeckLanding = "face-up" | "face-down" | "upside-down";
 ```
 
 ### FanPlace
 
-*interface*. Where the cards of a fan lie, first card on the left when open and on top when closed. `open` is the fan spread like a hand of playing cards; `closed` is the squared-up deck it starts from and closes back to.
+*interface*. Where one card of a fan lies, first card on the left when open and on top when closed. `angle`, `x` and `y` are the open fan, spread like a hand
 
 ```ts
 interface FanPlace {
@@ -693,28 +743,10 @@ import { FudaCollection } from '@johnmorrisdotca/fuda-cards/collection-element';
 
 ### FudaCollection
 
-*class*
+*class*. `<fuda-collection>`: a whole collection in one of ten displays (a deck, a rolodex, binder pages, a display case, a random draw, a story scroll, a gallery wall,
 
 ```ts
 class FudaCollection extends HTMLElement {
-    private root;
-    private data;
-    private index;
-    private pageSize;
-    private selected;
-    private back;
-    private drawFilter;
-    private zoom;
-    private tiles?;
-    private landing?;
-    private fanChoice?;
-    private animateChoice?;
-    private speedChoice?;
-    private binderChoices;
-    private turn;
-    private flip;
-    private addressTimer;
-    private fanPlaces;
     private liveSetup;
     private liveOff;
     static get observedAttributes(): string[];
@@ -730,54 +762,10 @@ class FudaCollection extends HTMLElement {
     connectedCallback(): void;
     disconnectedCallback(): void;
     attributeChangedCallback(name: string): void;
-    private get currentView();
-    /** How a card taken off lands: still facing up, or turned over sideways. The 0.6.0 value `upside-down` is still accepted and means turned over. */
-    private get land();
-    private get fanOpen();
-    private get stacked();
-    private get piled();
-    /** Only a card turns: a collection of objects (no card in it) never turns, and in a mixed one the objects stay square to the reader while the cards turn. */
-    private get hasCards();
-    private get turnable();
-    private q;
-    /** With `address`, the display, the fan, the landing, the animation and its speed are kept in the page's address (`?view=fan&fan=open&land=face-down&animate=off`), and a link to it opens the same. */
-    private readAddress;
-    private writeAddress;
-    private move;
-    private binderLay;
     /** The first card of an opening of the binder: the right-hand page's first card, or the left-hand page's when the right-hand page is past the end. */
     private spreadFirst;
-    private image;
-    private open;
-    private renderDialog;
-    private canDraw;
-    /** The one length every move takes, in a custom property the stylesheet reads: `animate="off"` and reduced motion make it 0, `speed` stretches it. */
-    private timeVars;
-    private syncChoices;
-    private build;
-    /** One pile of the deck. `positions` are data indexes from the bottom of the pile to its top; the cards under the top one lie nudged and turned from the seed and the top one lies square. A deck's cards also carry where they lie when the fan is open. */
-    private pile;
-    /** Where the fan's cards lie for a pile of this many cards. A phone's fan lies closer across and leans on its angle. */
-    private fanFor;
-    /** Open the fan (or close it) on the pile that is on screen, without drawing it again, so every card glides: the open fan's reach is put in custom properties that move the piles apart and the Fit box. */
-    private fanVars;
     /** `fan` changed: when a pile is on screen, move its cards to or from the fan in place (animated) and fit the view to it. Returns false when there is no pile to move. */
     private setFan;
-    private renderDeck;
-    /** The card that just moved flies between the two piles, turning over sideways on the way if it lands face down. The same element, so the card is never drawn twice. An open fan sends the card from where the fan holds it. */
-    private playFlip;
-    private renderFan;
-    /** Where every card is on screen now, by data index. */
-    private snapshot;
-    /** Cards that arrive grow and fade in, a little to the side the reader is heading. Only an opening keyframe: they end on the card's own style. */
-    private enter;
-    /** After a card or page change or a switch of display: glide what stays, let what goes leave, bring in what comes. Nothing runs afterwards: each is one animation that ends by itself. */
-    private play;
-    private syncBinder;
-    private binderCount;
-    /** The binder: a ring or zip binder open on two facing sheets of pockets. A page turn swings the leaf about the spine, bending as it goes, and shows the pockets on its back. */
-    private renderBinder;
-    private render;
 }
 ```
 

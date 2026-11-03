@@ -1,0 +1,22 @@
+<!doctype html>
+<!-- A collection and nothing else, for another site's iframe: embed-collection.html?view=binder&cover=navy&pockets=12. Every parameter that names an attribute of
+     <fuda-collection> is put on it; the cards are eighteen sample pictures, or the list in the JSON file that `cards` names (an address that allows it). -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="robots" content="noindex" />
+    <meta name="color-scheme" content="light dark" />
+    <title>Fuda Cards: a collection</title>
+    <style>fuda-card:where(:not(:defined)){display:inline-block;width:300px;aspect-ratio:2.5/3.5;overflow:hidden;visibility:hidden}fuda-collection:where(:not(:defined)){display:block;min-height:calc(var(--fuda-stage-height,clamp(300px,calc(100svh - 440px),620px)) + 380px)}</style>
+    <style>
+      html, body { margin: 0; background: transparent; }
+      body { padding: 8px; }
+      fuda-collection { --fuda-stage-height: clamp(260px, calc(100svh - 300px), 620px); }
+    </style>
+    <script type="importmap">{"imports":{"@johnmorrisdotca/kazoku-ui/view-controls/define":"../node_modules/@johnmorrisdotca/kazoku-ui/dist/view-controls/define.js"}}</script>
+  </head>
+  <body>
+    <script type="module" src="embed-collection.js"></script>
+  </body>
+</html>

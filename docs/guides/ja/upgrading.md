@@ -41,7 +41,7 @@ description: 0.1から0.10まで、各バージョンで対応が必要な変更
 
 ## 0.2へ
 
-- **`@johnmorrisdotca/kazoku-ui`は実行時の依存になりました。** バンドラーのないページでは、`@johnmorrisdotca/kazoku-ui/view-controls/define`のインポートマップが要ります。[フレームワークとバンドラー](frameworks.md)を参照してください。
+- **`@johnmorrisdotca/kazoku-ui`は実行時の依存になりました。** バンドラーのないページでは、`@johnmorrisdotca/kazoku-ui/view-controls/define`のインポートマップが要ります。[HTMLとCDN](html-and-cdn.md)と[バンドラー](bundlers.md)を参照してください。
 - `<fuda-collection>`の`address`属性が、表示の状態をページのURLに保ちます。
 
 ## アップグレードの確認

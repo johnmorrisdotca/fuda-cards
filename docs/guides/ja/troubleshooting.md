@@ -21,7 +21,7 @@ description: カードが空白、画像がちらつく、コレクションが�
 
 ## 「HTMLElement is not defined」
 
-`element`か`collection-element`をサーバーでインポートしています。これらは評価時に`HTMLElement`を継承します。ブラウザーだけでインポートしてください（[フレームワークとバンドラー](frameworks.md#サーバーサイドレンダリング)を参照）。メインのエントリーと`@johnmorrisdotca/fuda-cards/collection`は、サーバーでも安全です。
+`element`か`collection-element`をサーバーでインポートしています。これらは評価時に`HTMLElement`を継承します。ブラウザーだけでインポートしてください（[HTMLとCDN](html-and-cdn.md)と[バンドラー](bundlers.md)を参照）。メインのエントリーと`@johnmorrisdotca/fuda-cards/collection`は、サーバーでも安全です。
 
 ## コレクションに何も表示されない
 
@@ -29,7 +29,7 @@ description: カードが空白、画像がちらつく、コレクションが�
 
 ## ズームバーがない、またはコンソールに`@johnmorrisdotca/kazoku-ui/view-controls/define`を解決できないと出る
 
-バンドラーのないページでは、コレクションにその名前のインポートマップが要ります（[フレームワークとバンドラー](frameworks.md#インポートマップを使うふつうのhtml)を参照）。カード1枚の`<fuda-card>`には要りません。
+バンドラーのないページでは、コレクションにその名前のインポートマップが要ります（[HTMLとCDN](html-and-cdn.md)を参照）。カード1枚の`<fuda-card>`には要りません。
 
 ## 角度、傾き、自動回転が出ない
 

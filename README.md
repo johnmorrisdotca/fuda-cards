@@ -110,7 +110,7 @@ card.setAttribute('thickness', String(options.thickness));
 document.body.append(card);
 ```
 
-The main entry, `@johnmorrisdotca/fuda-cards`, exports only the options types and the tables (variants, finishes, materials, stack presets, wear presets and their maths) and registers nothing, so it is safe on a server. Frameworks may need a custom-element setting (Angular's `CUSTOM_ELEMENTS_SCHEMA`, Vue's `isCustomElement`): see [Frameworks and bundlers](https://github.com/johnmorrisdotca/fuda-cards/blob/main/docs/guides/frameworks.md).
+The main entry, `@johnmorrisdotca/fuda-cards`, exports only the options types and the tables (variants, finishes, materials, stack presets, wear presets and their maths) and registers nothing, so it is safe on a server. Frameworks may need a custom-element setting (Angular's `CUSTOM_ELEMENTS_SCHEMA`, Vue's `isCustomElement`): see [Frameworks](https://github.com/johnmorrisdotca/fuda-cards/blob/main/docs/guides/frameworks.md).
 
 ## Use it anywhere
 
@@ -124,7 +124,7 @@ With no bundler, serve the package's `dist` folder and point a module script at 
 <fuda-card title="Anywhere"></fuda-card>
 ```
 
-`<fuda-collection>` imports kazoku-ui's zoom bar, so it also needs `@johnmorrisdotca/kazoku-ui/view-controls/define` in the import map; the [framework guide](https://github.com/johnmorrisdotca/fuda-cards/blob/main/docs/guides/frameworks.md) has the whole map.
+`<fuda-collection>` imports kazoku-ui's zoom bar, so it also needs `@johnmorrisdotca/kazoku-ui/view-controls/define` in the import map; the [HTML and CDN guide](https://github.com/johnmorrisdotca/fuda-cards/blob/main/docs/guides/html-and-cdn.md) has the whole map.
 
 ## Examples
 
@@ -174,7 +174,7 @@ It keeps `<fuda-card>` (300 px wide, 2.5:3.5, or whatever width your own rule gi
 
 A card turned past 90° shows its back (the navy FUDA face), never the mirrored front, and the front's Animate button cannot be seen or clicked from behind. The back is the card's own face and is shown for `flipped` too.
 
-The card has thickness, drawn to scale at the 63 mm wide card size: set `thickness` in millimetres (default `0.3`, about 12 pt stock; `0` for a flat card; or pick a `material`, below). The edge is drawn from thin planes between the two faces, so it shows edge-on and at any angle, and it scales with the element's width (a 300px card is about 1.4px thick at the default). It is gold foil for the classic gold frame and card-stock cream for the sport and cosmic variants; override it with the `--fuda-edge` CSS custom property (any CSS background). The drop shadow is on the element itself, so a `filter` must not be added to anything between the card and its faces.
+The card has thickness, drawn to scale at the 63 mm wide card size: set `thickness` in millimetres (default `0.325`, a playing card's black-core stock, 13 pt, `DEFAULT_CARD_THICKNESS_MM`; `0` for a flat card; or pick a `material`, below). The edge is drawn from thin planes between the two faces, so it shows edge-on and at any angle, and it scales with the element's width (a 300px card is about 1.4px thick at the default). It is gold foil for the classic gold frame and card-stock cream for the sport and cosmic variants; override it with the `--fuda-edge` CSS custom property (any CSS background). The drop shadow is on the element itself, so a `filter` must not be added to anything between the card and its faces.
 
 ```html
 <script type="module">import '@johnmorrisdotca/fuda-cards/element';</script>
@@ -187,7 +187,7 @@ The card has thickness, drawn to scale at the 63 mm wide card size: set `thickne
 
 `material="<id>"` gives a card the thickness and edge colour of a material, each thickness read from a maker or a standard and cited: card stock at 11, 13 and 16 pt, a plastic bank-size card (0.76 mm), thick trading cards from 35 to 180 pt, a 175 pt booklet card, anodised aluminium (0.8 mm) and stainless steel (0.5 mm). `thickness` still overrides it. [docs/materials.md](docs/materials.md) lists every material, its thickness, its source and what the source says, and what was left out because it could not be sourced (a patch or relic card, for one).
 
-`stack="52"` draws that many cards as a stack whose height is the count times a card's thickness (52 cards of the black-core playing-card stock are 16.9 mm; 60 thick 130 pt cards are 198 mm). The count is free, 1 to 1000; the Card Studio has presets with a source (52 playing cards, 52 and two jokers, a 60-card Pokémon deck, a booster pack of 10). Turn the card to see the stack's edge, with a line for each card in the material's colour.
+`stack="52"` draws that many cards as a stack whose height is the count times a card's thickness (52 cards of the black-core playing-card stock are 16.9 mm). The count is free, 1 to 1000; the Card Studio has presets with a source (52 playing cards, 52 and two jokers, a 60-card Pokémon deck, a booster pack of 10). Turn the card to see the stack's edge, with a line for each card in the material's colour.
 
 ```html
 <script type="module">import '@johnmorrisdotca/fuda-cards/element';</script>
@@ -372,7 +372,7 @@ export function Cards({ cards }) {
 }
 ```
 
-Vue 3 (`:cards.prop`), Svelte, Angular (`CUSTOM_ELEMENTS_SCHEMA`) and server rendering are in [Frameworks and bundlers](https://github.com/johnmorrisdotca/fuda-cards/blob/main/docs/guides/frameworks.md). The integrations were bundled and exercised in Chromium with React 19, Angular 19, Vue 3 and Svelte 4; there are no framework wrappers yet.
+Vue 3 (`:cards.prop`), Svelte and Angular (`CUSTOM_ELEMENTS_SCHEMA`) are in [Frameworks](https://github.com/johnmorrisdotca/fuda-cards/blob/main/docs/guides/frameworks.md), and server rendering in [TypeScript and Node](https://github.com/johnmorrisdotca/fuda-cards/blob/main/docs/guides/typescript-and-node.md). The integrations were bundled and exercised in Chromium with React 19, Angular 19, Vue 3 and Svelte 4; there are no framework wrappers yet.
 
 ## Demos
 
@@ -455,7 +455,11 @@ Open work, in order of what a user would notice: framework wrappers; JSON, API a
 | [Collections](https://github.com/johnmorrisdotca/fuda-cards/blob/main/docs/guides/collections.md) | The element, the input, kinds, ten displays |
 | [Binders and piles](https://github.com/johnmorrisdotca/fuda-cards/blob/main/docs/guides/binder-and-piles.md) | Binder pages, fan, take a card off, animate |
 | [Live 3D in a card](https://github.com/johnmorrisdotca/fuda-cards/blob/main/docs/guides/live-3d.md) | One card live on one context |
-| [Frameworks and bundlers](https://github.com/johnmorrisdotca/fuda-cards/blob/main/docs/guides/frameworks.md) | Import maps, React, Vue, Svelte, Angular, servers |
+| [HTML and CDN](https://github.com/johnmorrisdotca/fuda-cards/blob/main/docs/guides/html-and-cdn.md) | A script tag from jsDelivr or unpkg, an import map |
+| [Bundlers](https://github.com/johnmorrisdotca/fuda-cards/blob/main/docs/guides/bundlers.md) | Vite and webpack |
+| [Frameworks](https://github.com/johnmorrisdotca/fuda-cards/blob/main/docs/guides/frameworks.md) | React, Vue, Svelte, Angular |
+| [Embed in an iframe](https://github.com/johnmorrisdotca/fuda-cards/blob/main/docs/guides/embed-in-an-iframe.md) | The embed page and its address |
+| [TypeScript and Node](https://github.com/johnmorrisdotca/fuda-cards/blob/main/docs/guides/typescript-and-node.md) | The types, and the tables on a server |
 | [Accessibility and theming](https://github.com/johnmorrisdotca/fuda-cards/blob/main/docs/guides/accessibility-and-theming.md) | What is built in, every custom property |
 | [Architecture](https://github.com/johnmorrisdotca/fuda-cards/blob/main/docs/guides/architecture.md) | The modules and why |
 | [Troubleshooting and FAQ](https://github.com/johnmorrisdotca/fuda-cards/blob/main/docs/guides/troubleshooting.md) | A blank card, a flash, a missing bar |
@@ -483,6 +487,75 @@ Read [AGENTS.md](AGENTS.md) for how work is done here: a board ticket for each c
 ## Changes
 
 Every release, dated, is in [CHANGELOG.md](CHANGELOG.md).
+
+## The family
+
+<!-- family:start (made by scripts/family-readme.mjs from scripts/family-template.mjs; change those, not this) -->
+Fuda Cards is one of thirty-five packages, each made for the same site, each at
+[github.com/johnmorrisdotca](https://github.com/johnmorrisdotca) or [github.com/spxis](https://github.com/spxis). The code of every one is MIT.
+
+**Games — board**
+
+- [Domino](https://github.com/johnmorrisdotca/domino) (ドミノ): dominoes and Mexican Train. [Demo](https://johnmorrisdotca.github.io/domino/).
+- [Gunjin](https://github.com/johnmorrisdotca/gunjin) (軍人): five hidden-rank strategy games with pass-the-device play. [Demo](https://johnmorrisdotca.github.io/gunjin/).
+- [Narabe](https://github.com/johnmorrisdotca/narabe) (並べ): one rules engine for abstract board games, from gomoku and Reversi to Go and checkers. [Demo](https://johnmorrisdotca.github.io/narabe/).
+- [Sugoroku](https://github.com/johnmorrisdotca/sugoroku) (双六): backgammon and its variants, with the doubling cube and match play. [Demo](https://johnmorrisdotca.github.io/sugoroku/).
+- [Tenka](https://github.com/johnmorrisdotca/tenka) (天下): world conquest for two to six, on a map of the real world. [Demo](https://johnmorrisdotca.github.io/tenka/).
+
+**Games — cards & tiles**
+
+- [Fuda Cards](https://github.com/johnmorrisdotca/fuda-cards) (札): collectible card frames with a true thickness, foil, stacks, wear and a binder, as two web components. [Demo](https://johnmorrisdotca.github.io/fuda-cards/).
+- [Hitotsu](https://github.com/johnmorrisdotca/hitotsu) (一つ): a colour-card shedding game for two to eight, with the house rules people play. [Demo](https://johnmorrisdotca.github.io/hitotsu/).
+- [Jarajara](https://github.com/johnmorrisdotca/jarajara) (ジャラジャラ): mahjong tiles drawn as SVG, stacked layouts, and the matching solitaire Awase. [Demo](https://johnmorrisdotca.github.io/jarajara/).
+- [Kumimoji](https://github.com/johnmorrisdotca/kumimoji) (組み文字): a crossword tile race, in English and Japanese kana. [Demo](https://johnmorrisdotca.github.io/kumimoji/).
+- [Toranpu](https://github.com/johnmorrisdotca/toranpu) (トランプ): a deck of playing cards, card games with computer players, and solitaires. [Demo](https://johnmorrisdotca.github.io/toranpu/).
+
+**Games — puzzles**
+
+- [Houseki](https://github.com/johnmorrisdotca/houseki) (宝石): gem and stone matching puzzles: falling triplets, stone collapse, colour chains and gem swap. [Demo](https://johnmorrisdotca.github.io/houseki/).
+- [Jirai](https://github.com/johnmorrisdotca/jirai) (地雷): minesweeper on shaped grids with verified no-guess boards. [Demo](https://johnmorrisdotca.github.io/jirai/).
+- [Karakuri](https://github.com/johnmorrisdotca/karakuri) (からくり): eight hyper-casual puzzle games, some of them physics: draw a shield, pull pins, cut ropes, slide blocks, pour tubes. [Demo](https://johnmorrisdotca.github.io/karakuri/).
+- [Kazu](https://github.com/johnmorrisdotca/kazu) (数): grid number puzzles: Sudoku and its variants, Futoshiki and Skyscrapers. [Demo](https://johnmorrisdotca.github.io/kazu/).
+- [Kyuubu](https://github.com/johnmorrisdotca/kyuubu) (キューブ): a turning cube for the browser, 2×2 to 7×7, with record solves to replay. [Demo](https://johnmorrisdotca.github.io/kyuubu/).
+- [Meikyuu](https://github.com/johnmorrisdotca/meikyuu) (迷宮): mazes on squares, hexagons, triangles and circles, made from a seed and drawn through with a finger or the mouse. [Demo](https://johnmorrisdotca.github.io/meikyuu/).
+- [Suido](https://github.com/johnmorrisdotca/suido) (水道): a pipe puzzle: turn the pieces until the water reaches every drain. [Demo](https://johnmorrisdotca.github.io/suido/).
+- [Tobiishi](https://github.com/johnmorrisdotca/tobiishi) (飛び石): peg solitaire with nine boards and seeded solvable challenges. [Demo](https://johnmorrisdotca.github.io/tobiishi/).
+- [Tsunagi](https://github.com/johnmorrisdotca/tsunagi) (繋ぎ): a line-joining logic puzzle whose every level has exactly one answer. [Demo](https://johnmorrisdotca.github.io/tsunagi/).
+
+**Games — dice & random**
+
+- [Korokoro](https://github.com/johnmorrisdotca/korokoro) (コロコロ): dice, with notation, exact odds, real sounds and the dice of many games. [Demo](https://johnmorrisdotca.github.io/korokoro/).
+- [Tane](https://github.com/johnmorrisdotca/tane) (種): seeded random numbers and daily seeds, the same in every browser and on every server. [Demo](https://johnmorrisdotca.github.io/tane/).
+
+**Language**
+
+- [Bushu](https://github.com/johnmorrisdotca/bushu) (部首): find a kanji by the parts it is made of. [Demo](https://johnmorrisdotca.github.io/bushu/).
+- [Hikidashi](https://github.com/johnmorrisdotca/hikidashi) (引き出し): a drawer of small Japanese text tools: era dates, kanji numerals, readings and sentence difficulty. [Demo](https://johnmorrisdotca.github.io/hikidashi/).
+- [Kotoba](https://github.com/johnmorrisdotca/kotoba) (言葉): word lists and word-game rules in English, French, German and Japanese. [Demo](https://johnmorrisdotca.github.io/kotoba/).
+
+**Geography & data**
+
+- [address-plus](https://github.com/johnmorrisdotca/address-plus) (アドレスプラス): parse and format addresses in the United States, Canada, Japan, Australia, France, Germany and the United Kingdom. [Demo](https://johnmorrisdotca.github.io/address-plus/).
+- [Chikyu Earth](https://github.com/johnmorrisdotca/chikyu-earth) (地球): a line-drawn globe that turns at the Earth's own rate, with an optional realistic Earth from space and markers for any place. [Demo](https://johnmorrisdotca.github.io/chikyu-earth/).
+- [Chizu](https://github.com/johnmorrisdotca/chizu) (地図): maps of the world and of countries' regions, in English and Japanese, with a quiz and callouts. [Demo](https://johnmorrisdotca.github.io/chizu/).
+- [Hata](https://github.com/johnmorrisdotca/hata) (旗): country and regional flags as SVG, at their true proportions and keyed by ISO code. [Demo](https://johnmorrisdotca.github.io/hata/).
+- [Kuni](https://github.com/johnmorrisdotca/kuni) (国): countries and their regions, with ISO codes and names in English and Japanese. [Demo](https://johnmorrisdotca.github.io/kuni/).
+- [Wakusei Planets](https://github.com/johnmorrisdotca/wakusei-planets) (惑星): the Sun, the planets and their moons, as line drawings, shaded drawings and painted surface maps, with their real sizes, tilt and rotation. [Demo](https://johnmorrisdotca.github.io/wakusei-planets/).
+
+**Sports**
+
+- [Dougu Sports](https://github.com/johnmorrisdotca/dougu-sports) (道具): sports emblems as SVG: trophies, medals, crests, and the ball and gear of every sport, with optional 3D turning. [Demo](https://johnmorrisdotca.github.io/dougu-sports/).
+- [Kyogijo Stadiums](https://github.com/johnmorrisdotca/kyogijo-stadiums) (競技場): sports fields, rinks, courts and ballparks drawn to scale as SVG, with each team and the score on them. [Demo](https://johnmorrisdotca.github.io/kyogijo-stadiums/).
+- [Senshu Jerseys](https://github.com/johnmorrisdotca/senshu-jerseys) (選手): sports jerseys, sweaters, kits, caps, helmets and retired-number banners as SVG, front and back, with optional 2.5D turning. [Demo](https://johnmorrisdotca.github.io/senshu-jerseys/).
+- [Taisen Brackets](https://github.com/johnmorrisdotca/taisen-brackets) (対戦): a sport-agnostic tournament bracket, drawn as SVG, from a list of ties. [Demo](https://johnmorrisdotca.github.io/taisen-brackets/).
+
+**Developer tools**
+
+- [REST in Pieces](https://github.com/spxis/rest-in-pieces) (レスト・イン・ピーシーズ): seeded test data and REST APIs for frontend development, with latency and error drills. [Demo](https://spxis.github.io/rest-in-pieces/).
+
+
+**This package is Fuda Cards.** The demos of all thirty-five share one header and footer, so each links the rest.
+<!-- family:end -->
 
 ## Licence
 

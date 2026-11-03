@@ -11,7 +11,7 @@ Fudaのカードには厚みがあり、カードの山の高さは、枚数に�
 
 ## 厚み
 
-`thickness`はミリメートルです。初期値は`0.3`（約12 ptの用紙）で、`0`は平らなカードです。`material`を指定すると、実際の用紙の厚みと縁の色が使われます。`thickness`を併せて指定すると、そちらが優先されます。
+`thickness`はミリメートルです。初期値は`0.325`（トランプの黒芯用紙、13 pt。`DEFAULT_CARD_THICKNESS_MM`として公開）で、`0`は平らなカードです。`material`を指定すると、実際の用紙の厚みと縁の色が使われます。`thickness`を併せて指定すると、そちらが優先されます。
 
 ```html
 <script type="module">import '@johnmorrisdotca/fuda-cards/element';</script>
@@ -55,10 +55,10 @@ console.log(130 * mmPerPoint);
 `stackPresets`は出典のある4つの枚数です。トランプ2種類（52枚と54枚）、ポケモンのデッキ60枚、ブースターパック10枚です。ページにカードを置かなくても、山の高さを計算できます。
 
 ```ts
-import { cardMaterial, stackHeightMm, stackLayout, stackPresets } from '@johnmorrisdotca/fuda-cards';
+import { cardMaterial, DEFAULT_CARD_THICKNESS_MM, stackHeightMm, stackLayout, stackPresets } from '@johnmorrisdotca/fuda-cards';
 
 const stock = cardMaterial('paper-310-black-core');
-console.log(stackHeightMm(52, stock?.thicknessMm ?? 0.3));
+console.log(stackHeightMm(52, stock?.thicknessMm ?? DEFAULT_CARD_THICKNESS_MM));
 console.log(stackPresets.map((preset) => preset.count).join(' '));
 console.log(stackLayout(5, { messiness: 0, seed: 1 }).length);
 // 16.9

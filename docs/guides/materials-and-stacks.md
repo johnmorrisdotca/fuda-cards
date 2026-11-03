@@ -11,7 +11,7 @@ A Fuda card has a thickness, and a stack of cards is as high as its count times 
 
 ## Thickness
 
-`thickness` is in millimetres. The default is `0.3` (about 12 pt stock); `0` is a flat card. A `material` takes the thickness, and the edge colour, of a real stock, and `thickness` still overrides it.
+`thickness` is in millimetres. The default is `0.325` (a playing card's black-core stock, 13 pt, exported as `DEFAULT_CARD_THICKNESS_MM`); `0` is a flat card. A `material` takes the thickness, and the edge colour, of a real stock, and `thickness` still overrides it.
 
 ```html
 <script type="module">import '@johnmorrisdotca/fuda-cards/element';</script>
@@ -55,10 +55,10 @@ A card put on top of the stack moves none of those under it, because each card's
 `stackPresets` are four counts with a source: two decks of playing cards (52 and 54), a Pokémon deck of 60 and a booster pack of 10. Work out the height of any pile in code without a card on the page:
 
 ```ts
-import { cardMaterial, stackHeightMm, stackLayout, stackPresets } from '@johnmorrisdotca/fuda-cards';
+import { cardMaterial, DEFAULT_CARD_THICKNESS_MM, stackHeightMm, stackLayout, stackPresets } from '@johnmorrisdotca/fuda-cards';
 
 const stock = cardMaterial('paper-310-black-core');
-console.log(stackHeightMm(52, stock?.thicknessMm ?? 0.3));
+console.log(stackHeightMm(52, stock?.thicknessMm ?? DEFAULT_CARD_THICKNESS_MM));
 console.log(stackPresets.map((preset) => preset.count).join(' '));
 console.log(stackLayout(5, { messiness: 0, seed: 1 }).length);
 // 16.9

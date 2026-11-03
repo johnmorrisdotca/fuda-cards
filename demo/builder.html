@@ -1,58 +1,55 @@
 <!doctype html>
+<!-- The Builder's source: see demo/index.html for how the "family:" lines are filled. -->
 <html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<style>fuda-card:where(:not(:defined)){display:inline-block;width:300px;aspect-ratio:2.5/3.5;overflow:hidden;visibility:hidden}fuda-collection:where(:not(:defined)){display:block;min-height:calc(var(--fuda-stage-height,clamp(300px,calc(100svh - 440px),620px)) + 380px)}</style>
-<link rel="stylesheet" href="ui.css">
-<script>try{var t=new URLSearchParams(location.search).get('theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t}catch(e){}</script>
-<title>Fuda Cards: build a card or a collection</title>
-<style>
-body{margin:0}
-main{max-width:1200px;margin:auto;padding:24px 20px 48px}
-h1{font:40px Georgia,serif;margin:4px 0}
-.tag{color:var(--link);letter-spacing:.22em;font-size:11px;font-weight:bold}
-p{color:var(--fc-muted)}
-.top a{display:inline-flex;align-items:center;min-height:48px;margin-right:1rem}
-.tabs{display:flex;gap:.5rem;flex-wrap:wrap;margin:.5rem 0 1rem}
-.tabs button{min-height:48px;padding:.4rem 1.1rem;font:700 .95rem system-ui;border-radius:.7rem;border:2px solid var(--fc-btn-border);background:var(--fc-btn);color:var(--fc-text);cursor:pointer}
-.tabs button[aria-selected=true]{background:var(--fc-accent);border-color:var(--fc-accent);color:var(--fc-on-accent)}
-.tabs button:focus-visible{outline:3px solid var(--fc-focus);outline-offset:3px}
-.layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:32px;align-items:start}
-.preview{position:sticky;top:12px;min-width:0}
-.stage{display:flex;align-items:center;justify-content:center;overflow:hidden;min-height:440px;background:radial-gradient(ellipse,var(--fc-stage-1),var(--fc-stage-2) 65%);border:1px solid var(--line);border-radius:16px;padding:24px 12px}
-.stage fuda-card{--fuda-perspective:2400px}
-.stage.wide{display:block;min-height:0;padding:12px}
-.controls{display:grid;gap:14px;min-width:0}
-.controls .choice{--choice-min:5.6rem}
-.code{margin-top:28px}
-pre{margin:0;padding:14px;overflow:auto;border:1px solid var(--line);border-radius:12px;background:var(--card);font:13px/1.5 ui-monospace,Menlo,monospace;color:var(--fc-text);max-height:360px}
-.actions{display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;margin-top:.7rem}
-[hidden]{display:none!important}
-@media(max-width:820px){.layout{grid-template-columns:1fr}.preview{position:static}.stage{min-height:360px}h1{font-size:32px}}
-</style>
-</head>
-<body>
-<main>
-<div class="tag">FUDA / BUILDER</div>
-<h1>Build it, then copy the code.</h1>
-<p class="top"><a href="../index.html">← Card Studio</a><a href="collections-component.html">Collection views →</a></p>
-<div class="tabs" role="tablist" aria-label="What to build" id="what">
-  <button role="tab" id="tab-card" aria-selected="true" aria-controls="panel" data-what="card" type="button">A card</button>
-  <button role="tab" id="tab-collection" aria-selected="false" aria-controls="panel" data-what="collection" type="button">A collection</button>
-</div>
-<div class="layout" id="panel" role="tabpanel">
-  <div class="preview"><div class="stage" id="stage" aria-live="polite"></div><p id="note" aria-live="polite"></p></div>
-  <div class="controls" id="controls"></div>
-</div>
-<section class="code" aria-labelledby="code-title">
-  <h2 id="code-title">The code</h2>
-  <div class="tabs" role="tablist" aria-label="Code format" id="formats"></div>
-  <pre><code id="code"></code></pre>
-  <div class="actions"><button class="btn primary" id="copy" type="button">Copy the code</button><button class="btn" id="link" type="button">Copy a link to this setup</button><span id="copied" role="status"></span></div>
-</section>
-</main>
-<script type="importmap">{"imports":{"@johnmorrisdotca/kazoku-ui/view-controls/define":"../node_modules/@johnmorrisdotca/kazoku-ui/dist/view-controls/define.js"}}</script>
-<script type="module" src="builder.js"></script>
-</body>
+  <head>
+    <!-- family:head -->
+    <style>fuda-card:where(:not(:defined)){display:inline-block;width:300px;aspect-ratio:2.5/3.5;overflow:hidden;visibility:hidden}fuda-collection:where(:not(:defined)){display:block;min-height:calc(var(--fuda-stage-height,clamp(300px,calc(100svh - 440px),620px)) + 380px)}</style>
+    <!-- family:icon -->
+    <link rel="stylesheet" href="demo/family.css" />
+    <link rel="stylesheet" href="demo/studio.css" />
+    <!-- family:importmap -->
+  </head>
+  <body>
+    <main>
+      <!-- family:header -->
+      <div class="studio builder">
+        <div class="studio-side">
+          <section class="fam-felt studio-felt" aria-labelledby="bld-preview-title">
+            <h2 class="fam-sr" id="bld-preview-title" data-say="previewTitle"></h2>
+            <div class="builder-stage" id="bld-stage" data-testid="bld-stage" aria-live="polite"></div>
+            <p class="fam-hint" id="bld-note" data-testid="bld-note"></p>
+          </section>
+          <div class="fam-actions">
+            <button class="fam-button" id="bld-link" type="button" data-say="copyLink" data-testid="bld-link"></button>
+            <button class="fam-button" id="bld-reset" type="button" data-say="startAgain" data-testid="bld-reset"></button>
+          </div>
+          <p class="fam-fine" id="bld-copied" aria-live="polite"></p>
+        </div>
+        <div class="studio-side">
+          <div class="fam-panel">
+            <div class="fam-seg" id="bld-makers" role="group" data-say-label="makerLabel" data-testid="bld-makers">
+              <button type="button" data-maker="card" data-say="makerCard"></button>
+              <button type="button" data-maker="collection" data-say="makerCollection"></button>
+            </div>
+            <p class="fam-muted" id="bld-maker-says" data-testid="bld-maker-says"></p>
+          </div>
+          <div class="fam-panels" id="controls" data-testid="controls"></div>
+        </div>
+      </div>
+      <section class="more builder-code" aria-labelledby="bld-code-title">
+        <h2 id="bld-code-title" data-say="codeTitle"></h2>
+        <p data-say="codeText"></p>
+        <div class="fam-tabs" role="tablist" id="bld-formats" data-testid="bld-formats"></div>
+        <div id="bld-panel" role="tabpanel" data-testid="bld-panel">
+          <pre><code id="bld-code" data-testid="bld-code"></code></pre>
+          <div class="fam-actions"><button class="fam-button" data-primary="true" id="bld-copy" type="button" data-say="copy" data-testid="bld-copy"></button></div>
+          <p class="fam-fine" id="bld-code-copied" aria-live="polite"></p>
+        </div>
+      </section>
+      <!-- family:unreviewed -->
+      <!-- family:footer -->
+    </main>
+    <!-- family:script -->
+    <script type="module" src="demo/builder.js"></script>
+  </body>
 </html>

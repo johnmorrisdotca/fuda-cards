@@ -15,6 +15,8 @@ Fuda Cards draws collectible cards as web components. A card is a frame around a
 npm install @johnmorrisdotca/fuda-cards
 ```
 
+The package's own version is exported as `VERSION`, so a page can say which one it runs.
+
 The package is plain ES modules in `dist/`. It has one runtime dependency, [`@johnmorrisdotca/kazoku-ui`](https://github.com/johnmorrisdotca/kazoku-ui), which draws the zoom bar of the collection viewer. A single card needs nothing else.
 
 ## Your first card
@@ -32,7 +34,7 @@ Import the element once, then write the tag. The picture goes inside it, as a ch
 
 `variant` is `classic`, `sport` or `cosmic`; `finish` is `foil` or `matte`. The card is 300 px wide by default and keeps the 2.5 by 3.5 proportion of a real card: set the element's `width` in CSS to scale it, and everything inside scales with it.
 
-On a page with no bundler, replace the bare name with the path of `dist/element.js` and serve the whole `dist` folder, or add an import map (see [Frameworks and bundlers](frameworks.md)).
+On a page with no bundler, replace the bare name with the path of `dist/element.js` and serve the whole `dist` folder, or add an import map (see [HTML and CDN](html-and-cdn.md) and [Bundlers](bundlers.md)).
 
 ## Turn it over and give it thickness
 

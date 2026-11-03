@@ -1,0 +1,23 @@
+<!doctype html>
+<!-- A card and nothing else, for another site's iframe. What it shows comes from its own address: every setting of <fuda-card> by its attribute name, as
+     embed.html?title=Explorer+One&variant=sport&finish=matte&stack=10&wear=near-mint&card-spin=center
+     and `image` for the picture (an address; the starship picture otherwise). A true boolean is 1. It tracks nothing, keeps nothing on the visitor's device and
+     loads nothing from anywhere else but the picture it was told to. -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="robots" content="noindex" />
+    <meta name="color-scheme" content="light dark" />
+    <title>Fuda Cards: a card</title>
+    <style>fuda-card:where(:not(:defined)){display:inline-block;width:300px;aspect-ratio:2.5/3.5;overflow:hidden;visibility:hidden}fuda-collection:where(:not(:defined)){display:block;min-height:calc(var(--fuda-stage-height,clamp(300px,calc(100svh - 440px),620px)) + 380px)}</style>
+    <style>
+      html, body { margin: 0; height: 100%; background: transparent; }
+      body { display: flex; align-items: center; justify-content: center; overflow: hidden; }
+      fuda-card { --fuda-perspective: 2400px; width: min(300px, calc(100vw - 32px), calc((100vh - 32px) / 1.4)); }
+    </style>
+  </head>
+  <body>
+    <script type="module" src="embed.js"></script>
+  </body>
+</html>

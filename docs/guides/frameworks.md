@@ -1,105 +1,132 @@
 ---
-title: Frameworks and bundlers
+title: Frameworks
 section: how-to
-order: 9
-description: Use Fuda in plain HTML with an import map, in a bundler, and in React, Vue, Svelte and Angular, including server rendering and the cards property.
+order: 11
+description: Use the card in React, Vue, Svelte and Angular, with the element imported only in the browser, and the whole page in plain HTML, a bundler or an iframe elsewhere.
 ---
 
-Both elements are standard custom elements, so any framework that can render a custom tag can show them. The two rules that matter are the same everywhere: **import the registration module once, in the browser**, and **set `cards` as a property**, never as an attribute.
-
-## Plain HTML with an import map
-
-Without a bundler the browser has to find three things by name: the package, kazoku-ui's zoom bar (the collection needs it) and, for live 3D, `three`. An import map says where each lives. Serve `dist` and `node_modules/@johnmorrisdotca/kazoku-ui/dist` (or copies of them):
-
-```html
-<script type="importmap">
-{ "imports": {
-  "@johnmorrisdotca/fuda-cards/collection-element": "/node_modules/@johnmorrisdotca/fuda-cards/dist/collection-element.js",
-  "@johnmorrisdotca/kazoku-ui/view-controls/define": "/node_modules/@johnmorrisdotca/kazoku-ui/dist/view-controls/define.js"
-} }
-</script>
-<fuda-collection view="binder"></fuda-collection>
-<script type="module">
-  import '@johnmorrisdotca/fuda-cards/collection-element';
-  document.querySelector('fuda-collection').cards = [{ id: 'one', name: 'Example', image: '/cards/one.jpg' }];
-</script>
-```
-
-The single card, `@johnmorrisdotca/fuda-cards/element`, imports only its own small modules and needs no import map for kazoku-ui.
-
-## A bundler
-
-A bundler resolves everything from `node_modules`. Import `@johnmorrisdotca/fuda-cards/element` or `/collection-element` once, anywhere that runs in the browser. The package marks these two files in `sideEffects`, so a bundler keeps the import even though nothing is used from it.
+Both elements are standard custom elements, so any framework that can render a custom tag can show them. Two rules hold everywhere: **import the registration module once, in the browser only** (the elements extend `HTMLElement`, which a server does not have), and **set a collection's `cards` as a property, not an attribute**. A card's settings are attributes, and `cardAttributes(options)` writes them from an object, so the same options work in every framework. Each example below is a file in `examples/` that `pnpm test:usage` builds and opens against the package as npm packs it.
 
 ## React
 
-Set the property with a ref. In TypeScript, declare the tags in JSX's intrinsic elements for your React version, or create the element with DOM calls in a wrapper.
+The component imports the element in an effect, so a server render never reaches it, and spreads the attributes of the options. Declare the tag for TypeScript once.
 
-```jsx
-import { useEffect, useRef } from 'react';
-import '@johnmorrisdotca/fuda-cards/collection-element';
+```tsx
+import { type CardOptions, cardAttributes } from "@johnmorrisdotca/fuda-cards";
+import { useEffect } from "react";
 
-export function Cards({ cards }) {
-  const ref = useRef(null);
-  useEffect(() => { if (ref.current) ref.current.cards = cards; }, [cards]);
-  return <fuda-collection ref={ref} view="binder" />;
+export function FudaCard({ picture, ...options }: CardOptions & { picture: string }) {
+  useEffect(() => {
+    // The element needs a browser, so it is imported here, never at the top of the file: a server render never reaches an effect.
+    void import("@johnmorrisdotca/fuda-cards/element");
+  }, []);
+  return (
+    <fuda-card {...cardAttributes(options)}>
+      <img src={picture} alt={options.title ?? ""} />
+    </fuda-card>
+  );
+}
+```
+
+```ts
+import type { DetailedHTMLProps, HTMLAttributes } from "react";
+
+declare module "react" {
+  namespace JSX {
+    interface IntrinsicElements {
+      "fuda-card": DetailedHTMLProps<HTMLAttributes<HTMLElement>, HTMLElement> & Record<string, string | undefined>;
+    }
+  }
 }
 ```
 
 ## Vue 3
 
-Tell the compiler the tag is a custom element (`isCustomElement`, in the Vue plugin's `template.compilerOptions` for Vite) and bind the array as a DOM property with `.prop`:
+Tell the compiler that the tag is a custom element (`isCustomElement`, in the Vue plugin's `template.compilerOptions` for Vite), and import the element once the component is on the page.
 
 ```vue
-<script setup>
-import '@johnmorrisdotca/fuda-cards/collection-element';
-defineProps({ cards: { type: Array, required: true } });
+<script setup lang="ts">
+import { onMounted } from "vue";
+
+defineProps<{ title: string; picture: string; stack?: number; wear?: string }>();
+
+// The element needs a browser: import it once the component is on the page, never while a server renders it.
+onMounted(() => {
+  void import("@johnmorrisdotca/fuda-cards/element");
+});
 </script>
-<template><fuda-collection view="binder" :cards.prop="cards" /></template>
+
+<template>
+  <fuda-card :title="title" :stack="stack" :wear="wear"><img :src="picture" :alt="title" /></fuda-card>
+</template>
+```
+
+```ts no-check
+import { createApp, h } from "vue";
+import FudaCard from "./FudaCard.vue";
+
+const picture =
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10'%3E%3Crect width='10' height='10' fill='%23335'/%3E%3C/svg%3E";
+const app = createApp({ render: () => h(FudaCard, { title: "Explorer One", picture, stack: 10, wear: "near-mint" }) });
+app.config.compilerOptions.isCustomElement = (tag) => tag === "fuda-card";
+app.mount("#app");
 ```
 
 ## Svelte
 
+`onMount` never runs on the server, so the import goes there.
+
 ```svelte
-<script>
-  import { onMount } from 'svelte';
-  import '@johnmorrisdotca/fuda-cards/collection-element';
-  export let cards = [];
-  let viewer;
-  onMount(() => { viewer.cards = cards; });
-  $: if (viewer) viewer.cards = cards;
+<script lang="ts">
+import { onMount } from "svelte";
+
+let {
+  title,
+  picture,
+  stack = 1,
+  wear = "",
+}: { title: string; picture: string; stack?: number; wear?: string } = $props();
+
+// The element needs a browser: onMount never runs on the server.
+onMount(() => {
+  void import("@johnmorrisdotca/fuda-cards/element");
+});
 </script>
-<fuda-collection bind:this={viewer} view="binder"></fuda-collection>
+
+<fuda-card {title} {stack} {wear}><img src={picture} alt={title} /></fuda-card>
 ```
 
 ## Angular
 
-Add `CUSTOM_ELEMENTS_SCHEMA` to the component's schemas and load the registration module in browser code. Property binding sets the array property.
+Add `CUSTOM_ELEMENTS_SCHEMA` to the component's schemas and load the element in browser code. A property binding on `[attr.name]` writes the attribute.
 
 ```ts no-check
-import { Component, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import '@johnmorrisdotca/fuda-cards/collection-element';
+import { Component, CUSTOM_ELEMENTS_SCHEMA, Input, type OnInit } from "@angular/core";
 
 @Component({
-  selector: 'app-cards',
+  selector: "app-fuda-card",
   standalone: true,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  template: '<fuda-collection view="binder" [cards]="cards"></fuda-collection>',
+  template: `<fuda-card [attr.title]="title" [attr.stack]="stack" [attr.wear]="wear"><img [src]="picture" [alt]="title" /></fuda-card>`,
 })
-export class CardsComponent {
-  cards = [{ id: 'one', name: 'Example', image: '/cards/one.jpg' }];
+export class FudaCardComponent implements OnInit {
+  @Input() title = "Explorer One";
+  @Input() picture =
+    "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10'%3E%3Crect width='10' height='10' fill='%23335'/%3E%3C/svg%3E";
+  @Input() stack = 10;
+  @Input() wear = "near-mint";
+
+  ngOnInit(): void {
+    // The element needs a browser: ngOnInit also runs when a server renders, so the import waits for one.
+    if (typeof window !== "undefined") void import("@johnmorrisdotca/fuda-cards/element");
+  }
 }
 ```
 
-## Server rendering
+## A collection in a framework
 
-The elements extend `HTMLElement` when their module is evaluated, so importing one on a server fails with "HTMLElement is not defined". Import the registration module only on the client, after the DOM exists (in React, inside `useEffect` or a dynamic import with server rendering off), and render a placeholder on the server. The main entry, `@johnmorrisdotca/fuda-cards`, is safe on a server: it holds only the tables and the wear and stack maths.
+The collection takes an array, so set it as a DOM property: in React with a ref and an effect (`ref.current.cards = cards`), in Vue with `:cards.prop="cards"`, in Svelte with `bind:this` and a statement that runs when the array changes, and in Angular with the property binding `[cards]="cards"`. [Collections](collections.md) lists what an item holds.
 
-```ts
-import { cardMaterials, stackHeightMm } from '@johnmorrisdotca/fuda-cards';
+## Where to go next
 
-console.log(typeof document, cardMaterials.length, stackHeightMm(10, 0.3));
-// undefined 13 3
-```
-
-The integrations were bundled and exercised in Chromium with React 19, Angular 19, Vue 3 and Svelte 4; check your own framework version. There are no framework wrappers yet.
+The page itself can be plain HTML from a CDN ([HTML and CDN](html-and-cdn.md)), a bundler's ([Bundlers](bundlers.md)) or an iframe of the embed page ([Embed in an iframe](embed-in-an-iframe.md)). TypeScript's types and the server side are in [TypeScript and Node](typescript-and-node.md).

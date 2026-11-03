@@ -21,7 +21,7 @@ The element is not registered. Check that `@johnmorrisdotca/fuda-cards/element` 
 
 ## "HTMLElement is not defined"
 
-You imported `element` or `collection-element` on a server. They extend `HTMLElement` when evaluated. Import them only in the browser (see [Frameworks and bundlers](frameworks.md#server-rendering)). The main entry and `@johnmorrisdotca/fuda-cards/collection` are safe on a server.
+You imported `element` or `collection-element` on a server. They extend `HTMLElement` when evaluated. Import them only in the browser (see [TypeScript and Node](typescript-and-node.md#on-a-server)). The main entry and `@johnmorrisdotca/fuda-cards/collection` are safe on a server.
 
 ## The collection shows nothing
 
@@ -29,7 +29,7 @@ You imported `element` or `collection-element` on a server. They extend `HTMLEle
 
 ## The zoom bar is missing, or the console says it cannot resolve `@johnmorrisdotca/kazoku-ui/view-controls/define`
 
-On a page without a bundler the collection needs an import map for that name (see [Frameworks and bundlers](frameworks.md#plain-html-with-an-import-map)). The single `<fuda-card>` does not.
+On a page without a bundler the collection needs an import map for that name (see [HTML and CDN](html-and-cdn.md#the-collection-and-live-3d-from-a-cdn)). The single `<fuda-card>` does not.
 
 ## Angle, Tilt and Auto-turn are not there
 
