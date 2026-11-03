@@ -29,5 +29,6 @@ test('the browser tests run one file at a time, with limits', () => {
   const runner = read('scripts/e2e.mjs');
   assert.match(runner, /--test-concurrency=1/);
   assert.match(runner, /FUDA_E2E_MEMORY_GB\) \|\| 3/);
-  assert.doesNotMatch(runner, /pkill|killall/);
+  assert.doesNotMatch(runner, /pkill|killall|process\.kill/, 'it stops only the process it started, by its own handle: never a list of ids');
+  assert.match(runner, /child\.kill\('SIGTERM'\)/);
 });

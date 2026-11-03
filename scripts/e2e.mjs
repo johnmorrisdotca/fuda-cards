@@ -1,5 +1,5 @@
 // The browser tests, one file at a time and one browser at a time, with a hard limit on each file's time and on the memory of everything it started.
-// Usage: node scripts/e2e.mjs [part of a file name ...]. A file that goes over a limit is stopped, by process id, and counts as failed.
+// Usage: node scripts/e2e.mjs [part of a file name ...]. A file that goes over a limit is stopped (only the one process this script started) and counts as failed.
 import { spawn, execFileSync } from 'node:child_process';
 import { readdirSync } from 'node:fs';
 import { resolve } from 'node:path';
@@ -18,35 +18,32 @@ for (const port of PORTS) {
   if (holder) { console.error(`Port ${port} is taken by process ${holder}: another session may be running these tests (FUDA_E2E_PORT_SHIFT=20 moves this run). Nothing started.`); process.exit(2); }
 }
 
-/** Every process under `pid` (itself too), with its memory in kB, from one reading of ps. */
-function tree(pid) {
+/** The memory of every process under `pid`, in kB, from one reading of ps. Read only: nothing here chooses a process to stop. */
+function treeMemory(pid) {
   const rows = execFileSync('ps', ['-A', '-o', 'pid=,ppid=,rss='], { encoding: 'utf8' }).trim().split('\n').map((l) => l.trim().split(/\s+/).map(Number));
   const inside = new Set([pid]);
   for (let grown = true; grown;) { grown = false; for (const [p, parent] of rows) if (inside.has(parent) && !inside.has(p)) { inside.add(p); grown = true; } }
-  const members = rows.filter(([p]) => inside.has(p));
-  return { pids: members.map(([p]) => p), kb: members.reduce((sum, [, , rss]) => sum + rss, 0) };
+  return rows.filter(([p]) => inside.has(p)).reduce((sum, [, , rss]) => sum + rss, 0);
 }
-
-const stopAll = (pids, signal) => { for (const pid of pids) { try { process.kill(pid, signal); } catch {} } };
 
 function runFile(file) {
   return new Promise((done) => {
     const started = Date.now();
-    const child = spawn(process.execPath, ['--test', '--test-concurrency=1', resolve(root, 'test/e2e', file)], { cwd: root, stdio: ['ignore', 'pipe', 'inherit'] });
+    const child = spawn(process.execPath, ['--test', '--test-isolation=none', '--test-concurrency=1', resolve(root, 'test/e2e', file)], { cwd: root, stdio: ['ignore', 'pipe', 'inherit'] });
     let output = '', peak = 0, why = '';
     child.stdout.on('data', (chunk) => { process.stdout.write(chunk); output += chunk; });
-    let last = [];
+    // The one process this script started, by its own handle, and nothing else: it runs the tests in itself, so Playwright closes its browsers when it stops, and a browser whose pipe is gone ends by itself.
     const watch = setInterval(() => {
-      let now;
-      try { now = tree(child.pid); } catch { return; }
-      last = now.pids; peak = Math.max(peak, now.kb);
-      if (!why && now.kb > MEMORY_KB) why = `memory ${(now.kb / 1048576).toFixed(2)} GB`;
+      let kb;
+      try { kb = treeMemory(child.pid); } catch { return; }
+      peak = Math.max(peak, kb);
+      if (!why && kb > MEMORY_KB) why = `memory ${(kb / 1048576).toFixed(2)} GB`;
       if (!why && Date.now() - started > FILE_MS) why = `over ${FILE_MS / 60000} minutes`;
       if (why && !watch.stopping) {
         watch.stopping = true;
-        console.error(`\n${file}: stopping it (${why}): ${last.join(' ')}`);
-        stopAll(last, 'SIGTERM');
-        setTimeout(() => stopAll(last, 'SIGKILL'), 5000).unref();
+        console.error(`\n${file}: stopping it (${why}): ${child.pid}`);
+        child.kill('SIGTERM');
+        setTimeout(() => child.kill('SIGKILL'), 5000).unref();
       }
     }, 2000);
     child.on('close', (code) => {

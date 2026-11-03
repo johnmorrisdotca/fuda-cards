@@ -285,7 +285,7 @@
 - New `src/live-3d.ts`, the focus policy over kazoku-ui 0.10's shared renderer (`/renderer`, `/testing`), `docs/live-3d.md`, `demo/live-3d.html`, `collection.live`. Nothing of the renderer was copied. The renderer's module is imported dynamically, so a page of pictures has none of it.
 - A frozen card shows its last angle by giving the renderer an item whose `key` carries the angle (per 5 degrees): the renderer's own still is then made at that angle. It costs a render and, for a moment, the card shows its previous picture. Filed for kazoku-ui: a still taken from the live frame at `blur()`.
 - `test/e2e/live-3d.e2e.mjs`: see the CHANGELOG for the numbers. A broken build is a module served with one line changed. The test that builds the site found `SkeletonUtils.js` missing from it. The canvas budget first proved nothing: a flex row kept the card at 1200 px and the broken build read the same 3.85 MP as the good one; the card is now `flex:none` and the broken build reads 33 MP.
-- The runner's memory stop fired once, at 3.18 GB (sum of RSS of the process tree), when a server error left browsers open in a failing run. It stopped the file by process id as designed. The cause in `serve()` (a 200 written before the read) is fixed. Peak since: 1.75 GB.
+- The runner's memory stop fired once, at 3.18 GB (sum of RSS of the process tree), when a server error left browsers open in a failing run. It stopped the file as designed; since then the runner signals only the one process it started. The cause in `serve()` (a 200 written before the read) is fixed. Peak since: 1.75 GB.
 - Limits: software GL only, so no real GPU frame time, memory or driver behaviour is measured. A hidden tab is simulated by overriding `visibilityState`. No real phone or Safari. MODULES-35 (controls on the live card, real integration of the packages' viewers) is not started.
 
 ## 2026-11-02 - No reveal on every page (MODULES-42), Mac Studio / night
@@ -298,4 +298,9 @@
 
 - MODULES-40 (F21): looked for a remaining fault on kazoku-ui 0.10 and found none in a browser here: the sweep, full size at opening, Fit, zoom, reduced motion and Animate all pass, and a new test drives it by touch in Chromium's mobile mode. What the ticket still asks for, a real phone, cannot be done here. It stays open for that check.
 - MODULES-98: the four failures were fixed on main (0.9.1). Two more causes were found here: Chromium's build decides whether `img.getAnimations()` lists the pan (the test now asks the shadow root too) and which browser a run got depended on another repo's Playwright (now pinned at 1.64.0). Tests also waited fixed times that fail at load 25 and up (piles, stack).
+
+## 2026-11-02 - Incident: a wrong list of process ids, Mac Studio / night
+
+- To stop this session's own run I built a list of process ids with ps and awk and signalled it. The awk's `if (s[p[k]])` created a key for every parent it looked at, so the list was every process with a child on the Mac (71 ids), and it got SIGTERM. That stopped Docker Desktop and other sessions' work, among them another session's full check run. Written up in the owner's handoff for the day.
+- After it, `scripts/e2e.mjs` no longer signals a tree it worked out: it stops only the child it spawned, through `child.kill`, and reads `ps` only for memory. `test/e2e-safety.test.mjs` fails on `process.kill` in it. No process list is ever built to choose what to stop.
 

@@ -3,7 +3,7 @@
 // bends it, and shows the pockets on its back.
 import { test } from 'node:test';
 import { strict as assert } from 'node:assert';
-import { chromium, launch, portShift, serve, sizes, offline } from './support.mjs';
+import { chromium, launch, portShift, quiet, serve, sizes, offline } from './support.mjs';
 
 const PORT = 8110 + portShift, origin = `http://127.0.0.1:${PORT}`;
 const shadow = (p, code, arg) => p.evaluate(({ code, arg }) => new Function('root', 'arg', code)(document.querySelector('fuda-collection').shadowRoot, arg), { code, arg });
@@ -93,7 +93,7 @@ test('a page turn swings a leaf about the spine, bends it, shows its back pocket
       assert.ok(mid.bends.slice(1).some((b) => Math.abs(b) >= 2), `${name}: the leaf bends mid-turn (${mid.bends})`);
       assert.ok(mid.back >= 9 && mid.front >= 9, `${name}: it carries pockets on both sides (${mid.front} front, ${mid.back} back)`);
       await shadow(p, `for (const a of root.querySelector('.v').getAnimations({ subtree: true })) a.play()`);
-      await p.waitForTimeout(1800);
+      await quiet(p, 1800); // a fixed wait ended mid-turn at machine load 25
       assert.equal(await shadow(p, `return [root.querySelector('.leaf') === null, root.querySelector('.v').getAnimations({ subtree: true }).length]`).then((x) => x.join()), 'true,0', `${name}: the leaf is gone and nothing runs when the turn ends`);
       assert.deepEqual((await sides(p)).map((s) => s.side), ['1', '2']);
       // Backwards: the left leaf swings back to the right.
