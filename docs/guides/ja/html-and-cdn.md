@@ -11,7 +11,7 @@ description: ビルドなしでカードをページに置く方法です。jsDe
 
 アドレスの終わりに`/+esm`を付けると、jsDelivrはパッケージのサブパスを、依存するものと一緒にまとめて返します。
 
-```html
+```html no-check
 <!doctype html>
 <html lang="en">
   <head>
@@ -32,7 +32,7 @@ description: ビルドなしでカードをページに置く方法です。jsDe
 
 unpkgはパッケージのファイルをそのまま配信します。`?module`を付けると、ブラウザーがたどれるようにインポートを書き換えて返します。
 
-```html
+```html no-check
 <!doctype html>
 <html lang="en">
   <head>

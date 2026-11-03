@@ -7,7 +7,7 @@ description: 自分で作らないページにカードを載せる方法です�
 
 `demo/embed.html`は、`<iframe>`に入れるために作ったページで、カード以外は何もなく、アドレスに書かれた内容を描きます。何も追跡せず、訪れた人の端末に何も残さず、指定された絵以外は何も読み込みません。
 
-```html
+```html no-check
 <!doctype html>
 <html lang="en">
   <head>

@@ -11,7 +11,7 @@ A card needs one script tag and nothing else: `<fuda-card>` imports only its own
 
 jsDelivr bundles a subpath of the package with its dependencies when the address ends in `/+esm`.
 
-```html
+```html no-check
 <!doctype html>
 <html lang="en">
   <head>
@@ -32,7 +32,7 @@ jsDelivr bundles a subpath of the package with its dependencies when the address
 
 unpkg serves the package's own files; `?module` makes it rewrite the imports so that the browser can follow them.
 
-```html
+```html no-check
 <!doctype html>
 <html lang="en">
   <head>

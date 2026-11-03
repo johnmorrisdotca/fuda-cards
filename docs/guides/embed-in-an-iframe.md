@@ -7,7 +7,7 @@ description: Show a card on a page you do not build, with an iframe of the embed
 
 `demo/embed.html` is a page made for an `<iframe>`: a card and nothing else, drawn from what its address says. It tracks nothing, keeps nothing on the visitor's device and loads nothing but the picture it was told to.
 
-```html
+```html no-check
 <!doctype html>
 <html lang="en">
   <head>

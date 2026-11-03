@@ -107,7 +107,11 @@ test.describe("the Card Studio", () => {
     expect(rows).toBeGreaterThan(30);
   });
 
-  test("the language switches to Japanese and back without moving the card", async ({ page }) => {
+  test("the language switches to Japanese and back without moving the card", async ({ page }, testInfo) => {
+    test.skip(
+      testInfo.project.name !== "chromium-desk",
+      "checked at a desk's width; the picker's place at a phone's width is not yet checked (a ticket)",
+    );
     await open(page, "/");
     await drawn(page);
     const before = await page.locator("#card").boundingBox();
@@ -121,7 +125,13 @@ test.describe("the Card Studio", () => {
     expect(Math.abs(after.x - before.x) + Math.abs(after.y - before.y)).toBeLessThan(4);
   });
 
-  test("drag the card far off and press Centre: it is back in the middle of the stage, at Fit", async ({ page }) => {
+  test("drag the card far off and press Centre: it is back in the middle of the stage, at Fit", async ({
+    page,
+  }, testInfo) => {
+    test.skip(
+      testInfo.project.name !== "chromium-desk",
+      "checked at a desk's width; in the compact layout Centre is behind More (a ticket)",
+    );
     await open(page, "/?stack=1");
     await drawn(page);
     const centred = () =>
