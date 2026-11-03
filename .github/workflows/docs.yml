@@ -4,9 +4,9 @@ name: Docs
 on:
   push:
     branches: [main]
-    paths: ['README.md', 'docs/**', 'src/**', 'scripts/docs.mjs', 'scripts/check-readme-examples.mjs', 'CHANGELOG.md', '.github/workflows/docs.yml']
+    paths: ['README.md', 'docs/**', 'src/**', 'scripts/docs.mjs', 'scripts/docs-site.mjs', 'scripts/check-readme-examples.mjs', 'CHANGELOG.md', '.github/workflows/docs.yml']
   pull_request:
-    paths: ['README.md', 'docs/**', 'src/**', 'scripts/docs.mjs', 'scripts/check-readme-examples.mjs', 'CHANGELOG.md', '.github/workflows/docs.yml']
+    paths: ['README.md', 'docs/**', 'src/**', 'scripts/docs.mjs', 'scripts/docs-site.mjs', 'scripts/check-readme-examples.mjs', 'CHANGELOG.md', '.github/workflows/docs.yml']
   workflow_dispatch:
 permissions:
   contents: read

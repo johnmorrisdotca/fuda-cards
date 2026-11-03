@@ -1,11 +1,12 @@
 {
   "name": "@johnmorrisdotca/fuda-cards",
   "version": "0.10.1",
-  "description": "Fuda Cards: collectible card frames for images and interactive 3D content.",
+  "description": "Collectible card frames for the web: images and live 3D in a card with a true thickness, foil, stacks, wear and a binder.",
   "type": "module",
   "sideEffects": [
     "./dist/element.js",
-    "./dist/collection-element.js"
+    "./dist/collection-element.js",
+    "./dist/element-define.js"
   ],
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -17,6 +18,10 @@
     "./element": {
       "types": "./dist/element.d.ts",
       "import": "./dist/element.js"
+    },
+    "./element/define": {
+      "types": "./dist/element-define.d.ts",
+      "import": "./dist/element-define.js"
     },
     "./package.json": "./package.json",
     "./live-3d": {
@@ -49,7 +54,7 @@
     "node": ">=22"
   },
   "scripts": {
-    "build": "tsc -p tsconfig.json",
+    "build": "node -e \"require('node:fs').rmSync('dist',{recursive:true,force:true})\" && tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "pnpm build && node --test test/*.test.mjs test/*.test.ts",
     "check": "pnpm lint && pnpm typecheck && pnpm build && pnpm check:size && pnpm test",
@@ -59,14 +64,21 @@
     "site": "pnpm build && node scripts/site.mjs",
     "screenshots:readme": "pnpm site && node scripts/readme-pictures.mjs",
     "docs:api": "pnpm build && node scripts/docs.mjs api",
-    "docs:check": "pnpm build && node scripts/docs.mjs check",
+    "docs:check": "pnpm build && node scripts/docs.mjs check && node scripts/docs-site.mjs check",
     "test:readme": "pnpm build && node scripts/check-readme-examples.mjs",
     "lint": "biome check .",
     "format": "biome check --write .",
-    "check:size": "node scripts/check-size.mjs"
+    "check:size": "node scripts/check-size.mjs",
+    "test:package": "pnpm build && node scripts/check-package.mjs",
+    "check:standard": "node scripts/check-standard.mjs",
+    "family:readme": "node scripts/family-readme.mjs",
+    "docs:site": "pnpm build && node scripts/docs-site.mjs build",
+    "size": "node scripts/docs-site.mjs size",
+    "test:usage": "pnpm site && node scripts/check-usage.ts",
+    "test:demo": "pnpm site && node scripts/docs-site.mjs build && playwright test"
   },
   "dependencies": {
-    "@johnmorrisdotca/kazoku-ui": "^0.10.0"
+    "@johnmorrisdotca/kazoku-ui": "^0.12.0"
   },
   "peerDependencies": {
     "three": ">=0.160.0"
@@ -77,11 +89,33 @@
     }
   },
   "devDependencies": {
+    "@angular/common": "^22.2.4",
+    "@angular/compiler": "^22.2.4",
+    "@angular/core": "^22.2.4",
+    "@angular/platform-browser": "^22.2.4",
     "@biomejs/biome": "2.6.4",
     "@johnmorrisdotca/uchusen-rockets": "0.2.2",
+    "@playwright/test": "1.64.0",
+    "@sveltejs/vite-plugin-svelte": "^7.3.1",
+    "@types/node": "^24.19.2",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@types/three": "^0.187.0",
+    "@vitejs/plugin-vue": "^6.0.10",
+    "esbuild": "^0.25.12",
+    "marked": "^18.1.3",
+    "pagefind": "^1.6.0",
     "playwright": "1.64.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "rxjs": "^7.8.2",
+    "svelte": "^5.57.3",
     "three": "0.186.1",
-    "typescript": "5.9.3"
+    "typescript": "5.9.3",
+    "vite": "^8.3.5",
+    "vue": "^3.5.44",
+    "webpack": "^5.112.2",
+    "webpack-cli": "^7.3.1"
   },
   "publishConfig": {
     "access": "public"
@@ -94,5 +128,10 @@
   },
   "bugs": {
     "url": "https://github.com/johnmorrisdotca/fuda-cards/issues"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
   }
 }

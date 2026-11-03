@@ -1,0 +1,66 @@
+# The checks of every push to main and every pull request: the code and the docs (lint, types, the 500-line check, the must-have list, the unit tests), the package as npm
+# packs it on Linux, macOS and Windows, the browser tests of the pages and the elements, every way of using the package, and the freeze test of the live 3D.
+# Free on a public repository.
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm check
+  package:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: The package as npm packs it installs and imports
+        run: pnpm test:package
+  demo:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps chromium webkit
+      - name: The pages and the docs site, played in Chromium and WebKit at a phone's width and a desk's
+        run: pnpm test:demo
+      - name: The elements in Chromium, drawing in software
+        run: pnpm test:e2e
+      - name: Every way to use it (a script tag, Vite, webpack, React, Vue, Svelte, Angular, an iframe, TypeScript, Node), from the package as npm packs it
+        run: pnpm test:usage
+  freeze:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps chromium
+      - name: Live 3D on one context, nothing drawn at rest or out of sight, no growth in GPU objects (software GL, never a graphics card)
+        run: pnpm test:freeze
