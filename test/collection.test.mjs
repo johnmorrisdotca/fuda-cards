@@ -1,6 +1,12 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { collectionViewAliases, collectionViews, movePage, parseCollection } from "../dist/collection.js";
+import {
+  collectionViewAliases,
+  collectionViews,
+  movePage,
+  parseCollection,
+  randomDrawIndex,
+} from "../dist/collection.js";
 
 test("each display has a distinct stable id, and the two dropped names still open a display", () => {
   assert.equal(collectionViews.length, 10);
@@ -99,4 +105,49 @@ test("an item says what it is: a card (the default) or an object, and an old col
   assert.deepEqual([isCard(none), isCard(card), isCard(thing)], [true, true, false]);
   assert.equal(thing.kind, "object");
   assert.throws(() => parseCollection([{ name: "A", image: "a", kind: "console" }]), /kind/);
+});
+
+test("random draw picks a card whose name matches, and never the same card twice in a row when there is another", () => {
+  const cards = ["Alpha", "Beta", "Alphabet", "Gamma"].map((name, i) => ({ id: String(i), name, image: `${i}.jpg` }));
+  const first = () => 0;
+  const last = () => 0.999999;
+  assert.equal(randomDrawIndex(cards, 0, "", first), 1, "the current card is left out");
+  assert.equal(randomDrawIndex(cards, 0, "", last), 3);
+  assert.equal(randomDrawIndex(cards, 3, "alpha", last), 2, "the filter ignores case and the current card");
+  assert.equal(randomDrawIndex(cards, 0, "  GAMMA ", first), 3, "and the spaces round it");
+  assert.equal(randomDrawIndex(cards, 1, "beta", first), 1, "the only match is drawn even when it is the current card");
+  assert.equal(randomDrawIndex(cards, 0, "nothing like it", first), null);
+  assert.equal(randomDrawIndex([], 0, "", first), null);
+});
+
+test("an object is not a card: only a card turns, has a back and lands turned over", () => {
+  assert.equal(isCard({}), true, "the default, so older collections are all cards");
+  assert.equal(isCard({ kind: "card" }), true);
+  assert.equal(isCard({ kind: "object" }), false);
+  assert.deepEqual(collectionKinds, ["card", "object"]);
+  const [thing] = parseCollection([{ name: "Console", image: "c.jpg", kind: "object" }]);
+  assert.equal(thing.kind, "object");
+  const [plain] = parseCollection([{ name: "Card", image: "c.jpg", kind: "card" }]);
+  assert.equal("kind" in plain, false, "a card says nothing: it is the default");
+  assert.throws(() => parseCollection([{ name: "A", image: "a", kind: "gadget" }]), /kind/);
+});
+
+test("a card without an id is numbered by its place, text ids are kept, and what is read is a copy", () => {
+  const input = [
+    { name: "A", image: "a" },
+    { id: "x", name: "B", image: "b", metadata: { notes: "n" } },
+  ];
+  const cards = parseCollection(input);
+  assert.deepEqual(
+    cards.map((c) => c.id),
+    ["0", "x"],
+  );
+  cards[1].metadata.notes = "changed";
+  assert.equal(input[1].metadata.notes, "n", "the caller's data is never changed");
+  assert.throws(() => parseCollection([{ name: "A", image: "a", backImage: 3 }]), /backImage/);
+  assert.throws(() => parseCollection([null]), /Card 1/);
+  assert.throws(() => parseCollection([{ name: " ", image: "a" }]), /name and image/);
+  assert.throws(() => parseCollection([{ name: "A", image: "a", metadata: { year: 1.5 } }]), /year/);
+  assert.throws(() => parseCollection([{ name: "A", image: "a", metadata: { set: 4 } }]), /set/);
+  assert.deepEqual(parseCollection({ cards: [] }), []);
 });

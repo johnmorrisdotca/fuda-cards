@@ -374,6 +374,7 @@ test("the displays are buttons, not a drop-down: all ten on screen, at least 48 
         await p.locator("fuda-collection").locator('.displays [data-value="wall"]').click();
         await p.waitForTimeout(300);
         assert.equal(await shadow(p, `return root.querySelector('.stage').className`), "stage wall");
+        await p.waitForFunction(() => /view=wall/.test(location.search), null, { timeout: 5000 });
         assert.match(new URL(p.url()).search, /view=wall/);
         await p.locator("fuda-collection").locator('.displays [data-value="wall"]').focus();
         await p.keyboard.press("ArrowRight");
