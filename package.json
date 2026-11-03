@@ -51,7 +51,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "pnpm build && node --test test/*.test.mjs",
+    "test": "pnpm build && node --test test/*.test.mjs test/*.test.ts",
     "check": "pnpm typecheck && pnpm build && pnpm test",
     "test:e2e": "pnpm build && node scripts/e2e.mjs",
     "test:freeze": "pnpm build && node scripts/e2e.mjs live-3d",

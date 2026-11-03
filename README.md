@@ -1,3 +1,5 @@
+<p align="center"><a href="https://johnmorrisdotca.github.io/fuda-cards/"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/johnmorrisdotca/fuda-cards/main/docs/images/thumbnail-dark.png"><img src="https://raw.githubusercontent.com/johnmorrisdotca/fuda-cards/main/docs/images/thumbnail.png" alt="Fuda Cards: three collectible cards, classic gold, silver sport and cosmic violet, framing the same rocket picture." width="1200"></picture></a></p>
+
 <h1 align="center">Fuda Cards <sub>札</sub> — collectible card frames for the web</h1>
 
 <p align="center"><strong>Cards with a true thickness, a stack, a worn corner and a binder to put them in, as two web components.</strong><br>
@@ -471,7 +473,7 @@ pnpm test:e2e         # the browser tests (headless Chromium, in software)
 pnpm test:readme      # every README and guide example, run (Node and a browser)
 pnpm docs:api         # rewrite docs/API.md from the built declarations
 pnpm docs:check       # the reference is current, the Japanese twins and links hold
-pnpm screenshots:readme  # retake docs/images
+pnpm screenshots:readme  # retake docs/images, the thumbnail, dark thumbnail and icon too
 ```
 
 ## Contributing

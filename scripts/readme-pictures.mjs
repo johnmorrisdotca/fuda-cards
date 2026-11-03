@@ -3,10 +3,14 @@
 // other sites for are answered with local stand-ins, and the page is served from site/ on this checkout's own port (8102 of the
 // repo's block). The browser is the tests' own `launch()`: headless and drawing in software, never on the machine's GPU.
 // A shot waits on what the page draws (a selector or a function), never on a clock, and motion is reduced so each picture is the same every run.
+// It also makes the family's thumbnail, dark thumbnail and icon (scripts/family-thumbnail.mjs): docs/images/thumbnail.png and
+// thumbnail-dark.png (1200x630) and icon.png (512x512), three cards, one of each style, turned a little in 3D, and for the icon one
+// card alone with its words left out. `ONLY=thumbnail` takes just those; any other ONLY leaves them as they are.
 import { existsSync, mkdirSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { Buffer } from 'node:buffer';
 import { launch, serve, offline, quiet, root } from '../test/e2e/support.mjs';
+import { captureDrawing, composeThumbnails, THUMBNAIL_FILES } from './family-thumbnail.mjs';
 
 const PORT = Number(process.env.FUDA_PICTURE_PORT) || 8102;
 const out = join(root, 'docs', 'images');
@@ -65,7 +69,68 @@ async function toWebp(page, png) {
   return Buffer.from(base64, 'base64');
 }
 
+// The cards of the thumbnail: the three styles side by side, each turned a little towards the middle.
+const THUMBNAIL_CARDS = [
+  { variant: 'classic', number: 'NO. 001', rarity: '✦ RARE', yaw: 16 },
+  { variant: 'sport', number: 'NO. 002', rarity: '✦✦ EPIC', yaw: 0 },
+  { variant: 'cosmic', number: 'NO. 003', rarity: '✦✦✦ LEGEND', yaw: -16 },
+];
+// The icon: one cosmic card with its words left out, so that only the frame, the picture and the lines show.
+const ICON_CARDS = [{ variant: 'cosmic', number: '', rarity: '', yaw: -10, quiet: true }];
+
+/** Lay the cards out alone on the studio page, wait until every picture is drawn, and take the drawing on a clear ground. */
+async function thumbnailStage(page, cards) {
+  await page.goto(`http://127.0.0.1:${PORT}/index.html`);
+  await page.waitForFunction(() => customElements.get('fuda-card'));
+  await page.evaluate((cards) => {
+    const row = document.createElement('div');
+    row.id = 'thumbnail-stage';
+    row.style.cssText = 'display:flex;gap:28px;align-items:center;padding:40px;width:max-content';
+    for (const one of cards) {
+      const card = document.createElement('fuda-card');
+      for (const [name, value] of Object.entries({ variant: one.variant, finish: 'foil', motion: 'still', 'card-view': '', title: 'Starship Block 3', category: 'ROCKET', subtitle: 'Starship + Super Heavy', description: 'Height: 124.4 m · Diameter: 9 m · 33 Raptor 3 booster engines.', number: one.number, rarity: one.rarity })) card.setAttribute(name, value);
+      card.style.cssText = `--fuda-perspective:1400px;--fuda-yaw:${one.yaw}deg;--fuda-tilt:4deg`;
+      const art = document.createElement('img');
+      art.alt = '';
+      art.src = 'assets/starship-v3-preview.jpg';
+      card.append(art);
+      row.append(card);
+      // The whole picture shows (a still card); the icon's card leaves its words out.
+      if (one.quiet) {
+        const style = document.createElement('style');
+        style.textContent = '.heading,.subtitle,.description,.footer{color:transparent!important}';
+        card.shadowRoot.append(style);
+      }
+    }
+    document.body.replaceChildren(row);
+  }, cards);
+  await page.waitForFunction(() => [...document.querySelectorAll('#thumbnail-stage fuda-card')].every((card) => card.shadowRoot?.querySelector('.art.ready')));
+  await quiet(page, 400);
+  return captureDrawing(page, '#thumbnail-stage');
+}
+
 try {
+  if (!only || only.includes('thumbnail')) {
+    try {
+      const taken = {};
+      for (const [kind, scheme] of [['light', 'light'], ['dark', 'dark'], ['icon', 'light']]) {
+        const context = await browser.newContext({ viewport: { width: 1440, height: 1000 }, deviceScaleFactor: 2, colorScheme: scheme, reducedMotion: 'reduce', locale: 'en-US', timezoneId: 'UTC' });
+        const page = await context.newPage();
+        try {
+          await offline(page);
+          taken[kind] = await thumbnailStage(page, kind === 'icon' ? ICON_CARDS : THUMBNAIL_CARDS);
+          if (kind === 'icon') {
+            for (const picture of await composeThumbnails({ page, root, light: taken.light, dark: taken.dark, icon: taken.icon, label: 'Fuda Cards' })) {
+              written.push(picture.file);
+              console.log(`${picture.file.padEnd(34)} ${String(Math.round(picture.bytes / 1024)).padStart(4)} KB`);
+            }
+          }
+        } finally { await context.close(); }
+      }
+    } catch (error) {
+      failures.push(`thumbnail: ${error.message.split('\n')[0]}`);
+    }
+  }
   for (const shot of SHOTS) {
     if (only && !only.includes(shot.subject)) continue;
     for (const view of shot.views) for (const scheme of ['light', 'dark']) {
@@ -92,6 +157,7 @@ try {
     }
   }
 } finally { await browser.close(); server.close(); }
-if (!only) for (const file of readdirSync(out)) if (!written.includes(file) && /\.(webp|png)$/.test(file)) { rmSync(join(out, file)); console.log(`removed ${file}: no shot makes it`); }
+// The thumbnails are never removed as pictures no shot makes: a failed take leaves the committed ones and fails the run.
+if (!only) for (const file of readdirSync(out)) if (!written.includes(file) && !THUMBNAIL_FILES.includes(file) && /\.(webp|png)$/.test(file)) { rmSync(join(out, file)); console.log(`removed ${file}: no shot makes it`); }
 console.log(`${written.length} pictures in docs/images`);
 if (failures.length) { console.error(failures.join('\n')); process.exit(1); }
