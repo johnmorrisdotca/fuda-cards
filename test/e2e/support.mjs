@@ -4,6 +4,7 @@ import { readFile } from "node:fs/promises";
 import { createServer } from "node:http";
 import { createRequire } from "node:module";
 import { extname, resolve } from "node:path";
+import { MADE_FILES, PAGE_ADDRESSES, renderPage } from "../../scripts/pages.mjs";
 
 export const root = resolve(import.meta.dirname, "../..");
 const types = {
@@ -59,6 +60,27 @@ export async function glRenderer(browser) {
   }
 }
 
+/**
+ * `FUDA_E2E_TIMEOUT_MS` raises Playwright's 30 s wait for every action and navigation of every page of this browser: on a machine that
+ * is running other work (a Mac with several sessions) a click can wait for a steady element for longer than that. Unset, nothing changes.
+ */
+function slowMachines(browser) {
+  const timeout = Number(process.env.FUDA_E2E_TIMEOUT_MS);
+  if (!timeout) return;
+  const newContext = browser.newContext.bind(browser);
+  browser.newContext = async (...args) => {
+    const context = await newContext(...args);
+    context.setDefaultTimeout(timeout);
+    return context;
+  };
+  const newPage = browser.newPage.bind(browser);
+  browser.newPage = async (...args) => {
+    const page = await newPage(...args);
+    page.setDefaultTimeout(timeout);
+    return page;
+  };
+}
+
 /** The one way these tests start Chromium: headless, drawing in software, checked to be so before anything is driven, with a hard limit on its life. */
 export async function launch() {
   const browser = await chromium.launch({
@@ -72,6 +94,7 @@ export async function launch() {
     await browser.close();
     throw new Error(`Refusing to drive a browser that does not draw in software: ${renderer}`);
   }
+  slowMachines(browser);
   return browser;
 }
 
@@ -91,11 +114,23 @@ export const sizes = [
   ["mobile", { width: 390, height: 844 }],
 ];
 
+/**
+ * A static server for the repository. The Card Studio and the Builder are written from their templates with the family's header and footer, by the same
+ * function that `pnpm site` uses, so a test opens the page the site publishes; everything else is a file of the repository.
+ */
 export function serve(port, dir = root) {
   return createServer(async (req, res) => {
-    const url = req.url.split("?")[0];
-    const path = url === "/" ? "/index.html" : url;
+    const pathname = req.url.split("?")[0];
     try {
+      if (dir === root && PAGE_ADDRESSES[pathname]) {
+        res.writeHead(200, { "Content-Type": "text/html" }).end(renderPage(PAGE_ADDRESSES[pathname]));
+        return;
+      }
+      if (dir === root && MADE_FILES[pathname]) {
+        res.writeHead(200, { "Content-Type": "text/javascript" }).end(MADE_FILES[pathname]());
+        return;
+      }
+      const path = pathname === "/" ? "/index.html" : pathname;
       const body = await readFile(resolve(dir, `.${path}`));
       res.writeHead(200, { "Content-Type": types[extname(path)] ?? "text/plain" }).end(body);
     } catch {
@@ -127,7 +162,7 @@ export async function quiet(page, ms = 0) {
         return !roots.some(running);
       },
       null,
-      { timeout: 15000 },
+      { timeout: Number(process.env.FUDA_E2E_TIMEOUT_MS) || 15000 },
     )
     .catch(() => {});
 }
@@ -160,8 +195,20 @@ export async function offline(page) {
   );
 }
 
-/** Choose a value of a control the demos draw as a row of buttons (the select stays in the page, hidden), or of a plain select. */
+/**
+ * Choose a value of a setting of the Studio or the Builder (found by its option id): open the tab of its group (every group's panel is in the page, the others hidden), then press
+ * its button or pick it from its drop-down. Or of a control the other demos draw as a row of buttons (the select stays in the page, hidden), or of a plain select.
+ */
 export async function choose(page, id, value) {
+  const row = page.locator(`[data-option="${id}"]`);
+  if (await row.count()) {
+    const group = await row.evaluate((el) => el.closest('[role="tabpanel"]').dataset.group);
+    await page.locator(`#opt-tab-${group}`).click();
+    const button = row.locator(`button[data-value="${value}"]`);
+    if (await button.count()) await button.click();
+    else await row.locator("select").selectOption(value);
+    return;
+  }
   const button = page.locator(`#${id}`).locator("xpath=..").locator(`button[data-value="${value}"]`);
   if (await button.count()) await button.click();
   else await page.selectOption(`#${id}`, value);

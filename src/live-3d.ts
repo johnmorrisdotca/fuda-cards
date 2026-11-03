@@ -13,15 +13,56 @@ import type {
 } from "@johnmorrisdotca/kazoku-ui/renderer";
 import { reducedMotion } from "./motion.js";
 
-/** A scene for a card. `object` is what turns about its upright axis while the card is in focus. */
+/**
+ * A scene for a card: kazoku-ui's scene, with `object`, the thing that turns about its upright axis while the card is in focus.
+ *
+ * @example
+ * ```ts no-run
+ * import type { LiveScene } from "@johnmorrisdotca/fuda-cards/live-3d";
+ * import { BoxGeometry, Mesh, MeshNormalMaterial, PerspectiveCamera, Scene } from "three";
+ *
+ * const cube = new Mesh(new BoxGeometry(1, 1, 1), new MeshNormalMaterial());
+ * const scene = new Scene().add(cube);
+ * const live: LiveScene = { scene, camera: new PerspectiveCamera(40, 1, 0.1, 10), object: cube };
+ * console.log(live.object === cube);
+ * ```
+ */
 export interface LiveScene extends Scene3D {
   object?: { rotation: { y: number } };
 }
-/** What a card shows in 3D: a key (items with the same key share their pictures) and a scene made from shared assets (`assets.acquire`). */
+/**
+ * What a card shows in 3D: a key (items with the same key share their pictures) and a scene made from shared assets (`assets.acquire`).
+ *
+ * @example
+ * ```ts no-run
+ * import type { LiveItem } from "@johnmorrisdotca/fuda-cards/live-3d";
+ * import { BoxGeometry, Mesh, MeshNormalMaterial, PerspectiveCamera, Scene } from "three";
+ *
+ * const cube: LiveItem = {
+ *   key: "cube",
+ *   build() {
+ *     const object = new Mesh(new BoxGeometry(1, 1, 1), new MeshNormalMaterial());
+ *     return { scene: new Scene().add(object), camera: new PerspectiveCamera(40, 1, 0.1, 10), object };
+ *   },
+ * };
+ * console.log(cube.key);
+ * ```
+ */
 export interface LiveItem<T extends ThreeLike = ThreeLike> {
   key: string;
   build(context: BuildContext<T>): LiveScene | Promise<LiveScene>;
 }
+/**
+ * How the live cards behave: the shared renderer's options (kazoku-ui's), and how long a turn takes, how long the pointer rests before a card goes live and how far ahead a still is made.
+ *
+ * @example
+ * ```ts no-run
+ * import type { LiveCardsOptions } from "@johnmorrisdotca/fuda-cards/live-3d";
+ *
+ * const options: LiveCardsOptions = { load: () => import("three"), turnSeconds: 20, dwellMs: 250 };
+ * console.log(options.turnSeconds);
+ * ```
+ */
 export interface LiveCardsOptions<T extends ThreeLike = ThreeLike>
   extends Omit<SharedRendererOptions<T>, "scheduler" | "assets" | "clock" | "document"> {
   /** Seconds for one turn of the card in focus (12). 0 does not turn it. */
@@ -31,10 +72,33 @@ export interface LiveCardsOptions<T extends ThreeLike = ThreeLike>
   /** How far outside the view a card with no picture of its own gets its still made, in pixels (300). */
   lookAheadPx?: number;
 }
+/**
+ * What a card brings when it is added: the picture it already has.
+ *
+ * @example
+ * ```ts no-run
+ * import type { AddOptions } from "@johnmorrisdotca/fuda-cards/live-3d";
+ *
+ * const withPicture = (still: HTMLImageElement): AddOptions => ({ still });
+ * console.log(typeof withPicture);
+ * ```
+ */
 export interface AddOptions {
   /** A picture the card already has (an `<img>` of its own), kept until the card is in focus. With one, the card costs no 3D code until then. */
   still?: HTMLImageElement;
 }
+/**
+ * The live cards of a page: add a card, put one in focus, let go. Only the card in focus turns in 3D, on the page's one WebGL context; the others stay pictures.
+ *
+ * @example
+ * ```ts no-run
+ * import { createLiveCards, type LiveCards } from "@johnmorrisdotca/fuda-cards/live-3d";
+ *
+ * const live: LiveCards = createLiveCards({ load: () => import("three") });
+ * live.blur();
+ * live.dispose();
+ * ```
+ */
 export interface LiveCards<T extends ThreeLike = ThreeLike> {
   /** Make a card live on focus: a `<fuda-card>` or any element with a size. Gives back the function that takes it off again. */
   add(card: HTMLElement, item: LiveItem<T>, options?: AddOptions): () => void;
@@ -67,6 +131,25 @@ interface Entry<T extends ThreeLike> {
 /** Stills are shared per this many degrees, so a card frozen at any angle shows a picture at its angle without one picture per degree. */
 const STILL_STEP = 5;
 
+/**
+ * Make the live cards of a page. Nothing 3D is loaded until a card is first in focus (or a card with no picture of its own comes near the view and needs its still made).
+ *
+ * @param options - How to load three.js (`load`), and optionally the turn, the dwell and the look-ahead; see {@link LiveCardsOptions}.
+ * @returns The live cards; call `add` for each card, and `dispose` when the page is done with them.
+ * @example
+ * ```ts no-run
+ * import { createLiveCards } from "@johnmorrisdotca/fuda-cards/live-3d";
+ * import { PerspectiveCamera, Scene } from "three";
+ *
+ * const live = createLiveCards({ load: () => import("three") });
+ * const card = document.querySelector("fuda-card") as HTMLElement;
+ * const remove = live.add(card, {
+ *   key: "cube",
+ *   build: () => ({ scene: new Scene(), camera: new PerspectiveCamera(40, 1, 0.1, 10) }),
+ * });
+ * remove();
+ * ```
+ */
 export function createLiveCards<T extends ThreeLike = ThreeLike>(options: LiveCardsOptions<T>): LiveCards<T> {
   const { turnSeconds = 12, dwellMs = 150, lookAheadPx = 300, ...rendererOptions } = options;
   const entries = new Map<HTMLElement, Entry<T>>();

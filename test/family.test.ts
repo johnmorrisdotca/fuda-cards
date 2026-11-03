@@ -1,0 +1,89 @@
+// What this package holds the same way as every package of the family: the shared template and the README writer, the one list of the family, and the README
+// block written from it. Changing a shared file means changing it in every repository at once, with the new hash recorded here.
+import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
+import { readFileSync } from "node:fs";
+import { test } from "node:test";
+
+interface Template {
+  FAMILY: { id: string; name: string; kana: string }[];
+  FAMILY_GROUPS: { members: string[] }[];
+  FAMILY_PITCH: Record<string, string>;
+  FAMILY_NOT_ON_NPM: string[];
+  FAMILY_TEMPLATE_VERSION: string;
+  familyRepo(id: string): string;
+  familyHeader(options: { id: string }): string;
+  familyFooter(options: { id: string }): string;
+}
+interface Writer {
+  familyBlockOf(readme: string): string | null;
+  familyReadmeBlock(id: string): string;
+}
+const template = (await import(new URL("../scripts/family-template.mjs", import.meta.url).href)) as Template;
+const writer = (await import(new URL("../scripts/family-readme.mjs", import.meta.url).href)) as Writer;
+
+const read = (path: string) => readFileSync(path, "utf8").replace(/\r\n/g, "\n");
+const sha = (path: string) => createHash("sha256").update(readFileSync(path)).digest("hex");
+const pkg = JSON.parse(read("package.json")) as { name: string };
+const id = pkg.name.replace(/^@[^/]+\//, "");
+
+// The template of 2026-11-02d is the one of 2026-11-02c (Wakusei Planets) with this package added to the list (thirty-five packages, the cards group), and the README
+// writer's number words reaching thirty-five. The other packages take the same two files when they are next touched.
+const TEMPLATE = { version: "2026-11-02d", sha256: "732379cd33c26d20af8de733669d070ca22f8d13e47cc18cf96dc46478b471d3" };
+const WRITER = "af861c6e19e721f8b1be8fec08905b7d8de6b1364900735acde56e2275b17759";
+const FAMILY_CSS = "31df0a58f422070ca4023d5498566b26bc55a5f9a0751f1520d36c61bbb562c9";
+
+test("the family template, the README writer and family.css are the recorded files, byte for byte", () => {
+  assert.equal(template.FAMILY_TEMPLATE_VERSION, TEMPLATE.version);
+  assert.equal(sha("scripts/family-template.mjs"), TEMPLATE.sha256);
+  assert.equal(sha("scripts/family-readme.mjs"), WRITER);
+  assert.equal(sha("demo/family.css"), FAMILY_CSS);
+});
+
+test("it lists every package of the family, in order, each with its Japanese name and a line on it", () => {
+  assert.equal(template.FAMILY.length, 35);
+  assert.deepEqual(
+    template.FAMILY_GROUPS.flatMap((group) => group.members),
+    template.FAMILY.map((one) => one.id),
+  );
+  for (const group of template.FAMILY_GROUPS) assert.deepEqual(group.members, [...group.members].sort());
+  for (const one of template.FAMILY) {
+    const slug = one.name.toLowerCase().replaceAll(" ", "-");
+    assert.ok(one.id === slug || one.id.startsWith(`${slug}-`), one.id);
+    assert.match(one.kana, /\S/, one.id);
+    assert.match(template.FAMILY_PITCH[one.id] ?? "", /^[^A-Z.].*[^.]$/, one.id);
+  }
+  assert.deepEqual(Object.keys(template.FAMILY_PITCH).sort(), template.FAMILY.map((one) => one.id).sort());
+  assert.ok(template.FAMILY.some((one) => one.id === id));
+});
+
+test("this package is on npm: the header has the npm pill and the footer the install line", () => {
+  assert.ok(!template.FAMILY_NOT_ON_NPM.includes(id));
+  assert.ok(template.familyHeader({ id }).includes(`https://www.npmjs.com/package/@johnmorrisdotca/${id}`));
+  assert.ok(template.familyFooter({ id }).includes(`npm install @johnmorrisdotca/${id}`));
+});
+
+test("the pages are made with the family's header and footer, with the kazoku-ui language picker and theme switch in the header", () => {
+  const pages = read("scripts/pages.mjs");
+  for (const call of ["familyHead(", "familyHeader(", "familyFooter(", "familyUnreviewed(", "FAMILY_SCRIPT"])
+    assert.ok(pages.includes(call), call);
+  for (const file of ["demo/index.html", "demo/builder.html"]) {
+    const html = read(file);
+    for (const marker of ["family:head", "family:header", "family:unreviewed", "family:footer", "family:script"])
+      assert.ok(html.includes(`<!-- ${marker} -->`), `${file} ${marker}`);
+  }
+  const header = template.familyHeader({ id });
+  assert.ok(header.includes("<kazoku-language-picker"));
+  assert.ok(header.includes("<kazoku-theme-switch"));
+});
+
+test("the README's family is the block scripts/family-readme.mjs writes from the template, under a heading of its own, naming every package once", () => {
+  const readme = read("README.md");
+  const block = writer.familyBlockOf(readme);
+  assert.notEqual(block, null, "README.md has no family markers");
+  assert.equal(block, writer.familyReadmeBlock(id));
+  assert.equal(readme.split("<!-- family:start").length - 1, 1);
+  assert.match(readme, /\n#{2,3} The family\n+<!-- family:start/);
+  for (const one of template.FAMILY)
+    assert.equal((block ?? "").split(`](${template.familyRepo(one.id)})`).length - 1, 1, one.id);
+});

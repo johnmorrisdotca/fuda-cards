@@ -1,15 +1,12 @@
 // Browser test: run with `pnpm test:e2e` (needs Playwright; skipped when missing).
 
 import { strict as assert } from "node:assert";
-import { readFile } from "node:fs/promises";
-import { createServer } from "node:http";
-import { extname, resolve } from "node:path";
+import { resolve } from "node:path";
 import { test } from "node:test";
-import { chromium, launch, portShift } from "./support.mjs";
+import { chromium, launch, portShift, serve } from "./support.mjs";
 
 const PORT = 8112 + portShift;
-const root = resolve(import.meta.dirname, "../..");
-const types = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".jpg": "image/jpeg" };
+const _root = resolve(import.meta.dirname, "../..");
 
 const sizes = [
   ["desktop", { width: 1280, height: 800 }],
@@ -20,17 +17,7 @@ test("a turned card shows its back, not the mirrored front, and has a true-scale
   skip: !chromium && "Playwright not installed",
 }, async () => {
   const browser = await launch();
-  const server = createServer(async (req, res) => {
-    const url = req.url.split("?")[0];
-    const path = url === "/" ? "/index.html" : url;
-    try {
-      res
-        .writeHead(200, { "Content-Type": types[extname(path)] ?? "text/plain" })
-        .end(await readFile(resolve(root, `.${path}`)));
-    } catch {
-      res.writeHead(404).end();
-    }
-  }).listen(PORT, "127.0.0.1");
+  const server = serve(PORT);
   try {
     for (const [name, size] of sizes) {
       const p = await browser.newPage({ viewport: size, deviceScaleFactor: 2 });
@@ -129,7 +116,7 @@ test("a turned card shows its back, not the mirrored front, and has a true-scale
       );
       await p.evaluate(() => document.querySelector("#card").removeAttribute("playing"));
 
-      // Thickness: 0.3 mm at the 63 mm wide card size by default, in mm through the thickness attribute.
+      // Thickness: 0.325 mm (a playing card's black-core stock) at the 63 mm wide card size by default, in mm through the thickness attribute.
       const edge = (t) =>
         p.evaluate((t) => {
           const c = document.querySelector("#card");
@@ -142,7 +129,7 @@ test("a turned card shows its back, not the mirrored front, and has a true-scale
         }, t);
       const dflt = await edge(null);
       assert.ok(
-        Math.abs(dflt.thick - (0.3 * dflt.card) / 63) < 0.02,
+        Math.abs(dflt.thick - (0.325 * dflt.card) / 63) < 0.02,
         `${name}: default edge is ${dflt.thick}px at ${dflt.card}px`,
       );
       assert.ok(Math.abs((await edge("1.5")).thick - (1.5 * dflt.card) / 63) < 0.02, `${name}: thickness 1.5 mm`);

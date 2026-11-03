@@ -6,7 +6,7 @@
  * It shares everything with the collection's deck through `pile.js`: the fan's layout, how a card lands and how it flies.
  */
 import { fanBounds, fanLayout, fanRelative, fanShift, flight, normalizeLanding, timing } from "./pile.js";
-import { stackLayout } from "./stack.js";
+import { stackLayout, stillsHtml } from "./stack.js";
 
 interface PileHost extends HTMLElement {
   stackCount: number;
@@ -34,11 +34,11 @@ const PILE_CSS = `:host{position:relative}.rotation{position:relative}:host(:not
 :host([flipped]) .card.fanned{transform:translate(calc(var(--fx,0) * 100cqw),0) rotate(calc(var(--fa,0) * 1deg)) rotateY(180deg)}
 .still{transition:transform var(--fuda-move,.65s) cubic-bezier(.2,.8,.2,1),transform-origin var(--fuda-move,.65s) cubic-bezier(.2,.8,.2,1);transition-delay:calc(var(--j,0) * var(--stag,22ms))}
 .card.fanned .still{transform-origin:50% 165%;transform:translate3d(calc(var(--rx,0) * 100cqw),calc(var(--ry,0) * 100cqw),calc(var(--t) / -2 - var(--j,1) * 1.5px)) rotate(calc(var(--ra,0) * 1deg));transition-delay:calc(var(--j,0) * var(--stag,28ms))}
-.still.far{display:none}.still.faced{background:none;border:0;transform-style:preserve-3d}.still .face,.flyer .face,.discard .face{position:absolute;inset:0}
+.still.far{display:none}.still.faced{background:none;border:0;padding:0;transform-style:preserve-3d}.still.faced>.inner,.still.faced>.shine{display:none}.still .face,.flyer .face,.discard .face{position:absolute;inset:0}
 .art>img.copy{width:100%;height:100%;object-fit:contain;display:block}:host([motion="pan"]) .art>img.copy{object-fit:cover;object-position:var(--fuda-focus-x,50%) var(--fuda-focus-y,25%)}
 .discard{position:absolute;left:0;top:0;width:100%;height:100%;transform-style:preserve-3d;translate:calc(var(--dx,1.28) * 100cqw) 0;transition:translate var(--fuda-move,.65s) cubic-bezier(.2,.8,.2,1);pointer-events:none}
 .discard .card{transition:none}.discard[data-land=face-down] .card{transform:rotateY(180deg)}
-.flyer{position:absolute;left:0;top:0;width:100%;height:100%;transform-style:preserve-3d;pointer-events:none;--t:calc(var(--mm,.3) * 100cqw / 63)}.flyer .fly,.flyer .turn{position:absolute;inset:0;transform-style:preserve-3d}
+.flyer{position:absolute;left:0;top:0;width:100%;height:100%;transform-style:preserve-3d;pointer-events:none;--t:calc(var(--mm,.325) * 100cqw / 63)}.flyer .fly,.flyer .turn{position:absolute;inset:0;transform-style:preserve-3d}
 .bar{position:absolute;left:50%;top:calc(100% + 14px);translate:-50% 0;display:flex;gap:.5rem;flex-wrap:wrap;justify-content:center;width:max-content;max-width:min(100vw - 24px,22rem);filter:none;font:600 .9rem system-ui,sans-serif}
 .bar button{box-sizing:border-box;min-height:48px;min-width:48px;padding:.45rem .9rem;font:inherit;color:#f6f4f1;background:#2a2d3c;border:2px solid #8a8ca0;border-radius:.7rem;cursor:pointer}.bar button:hover{border-color:#ffd27e}.bar button[aria-pressed=true]{background:#ffd27e;border-color:#ffd27e;color:#241a05}.bar button:disabled{opacity:.45;cursor:default}.bar button:focus-visible{outline:3px solid #ffd27e;outline-offset:3px}
 @media(prefers-reduced-motion:reduce){.card,.still,.discard{transition:none}}`;
@@ -74,13 +74,7 @@ function stillsMarkup(count: number, host: HTMLElement): string {
   const seed = num(host, "stack-seed", 1) + 7;
   const depth = Math.min(52, Math.max(0, Math.floor(num(host, "stack-depth", 10))));
   if (count < 2) return "";
-  const places = stackLayout(count, { messiness, seed, depth });
-  return places
-    .map(
-      (p, at) =>
-        `<i class="still" style="--x:${p.x};--y:${p.y};--r:${p.rotate};--k:${count - places.length + at}"></i>`,
-    )
-    .join("");
+  return stillsHtml(stackLayout(count, { messiness, seed, depth }), count);
 }
 
 /** The pile of cards taken off: a thick block of `count` cards like the stack, its top card face up or turned over, at the stack's side. */

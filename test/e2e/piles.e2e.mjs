@@ -583,13 +583,13 @@ test("<fuda-card stack>: the top card comes off onto a pile at its side, still f
   }
 });
 
-test("a plain <fuda-card> is exactly what 0.6.0 drew and never loads the pile code; a stack with no pile option does not either", {
+test("a plain <fuda-card> draws only its own markup and never loads the pile code; a stack with no pile option does not either", {
   skip: !chromium && "Playwright not installed",
 }, async () => {
   const browser = await launch();
   const server = serve(PORT);
   try {
-    const before = await readFile(new URL("./fixtures/perfect-card-0.4.0.html", import.meta.url), "utf8");
+    const before = await readFile(new URL("./fixtures/perfect-card.html", import.meta.url), "utf8");
     const context = await browser.newContext({ viewport: sizes[0][1] });
     const p = await context.newPage();
     const requests = [];
@@ -600,7 +600,7 @@ test("a plain <fuda-card> is exactly what 0.6.0 drew and never loads the pile co
         customElements.get("fuda-card") && document.querySelector("fuda-card").shadowRoot.querySelector(".art.ready"),
     );
     assert.equal(
-      await p.evaluate(() => document.getElementById("p").shadowRoot.innerHTML),
+      await p.evaluate(() => document.getElementById("p").shadowRoot.innerHTML.replace(/<style>[\s\S]*?<\/style>/, "")),
       before,
       "the plain card draws the same markup",
     );

@@ -1,10 +1,10 @@
-import { cardMaterial, stackHeightMm } from "./materials.js";
-import { stackLayout } from "./stack.js";
+import { cardMarkup } from "./card-markup.js";
+import { cardMaterial, DEFAULT_CARD_THICKNESS_MM, stackHeightMm } from "./materials.js";
+import { reducedMotion } from "./motion.js";
+import { stackLayout, stillsHtml } from "./stack.js";
 
 const template = document.createElement("template");
-template.innerHTML = `<style>
-:host{display:inline-block;width:300px;aspect-ratio:2.5/3.5;perspective:var(--fuda-perspective,1000px);container-type:inline-size;filter:drop-shadow(0 12px 14px #0006);--edge:linear-gradient(90deg,#f6dc8c,#b98631 50%,#f6dc8c);font-family:Georgia,serif;color:#27201b}*{box-sizing:border-box}.rotation{height:100%;transform-style:preserve-3d;transform-origin:center center}:host([card-spin="center"]) .rotation{animation:fuda-turn var(--fuda-card-spin-duration, 180s) linear infinite}:host([card-spin="corner"]) .rotation{transform-origin:0 100%;transform:translate(50%,-50%);animation:fuda-corner-turn var(--fuda-card-spin-duration, 180s) linear infinite}:host([card-spin-direction="reverse"]) .rotation{animation-direction:reverse}:host([card-spin-paused]) .rotation{animation-play-state:paused}@keyframes fuda-turn{to{transform:rotateY(360deg)}}@keyframes fuda-corner-turn{from{transform:translate(50%,-50%) rotateY(0)}to{transform:translate(50%,-50%) rotateY(360deg)}}:host([card-view]) .rotation{animation:none;transform:rotateX(var(--fuda-tilt,0deg)) rotateY(var(--fuda-yaw,0deg))}:host([card-view][card-spin="corner"]) .rotation{transform:translate(50%,-50%) rotateX(var(--fuda-tilt,0deg)) rotateY(var(--fuda-yaw,0deg))}@media (prefers-reduced-motion:reduce){:host([card-spin]) .rotation{animation:none}:host .card{transition:none}.art ::slotted(*){transition:none}}.card{--t:calc(var(--mm,.3) * 100cqw / 63);--pitch:calc(var(--mm1,var(--mm,.3)) * 100cqw / 63);height:100%;position:relative;transform-style:preserve-3d;transition:transform .65s}:host([flipped]) .card{transform:rotateY(180deg)}.face{position:absolute;inset:0;border-radius:15px;backface-visibility:hidden;overflow:hidden}.front{transform:translateZ(calc(var(--t) / 2));padding:13px;background:linear-gradient(135deg,#fbdf87,#ab742c 35%,#ffe9a6 58%,#ae792d);border:2px solid #9c702d}.inner{height:100%;padding:12px;background:linear-gradient(150deg,#f9edc8,#d6b477);border:2px solid #76512a;display:flex;flex-direction:column;gap:8px}.heading,.footer{display:flex;justify-content:space-between;align-items:center;gap:5px}.heading{font-weight:bold;font-size:20px}.badge{font:700 10px sans-serif;letter-spacing:.12em}.art{position:relative;height:53%;border:5px ridge #dcc18a;box-shadow:0 2px 5px #47301488;background:radial-gradient(circle at 50% 35%,#7496a1,#273c4c);overflow:hidden}.art ::slotted(*){width:100%;height:100%;object-fit:contain;display:block;opacity:0;transition:opacity .35s ease}.art.ready ::slotted(*){opacity:1}:host([motion="pan"]) .art ::slotted(img){object-fit:cover;object-position:var(--fuda-focus-x, 50%) var(--fuda-focus-y, 25%)}:host([motion="pan"][moving]) .art ::slotted(img){animation:fuda-pan var(--fuda-pan-duration, 12s) ease-in-out infinite alternate}:host([motion="pan"][pan-loop="restart"]) .art ::slotted(img){animation-direction:normal}:host([motion="pan"][pan-direction="up"]) .art ::slotted(img){animation-direction:alternate-reverse}:host([motion="pan"][pan-direction="up"][pan-loop="restart"]) .art ::slotted(img){animation-direction:reverse}@keyframes fuda-pan{from{object-position:50% 0%}to{object-position:50% 100%}}@media (prefers-reduced-motion:reduce){:host([motion="pan"][moving]) .art ::slotted(img){animation:none}.motion-button{transition:none}}.motion-button{position:absolute;right:0;bottom:0;z-index:1;width:48px;height:48px;padding:0;border:0;background:none;display:grid;place-items:center;cursor:pointer;opacity:.55;transition:opacity .2s;-webkit-tap-highlight-color:transparent}.motion-button:hover,.motion-button:focus-visible,.motion-button[aria-pressed=true]{opacity:1}.motion-button:focus-visible{outline:none}.motion-button:focus-visible .glyph{outline:3px solid white;outline-offset:2px}.glyph{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:#101827b3;border:1px solid #fff5;color:white}.glyph svg{width:11px;height:11px;fill:currentColor}.motion-button[aria-pressed=true] .play,.motion-button[aria-pressed=false] .pause{display:none}.motion-button[hidden]{display:none}.subtitle{text-align:center;font:italic 11px Georgia}.description{border-top:1px solid #9d8054;padding-top:9px;font-size:13px;line-height:1.35;flex:1}.footer{border-top:1px solid #9d8054;padding-top:5px;font:700 9px sans-serif;letter-spacing:.08em}.back{transform:rotateY(180deg) translateZ(calc(var(--t) / 2));background:radial-gradient(ellipse at center,#b78745 0 12%,#152d46 13% 27%,#386988 28% 31%,#10233b 32% 62%,#d2b074 63% 66%,#182c45 67%);border:11px solid #b39158;display:grid;place-items:center;color:#f7e9bf}.emblem{width:125px;height:125px;border:2px solid #edd18c;border-radius:50%;display:grid;place-items:center;background:#17334a;box-shadow:0 0 0 7px #967344,0 0 30px #e6c98288;font:bold 23px Georgia;letter-spacing:.12em}.shine{pointer-events:none;position:absolute;inset:0;opacity:.35;mix-blend-mode:screen;background:linear-gradient(125deg,transparent 25%,#fff9 36%,transparent 48%,#7cf6 56%,#f9a5 62%,transparent 70%)}:host([finish=matte]) .shine{display:none}.edge{position:absolute;background:var(--fuda-edge,var(--edge))}.stacked .edge{--dir:180deg;background:repeating-linear-gradient(var(--dir),transparent 0 calc(var(--pitch) * .7),#8886 calc(var(--pitch) * .7) var(--pitch)),var(--fuda-edge,var(--edge))}.stacked .edge.side{--dir:90deg}.stills{display:contents}.still{position:absolute;inset:0;border-radius:15px;border:2px solid #9c702d;pointer-events:none;background:linear-gradient(135deg,#fbdf87,#ab742c 35%,#ffe9a6 58%,#ae792d);transform:translate3d(calc(var(--x) * 100cqw),calc(var(--y) * 100cqw),calc(var(--t) / -2 + var(--pitch) * var(--k))) rotate(calc(var(--r) * 1deg))}:host([variant=sport]) .still{background:linear-gradient(135deg,#ebedef,#525e69,#fff,#47505d);border-color:#394c5b}:host([variant=cosmic]) .still{background:linear-gradient(130deg,#c9b4ff,#433b83,#dabdff,#503969);border-color:#584378}:host([variant=sport]),:host([variant=cosmic]){--edge:#ece4d2}:host([variant=sport]) .front{background:linear-gradient(135deg,#ebedef,#525e69,#fff,#47505d)}:host([variant=sport]) .inner{background:linear-gradient(145deg,#eef1ee,#aebac1);border-color:#394c5b}:host([variant=sport]) .art{border-color:#a9b9c0}:host([variant=cosmic]) .front{background:linear-gradient(130deg,#c9b4ff,#433b83,#dabdff,#503969)}:host([variant=cosmic]) .inner{background:linear-gradient(145deg,#e6dafa,#a997cd);border-color:#584378}
-</style><div class="rotation"><div class="card"><div class="face front"><div class="inner"><div class="heading"><span id="title"></span><span class="badge" id="category"></span></div><div class="art"><slot></slot><button class="motion-button" type="button" aria-pressed="false" aria-label="Animate the picture" title="Animate" hidden><span class="glyph"><svg viewBox="0 0 12 12" aria-hidden="true"><path class="play" d="M3 1.5v9l7.5-4.5z"/><path class="pause" d="M2.5 1.5h2.8v9H2.5zM6.7 1.5h2.8v9H6.7z"/></svg></span></button></div><div class="subtitle" id="subtitle"></div><div class="description" id="description"></div><div class="footer"><span id="number"></span><span>✦ FUDA COLLECTION</span><span id="rarity"></span></div></div><div class="shine"></div></div><div class="face back"><div class="emblem">FUDA</div><div class="shine"></div></div><i class="edge" style="left:50%;top:0;width:calc(100% - 30px);height:var(--t);transform:translate(-50%,-50%) rotate(0deg) rotateX(90deg)"></i><i class="edge" style="left:50%;top:100%;width:calc(100% - 30px);height:var(--t);transform:translate(-50%,-50%) rotate(0deg) rotateX(90deg)"></i><i class="edge side" style="left:0;top:50%;width:var(--t);height:calc(100% - 30px);transform:translate(-50%,-50%) rotateY(90deg)"></i><i class="edge side" style="left:100%;top:50%;width:var(--t);height:calc(100% - 30px);transform:translate(-50%,-50%) rotateY(90deg)"></i><i class="edge" style="left:2.20px;top:9.70px;width:11.48px;height:var(--t);transform:translate(-50%,-50%) rotate(-67.5deg) rotateX(90deg)"></i><i class="edge" style="left:9.70px;top:2.20px;width:11.48px;height:var(--t);transform:translate(-50%,-50%) rotate(-22.5deg) rotateX(90deg)"></i><i class="edge" style="left:2.20px;top:calc(100% - 9.70px);width:11.48px;height:var(--t);transform:translate(-50%,-50%) rotate(67.5deg) rotateX(90deg)"></i><i class="edge" style="left:9.70px;top:calc(100% - 2.20px);width:11.48px;height:var(--t);transform:translate(-50%,-50%) rotate(22.5deg) rotateX(90deg)"></i><i class="edge" style="left:calc(100% - 2.20px);top:9.70px;width:11.48px;height:var(--t);transform:translate(-50%,-50%) rotate(67.5deg) rotateX(90deg)"></i><i class="edge" style="left:calc(100% - 9.70px);top:2.20px;width:11.48px;height:var(--t);transform:translate(-50%,-50%) rotate(22.5deg) rotateX(90deg)"></i><i class="edge" style="left:calc(100% - 2.20px);top:calc(100% - 9.70px);width:11.48px;height:var(--t);transform:translate(-50%,-50%) rotate(-67.5deg) rotateX(90deg)"></i><i class="edge" style="left:calc(100% - 9.70px);top:calc(100% - 2.20px);width:11.48px;height:var(--t);transform:translate(-50%,-50%) rotate(-22.5deg) rotateX(90deg)"></i><div class="stills"></div></div></div>`;
+template.innerHTML = cardMarkup();
 const defaults: Record<string, string> = {
   title: "Untitled",
   category: "COLLECTIBLE",
@@ -15,7 +15,6 @@ const defaults: Record<string, string> = {
 };
 /** The one card in focus: the card under the pointer, holding keyboard focus or last tapped. Only it may autoplay. */
 let focusedCard: FudaCard | null = null;
-const reducedMotion = () => typeof matchMedia === "function" && matchMedia("(prefers-reduced-motion: reduce)").matches;
 document.addEventListener(
   "pointerdown",
   (event) => {
@@ -23,6 +22,21 @@ document.addEventListener(
   },
   true,
 );
+/**
+ * `<fuda-card>`: a collectible card frame around a picture you give it (or a live 3D view), drawn with a true thickness, an edge, a back, foil or matte,
+ * a stack, wear and the three looks. Import this module once to register the element; the attributes are listed in the card guide and in
+ * [`CardOptions`](api:CardOptions), and `cardAttributes(options)` writes them from an object.
+ *
+ * @example
+ * ```ts no-run
+ * import "@johnmorrisdotca/fuda-cards/element";
+ * import { cardAttributes } from "@johnmorrisdotca/fuda-cards";
+ *
+ * const card = document.createElement("fuda-card");
+ * for (const [name, value] of Object.entries(cardAttributes({ title: "Explorer One", stack: 10, wear: "near-mint" }))) card.setAttribute(name, value);
+ * document.body.append(card);
+ * ```
+ */
 export class FudaCard extends HTMLElement {
   static observedAttributes = [
     "title",
@@ -64,6 +78,20 @@ export class FudaCard extends HTMLElement {
     button?.addEventListener("click", () => this.toggleMotion());
     this.watchArt(root);
     this.watchFocus(button);
+    this.watchLight();
+  }
+  /** The light follows the pointer over the card: a foil card shows its sheen where the pointer is (see `--fuda-sheen-x` and `--fuda-sheen-y`). */
+  private watchLight(): void {
+    this.addEventListener("pointermove", (e) => {
+      const box = this.getBoundingClientRect();
+      if (!box.width || !box.height) return;
+      this.style.setProperty("--fuda-sheen-x", String(Math.round(((e.clientX - box.left) / box.width) * 100)));
+      this.style.setProperty("--fuda-sheen-y", String(Math.round(((e.clientY - box.top) / box.height) * 100)));
+    });
+    this.addEventListener("pointerleave", () => {
+      this.style.removeProperty("--fuda-sheen-x");
+      this.style.removeProperty("--fuda-sheen-y");
+    });
   }
   /** With `autoplay="focus"` the card in focus animates its art; leaving it (pointer, keyboard or a tap elsewhere) stops it. */
   private watchFocus(button: HTMLButtonElement | null): void {
@@ -153,10 +181,10 @@ export class FudaCard extends HTMLElement {
       this.removeAttribute("playing");
     if (this.shadowRoot) this.render();
   }
-  /** Millimetres thick: the `thickness` attribute, else the `material`'s, else 0.3. */
+  /** Millimetres thick: the `thickness` attribute, else the `material`'s, else the playing-card stock's 0.325 (`DEFAULT_CARD_THICKNESS_MM`). */
   get cardThicknessMm(): number {
     const asked = Number.parseFloat(this.getAttribute("thickness") ?? "");
-    return asked >= 0 ? asked : (cardMaterial(this.getAttribute("material"))?.thicknessMm ?? 0.3);
+    return asked >= 0 ? asked : (cardMaterial(this.getAttribute("material"))?.thicknessMm ?? DEFAULT_CARD_THICKNESS_MM);
   }
   /** How many cards the stack holds: the `stack` attribute as a whole number from 1 (one card) to 1000. */
   get stackCount(): number {
@@ -266,13 +294,7 @@ export class FudaCard extends HTMLElement {
     if (key === this.stillsKey) return;
     this.stillsKey = key;
     const holder = card.querySelector(".stills");
-    if (holder)
-      holder.innerHTML = places
-        .map(
-          (p, at) =>
-            `<i class="still" style="--x:${p.x};--y:${p.y};--r:${p.rotate};--k:${count - places.length + at}"></i>`,
-        )
-        .join("");
+    if (holder) holder.innerHTML = stillsHtml(places, count);
   }
   render(): void {
     const card = this.shadowRoot?.querySelector<HTMLElement>(".card");
@@ -284,8 +306,8 @@ export class FudaCard extends HTMLElement {
       card.style.setProperty("--mm", String(fan ? mm : mm * count));
       card.style.setProperty("--mm1", String(mm));
       card.classList.toggle("stacked", count > 1 && !fan);
-      if (material) card.style.setProperty("--edge", material.edge);
-      else card.style.removeProperty("--edge");
+      if (material) card.style.setProperty("--edge-color", material.edge);
+      else card.style.removeProperty("--edge-color");
       this.drawStills(card, count);
     }
     this.applyWear();

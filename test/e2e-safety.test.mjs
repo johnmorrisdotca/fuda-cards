@@ -18,6 +18,11 @@ const read = (f) => readFileSync(resolve(root, f), "utf8");
 test("a browser is started only through the software launch in test/e2e/support.mjs", () => {
   for (const file of scripts) {
     if (file === "test/e2e/support.mjs") continue;
+    // The usage test opens pages from the package as npm packs it, in Chromium started here with the same software switches.
+    if (file === "scripts/check-usage.ts") {
+      assert.ok(read(file).includes('"--use-angle=swiftshader"'), `${file} must draw in software`);
+      continue;
+    }
     assert.doesNotMatch(
       read(file),
       /\.launch\(|launchServer|launchPersistentContext|connectOverCDP|headless:\s*false|require\(['"]playwright['"]\)/,

@@ -1,9 +1,13 @@
 /**
- * Where the cards of a stack lie, from neat to messy, the same every time for the same seed.
+ * Where one card of a stack lies, as the stack's layout says: how far it is nudged across and down, in card widths, and how far it is turned.
  *
- * The idea and the three parameters (messiness, seed, depth) come from toranpu's pileLayout
- * (github.com/johnmorrisdotca/toranpu, `src/ui/layout.ts`, MIT). This is written again here for a stack that has a true
- * thickness: a card's height is not faked by moving it down the page, so only the nudge and the turn are laid out.
+ * @example
+ * ```ts
+ * import { stackLayout, type StackPlace } from "@johnmorrisdotca/fuda-cards";
+ *
+ * const place: StackPlace = stackLayout(5, { seed: 3 })[0];
+ * console.log(Object.keys(place)); // [ 'x', 'y', 'rotate' ]
+ * ```
  */
 export interface StackPlace {
   /** Across, in card widths from where a square card lies. */
@@ -13,6 +17,17 @@ export interface StackPlace {
   /** Turn in degrees. */
   rotate: number;
 }
+/**
+ * How a stack is laid out: how messy, from which seed and how many cards deep.
+ *
+ * @example
+ * ```ts
+ * import { stackLayout, type StackLayoutOptions } from "@johnmorrisdotca/fuda-cards";
+ *
+ * const messy: StackLayoutOptions = { messiness: 0.8, seed: 7, depth: 5 };
+ * console.log(stackLayout(52, messy).length); // 5
+ * ```
+ */
 export interface StackLayoutOptions {
   /** From 0 (squared up) to 1 (very messy). Unless said, 0.3. */
   messiness?: number;
@@ -40,8 +55,24 @@ const round = (value: number): number => {
 };
 
 /**
- * The cards under the top one of a stack of `count`, bottom first: the top `depth` of them, as the top card is the live one
- * and lies square. A card's place depends on its number from the bottom, so a card put on top moves none of those under it.
+ * Where the cards of a stack lie, from neat to messy, the same every time for the same seed: the cards under the top one, bottom first, at most
+ * `depth` of them, as the top card is the live one and lies square. A card's place depends on its number from the bottom, so a card put
+ * on top moves none of those under it.
+ *
+ * The idea and the three parameters (messiness, seed, depth) come from toranpu's pileLayout (github.com/johnmorrisdotca/toranpu,
+ * `src/ui/layout.ts`, MIT). This is written again here for a stack that has a true thickness: a card's height is not faked by moving it
+ * down the page, so only the nudge and the turn are laid out.
+ *
+ * @param count - How many cards the stack holds; with none or one there is nothing under the top.
+ * @param options - How messy, which seed and how deep. Unless said: 0.3, 1 and 10.
+ * @returns The places of the cards under the top one, bottom first; empty for a stack of one.
+ * @example
+ * ```ts
+ * import { stackLayout } from "@johnmorrisdotca/fuda-cards";
+ *
+ * const same = JSON.stringify(stackLayout(52, { seed: 7 })) === JSON.stringify(stackLayout(52, { seed: 7 }));
+ * console.log(same, stackLayout(1).length, stackLayout(52).length); // true 0 10
+ * ```
  */
 export function stackLayout(count: number, options: StackLayoutOptions = {}): StackPlace[] {
   const whole = Math.max(0, Math.floor(Number.isFinite(count) ? count : 0));
@@ -61,4 +92,17 @@ export function stackLayout(count: number, options: StackLayoutOptions = {}): St
     });
   }
   return places;
+}
+
+/**
+ * The markup of the cards under the top one, bottom first, for a stack of `count` cards: each is the frame of the top card with
+ * nothing written on it, laid where `places` says and as many cards lower as its number from the bottom.
+ */
+export function stillsHtml(places: StackPlace[], count: number): string {
+  return places
+    .map(
+      (place, at) =>
+        `<div class="still" style="--x:${place.x};--y:${place.y};--r:${place.rotate};--k:${count - places.length + at}"><div class="inner"></div><div class="shine"></div></div>`,
+    )
+    .join("");
 }

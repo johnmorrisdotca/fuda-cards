@@ -20,12 +20,39 @@ import type { LiveCards, LiveItem } from "./live-3d.js";
 import { type FanPlace, normalizeLanding, timing } from "./pile.js";
 import type { ZoomView } from "./zoom.js";
 
-/** Live 3D in a collection's cards: the shared cards from `createLiveCards` and the 3D item of a card, if it has one. See docs/live-3d.md. */
+/**
+ * Live 3D in a collection's cards: the shared cards from `createLiveCards` and the 3D item of a card, if it has one. See docs/live-3d.md.
+ *
+ * @example
+ * ```ts no-run
+ * import type { CollectionLive } from "@johnmorrisdotca/fuda-cards/collection-element";
+ * import { createLiveCards } from "@johnmorrisdotca/fuda-cards/live-3d";
+ *
+ * const live: CollectionLive = { cards: createLiveCards({ load: () => import("three") }) as never, item: () => undefined };
+ * console.log(typeof live.item);
+ * ```
+ */
 export interface CollectionLive {
   cards: LiveCards<never>;
   item(card: CollectionCard): LiveItem<never> | undefined;
 }
 
+/**
+ * `<fuda-collection>`: a whole collection in one of ten displays (a deck, a rolodex, binder pages, a display case, a random draw, a story scroll, a gallery wall,
+ * a spotlight, a card table, a fan), with zoom, Fit and Centre, the choices kept in the page address and a card detail on a press. Give it
+ * `cards` (see {@link parseCollection}) and a `view`.
+ *
+ * @example
+ * ```ts no-run
+ * import "@johnmorrisdotca/fuda-cards/collection-element";
+ * import type { FudaCollection } from "@johnmorrisdotca/fuda-cards/collection-element";
+ *
+ * const collection = document.createElement("fuda-collection") as FudaCollection;
+ * collection.setAttribute("view", "binder");
+ * collection.cards = [{ id: "1", name: "Explorer One", image: "one.jpg" }];
+ * document.body.append(collection);
+ * ```
+ */
 export class FudaCollection extends HTMLElement {
   /** @internal */
   root = this.attachShadow({ mode: "open" });

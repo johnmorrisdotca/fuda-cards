@@ -1,6 +1,7 @@
 import { strict as assert } from "node:assert";
 import { readFile } from "node:fs/promises";
 import { test } from "node:test";
+import { renderPage } from "../scripts/pages.mjs";
 
 const read = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8");
 const line = (await read("README.md")).match(/<style>fuda-card:where[^\n]*?<\/style>/)?.[0];
@@ -12,8 +13,16 @@ test("the README documents the one CSS line that keeps an unready card hidden", 
 });
 
 test("every demo page that uses a fuda element carries the line in its head before any script", async () => {
-  for (const page of ["index.html", "demo/collections.html", "demo/collections-component.html", "demo/live-3d.html"]) {
-    const html = await read(page);
+  const pages = [
+    "demo/collections.html",
+    "demo/collections-component.html",
+    "demo/live-3d.html",
+    "demo/embed.html",
+    "demo/embed-collection.html",
+  ];
+  const made = { "the Card Studio": renderPage("index"), "the Builder": renderPage("builder") };
+  for (const page of [...pages, ...Object.keys(made)]) {
+    const html = made[page] ?? (await read(page));
     const head = html.slice(0, html.indexOf("</head>"));
     assert.ok(head.includes(line), `${page} lacks the no-flash line in its head`);
     assert.ok(
@@ -24,8 +33,9 @@ test("every demo page that uses a fuda element carries the line in its head befo
 });
 
 test("the element keeps the art invisible until the card is laid out and its images have loaded", async () => {
-  const source = await read("src/element.ts");
-  assert.match(source, /\.art ::slotted\(\*\)\{[^}]*opacity:0/);
-  assert.match(source, /\.art\.ready ::slotted\(\*\)\{opacity:1\}/);
-  assert.match(source, /prefers-reduced-motion:reduce\)\{[^@]*\.art ::slotted\(\*\)\{transition:none\}/);
+  const { CARD_CSS } = await import("../dist/card-styles.js");
+  const css = CARD_CSS.replace(/\s+/g, " ");
+  assert.match(css, /\.art ::slotted\(\*\) \{[^}]*opacity: 0/);
+  assert.match(css, /\.art\.ready ::slotted\(\*\) \{ opacity: 1; \}/);
+  assert.match(css, /prefers-reduced-motion: reduce\) \{[^@]*\.art ::slotted\(\*\) \{ transition: none; \}/);
 });

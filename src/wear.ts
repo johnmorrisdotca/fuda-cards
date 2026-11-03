@@ -11,7 +11,17 @@
  */
 import { seededRandom } from "./stack.js";
 
-/** How much of each kind of wear, from 0 (none) to 1 (the worst the preset names). */
+/**
+ * How much of each kind of wear, from 0 (none) to 1 (the worst the preset names).
+ *
+ * @example
+ * ```ts
+ * import { wearPreset, type WearLevels } from "@johnmorrisdotca/fuda-cards";
+ *
+ * const levels: WearLevels | undefined = wearPreset("near-mint")?.levels;
+ * console.log(levels?.corners, levels?.creases); // 0.18 0
+ * ```
+ */
 export interface WearLevels {
   corners: number;
   edges: number;
@@ -22,6 +32,17 @@ export interface WearLevels {
   /** How far the print sits off centre. */
   centering: number;
 }
+/**
+ * A grading term with the levels it stands for and what it means in a few words.
+ *
+ * @example
+ * ```ts
+ * import { wearPresets, type WearPreset } from "@johnmorrisdotca/fuda-cards";
+ *
+ * const worst: WearPreset = wearPresets[wearPresets.length - 1];
+ * console.log(worst.id, worst.says); // damaged Chipped and folded corners, hard creases, staining.
+ * ```
+ */
 export interface WearPreset {
   id: string;
   name: string;
@@ -37,7 +58,17 @@ const L = (
   toning: number,
   centering: number,
 ): WearLevels => ({ corners, edges, surface, creases, toning, centering });
-/** From perfect to damaged. The names are the plain grading terms; the numbers are this package's reading of them (docs/wear.md). */
+/**
+ * The seven grades, from perfect to damaged. The names are the plain grading terms; the numbers are this package's reading of them (docs/wear.md).
+ *
+ * @example
+ * ```ts
+ * import { wearPresets } from "@johnmorrisdotca/fuda-cards";
+ *
+ * console.log(wearPresets.map((preset) => preset.id).join(" "));
+ * // perfect mint near-mint lightly-played moderately-played heavily-played damaged
+ * ```
+ */
 export const wearPresets: readonly WearPreset[] = [
   {
     id: "perfect",
@@ -82,10 +113,33 @@ export const wearPresets: readonly WearPreset[] = [
     says: "Chipped and folded corners, hard creases, staining.",
   },
 ];
+/**
+ * The grade with this id.
+ *
+ * @param id - A grade's id, such as `near-mint` (the `wear` attribute's value).
+ * @returns The grade, or `undefined` when there is none with that id.
+ * @example
+ * ```ts
+ * import { wearPreset } from "@johnmorrisdotca/fuda-cards";
+ *
+ * console.log(wearPreset("mint")?.name, wearPreset("pristine")); // Mint undefined
+ * ```
+ */
 export function wearPreset(id: string | null | undefined): WearPreset | undefined {
   return wearPresets.find((preset) => preset.id === id);
 }
 
+/**
+ * What a card asks of its wear: a grade or a number, a seed, and any level on its own.
+ *
+ * @example
+ * ```ts
+ * import { wearLevels, type WearOptions } from "@johnmorrisdotca/fuda-cards";
+ *
+ * const asked: WearOptions = { wear: "mint", corners: 0.5, seed: 4 };
+ * console.log(wearLevels(asked)?.corners); // 0.5
+ * ```
+ */
 export interface WearOptions {
   /** A preset's id, or a number from 0 to 1 for all the levels at once. */
   wear?: string | number | null;
@@ -100,7 +154,19 @@ export interface WearOptions {
 const clamp01 = (value: number): number => (Number.isFinite(value) ? Math.min(1, Math.max(0, value)) : 0);
 const round = (value: number): number => Math.round(value * 100) / 100;
 
-/** The levels a card's wear asks for, or null when it asks for none (no wear, "perfect", an unknown name or all zero). */
+/**
+ * The levels a card's wear asks for: the grade's or the number's, with any level named on its own laid over them.
+ *
+ * @param options - The wear asked for: a grade or a number from 0 to 1, and levels of corners, edges, surface and creases.
+ * @returns The levels, or `null` when the card asks for none: no wear, "perfect", an unknown name or every level zero.
+ * @example
+ * ```ts
+ * import { wearLevels } from "@johnmorrisdotca/fuda-cards";
+ *
+ * console.log(wearLevels({ wear: "perfect" })); // null
+ * console.log(wearLevels({ wear: 0.5 })?.surface); // 0.5
+ * ```
+ */
 export function wearLevels(options: WearOptions): WearLevels | null {
   const asked = options.wear;
   let base: WearLevels = L(0, 0, 0, 0, 0, 0);
@@ -120,7 +186,29 @@ export function wearLevels(options: WearOptions): WearLevels | null {
   return Object.values(levels).every((v) => v === 0) ? null : levels;
 }
 
+/**
+ * How a corner is worn: sharp, softened, rounded, chipped or folded.
+ *
+ * @example
+ * ```ts
+ * import { wearLayout, wearPreset, type CornerKind } from "@johnmorrisdotca/fuda-cards";
+ *
+ * const kinds: CornerKind[] = wearLayout(wearPreset("damaged")!.levels, 3).corners.map((corner) => corner.kind);
+ * console.log(kinds.length); // 4
+ * ```
+ */
 export type CornerKind = "sharp" | "soft" | "rounded" | "chipped" | "dog-eared";
+/**
+ * One corner of a worn card: how it is worn and how far the damage reaches.
+ *
+ * @example
+ * ```ts
+ * import { wearLayout, wearPreset, type WearCorner } from "@johnmorrisdotca/fuda-cards";
+ *
+ * const corner: WearCorner = wearLayout(wearPreset("lightly-played")!.levels).corners[0];
+ * console.log(typeof corner.size, corner.jag.length >= 0); // number true
+ * ```
+ */
 export interface WearCorner {
   kind: CornerKind;
   /** How far the damage reaches along each edge, in units of a 250 by 350 card. */
@@ -159,6 +247,17 @@ export interface WearFace {
   specks: WearFleck[];
   stain: { x: number; y: number; r: number; a: number } | null;
 }
+/**
+ * Every mark of a worn card: its corners, its centring, and the creases, scratches, specks and stain of each face.
+ *
+ * @example
+ * ```ts
+ * import { wearLayout, wearPreset, type WearFeatures } from "@johnmorrisdotca/fuda-cards";
+ *
+ * const features: WearFeatures = wearLayout(wearPreset("moderately-played")!.levels, 2);
+ * console.log(features.front.scratches.length > 0); // true
+ * ```
+ */
 export interface WearFeatures {
   levels: WearLevels;
   /** Top left, top right, bottom right, bottom left of the front. */
@@ -260,7 +359,20 @@ function faceFor(levels: WearLevels, random: () => number): WearFace {
   return { edge, creases, scratches, specks, stain };
 }
 
-/** Where every mark of a card lies. A pure function of the levels and the seed: no DOM, nothing at random. */
+/**
+ * Where every mark of a card lies. A pure function of the levels and the seed: no DOM, nothing at random, so the same seed lays the same marks every time.
+ *
+ * @param levels - How much of each kind of wear (see {@link wearLevels}).
+ * @param seed - The seed that lays the marks out. Unless said, 1.
+ * @returns The corners, centring and marks of both faces.
+ * @example
+ * ```ts
+ * import { wearLayout, wearPreset } from "@johnmorrisdotca/fuda-cards";
+ *
+ * const levels = wearPreset("heavily-played")!.levels;
+ * console.log(JSON.stringify(wearLayout(levels, 5)) === JSON.stringify(wearLayout(levels, 5))); // true
+ * ```
+ */
 export function wearLayout(levels: WearLevels, seed = 1): WearFeatures {
   const base = (Number.isFinite(seed) ? seed : 1) * 2654435761;
   const corners: WearCorner[] = [];
@@ -334,7 +446,20 @@ function faceCorner(features: WearFeatures, index: number, face: "front" | "back
   return features.corners[face === "front" ? index : mirrored[index]];
 }
 
-/** The outline of a face as an SVG path in the 250 by 350 box, corners as worn. */
+/**
+ * The outline of a face as an SVG path in the 250 by 350 box, corners as worn.
+ *
+ * @param features - The marks of the card (see {@link wearLayout}).
+ * @param face - Which face; the back's corners are the front's seen from behind. Unless said, the front.
+ * @returns The path's `d` attribute.
+ * @example
+ * ```ts
+ * import { wearLayout, wearOutline, wearPreset } from "@johnmorrisdotca/fuda-cards";
+ *
+ * const features = wearLayout(wearPreset("damaged")!.levels, 1);
+ * console.log(wearOutline(features).startsWith("M"), wearOutline(features, "back") !== wearOutline(features)); // true true
+ * ```
+ */
 export function wearOutline(features: WearFeatures, face: "front" | "back" = "front"): string {
   const points: Array<[number, number]> = [];
   frames.forEach((frame, index) => {
@@ -353,7 +478,20 @@ function line(m: WearMark, stroke: string, width: number, opacity: number, extra
   return `<path d="M${m.x1} ${m.y1}${way}" stroke="${stroke}" stroke-width="${width}" opacity="${opacity}" fill="none" stroke-linecap="round"${extra}/>`;
 }
 
-/** The SVG laid over one face: whitening, folds, creases, scratches, specks, stain and toning. Markup only, no script. */
+/**
+ * The SVG laid over one face: whitening, folds, creases, scratches, specks, stain and toning. Markup only, no script.
+ *
+ * @param features - The marks of the card (see {@link wearLayout}).
+ * @param face - Which face. Unless said, the front.
+ * @returns The `<svg>` markup, in the 250 by 350 box.
+ * @example
+ * ```ts
+ * import { wearLayout, wearOverlaySvg, wearPreset } from "@johnmorrisdotca/fuda-cards";
+ *
+ * const svg = wearOverlaySvg(wearLayout(wearPreset("near-mint")!.levels));
+ * console.log(svg.startsWith("<svg"), /<script|onload/i.test(svg)); // true false
+ * ```
+ */
 export function wearOverlaySvg(features: WearFeatures, face: "front" | "back" = "front"): string {
   const data = face === "front" ? features.front : features.back;
   const levels = features.levels;

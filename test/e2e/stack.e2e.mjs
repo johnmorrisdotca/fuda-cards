@@ -80,7 +80,7 @@ test("a stack is count times the material thickness high, drawn as one block plu
       await set({ thickness: null, material: "aluminium-0.8" });
       assert.equal((await measure(page, "s")).heightMm, 41.6);
       await set({ material: "no-such-material" });
-      assert.equal((await measure(page, "s")).heightMm, 15.6, `${name}: an unknown material falls back to 0.3 mm`);
+      assert.equal((await measure(page, "s")).heightMm, 16.9, `${name}: an unknown material falls back to 0.325 mm`);
       await set({ material: "paper-310-black-core", stack: "1" });
       const back = await measure(page, "s");
       assert.deepEqual([back.stills, back.stacked], [0, false], `${name}: stack=1 is a single card`);
@@ -187,28 +187,36 @@ test("the Studio offers every material and preset, sets the stack and tells its 
         () =>
           customElements.get("fuda-card") &&
           document.querySelector("#view").state &&
-          document.querySelector("#material").options.length > 5,
+          document.querySelector("#opt-material"),
       );
       const ids = await page.evaluate(async () => {
         const { cardMaterials, stackPresets } = await import("/dist/index.js");
-        return { materials: cardMaterials.map((m) => m.id), counts: stackPresets.map((p) => String(p.count)) };
+        return { materials: cardMaterials.map((m) => m.id), counts: stackPresets.map((p) => p.count) };
       });
       const offered = await page.evaluate(() => ({
-        materials: [...document.querySelectorAll("#material option")].map((o) => o.value).filter(Boolean),
-        counts: [...document.querySelectorAll("#stack-preset option")].map((o) => o.value),
+        materials: [...document.querySelectorAll("#opt-material option")].map((o) => o.value).filter(Boolean),
+        counts: [...document.querySelectorAll('[data-option="stack"] .fam-seg button')].map((b) =>
+          Number(b.dataset.value),
+        ),
       }));
       assert.deepEqual(offered.materials, ids.materials, `${name}: the Studio must list every material`);
       for (const c of ids.counts) assert.ok(offered.counts.includes(c), `${name}: preset ${c} is missing`);
-      await page.selectOption("#material", "card-130pt");
-      await page.selectOption("#stack-preset", "60");
-      assert.equal(await page.evaluate(() => document.querySelector("#card").getAttribute("stack")), "60");
-      assert.equal(await page.inputValue("#stack"), "60");
-      assert.match(await page.textContent("#stack-info"), /60 cards x 3\.302 mm = 198\.12 mm high/);
-      await page.fill("#stack", "7");
+      await choose(page, "material", "paper-310-black-core");
+      await choose(page, "stack", "52");
+      assert.equal(await page.evaluate(() => document.querySelector("#card").getAttribute("stack")), "52");
+      assert.equal(await page.inputValue("#opt-stack"), "52");
+      assert.match(await page.textContent("#note"), /52 cards × 0\.325 mm = 16\.9 mm high/);
+      await page.fill("#opt-stack", "7");
       assert.equal(await page.evaluate(() => document.querySelector("#card").getAttribute("stack")), "7");
-      assert.equal(await page.inputValue("#stack-preset"), "custom");
-      await choose(page, "thickness", "0");
-      assert.match(await page.textContent("#stack-info"), /7 cards x 0 mm = 0 mm high/);
+      assert.equal(
+        await page.evaluate(
+          () => [...document.querySelectorAll('[data-option="stack"] .fam-seg button[aria-pressed="true"]')].length,
+        ),
+        0,
+        `${name}: a count that is no preset presses none`,
+      );
+      await page.fill("#opt-thickness", "0");
+      assert.match(await page.textContent("#note"), /7 cards × 0 mm = 0 mm high/);
       assert.ok(
         await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
         `${name}: the page must not scroll sideways`,

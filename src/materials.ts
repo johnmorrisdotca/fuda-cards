@@ -1,11 +1,43 @@
-/** A card material with a thickness taken from a maker or a standard, and where it was read. */
+/**
+ * Where a number was read: the maker's or the standard's page, and what it says there.
+ *
+ * @example
+ * ```ts
+ * import { cardMaterial, type CardMaterialSource } from "@johnmorrisdotca/fuda-cards";
+ *
+ * const source: CardMaterialSource | undefined = cardMaterial("paper-310-black-core")?.source;
+ * console.log(source?.says); // Black Core Paper, 310gsm, 0.325mm, 13pt
+ * ```
+ */
 export interface CardMaterialSource {
   label: string;
   url: string;
   /** What the source says, in short. */
   says: string;
 }
+/**
+ * The kind of stock a material is: plain paper card, plastic, a thick trading-card stock or metal.
+ *
+ * @example
+ * ```ts
+ * import { cardMaterials, type CardMaterialGroup } from "@johnmorrisdotca/fuda-cards";
+ *
+ * const group: CardMaterialGroup = "metal";
+ * console.log(cardMaterials.filter((material) => material.group === group).map((material) => material.id)); // [ 'aluminium-0.8', 'steel-0.5' ]
+ * ```
+ */
 export type CardMaterialGroup = "paper" | "plastic" | "thick-card" | "metal";
+/**
+ * A card material: a stock or a metal with a thickness read from a maker or a standard, and the colour its edge is drawn in.
+ *
+ * @example
+ * ```ts
+ * import { cardMaterial, type CardMaterial } from "@johnmorrisdotca/fuda-cards";
+ *
+ * const steel: CardMaterial | undefined = cardMaterial("steel-0.5");
+ * console.log(steel?.name, steel?.thicknessMm); // Stainless steel card, 0.5 mm 0.5
+ * ```
+ */
 export interface CardMaterial {
   id: string;
   name: string;
@@ -16,7 +48,17 @@ export interface CardMaterial {
   edge: string;
   source: CardMaterialSource;
 }
-/** A count of cards for a stack, with where the number comes from. */
+/**
+ * A count of cards for a stack, with where the number comes from: a deck of 52, a Pokémon deck of 60, a booster pack of about 10.
+ *
+ * @example
+ * ```ts
+ * import { stackPresets, type StackPreset } from "@johnmorrisdotca/fuda-cards";
+ *
+ * const first: StackPreset = stackPresets[0];
+ * console.log(first.name, first.count); // Playing cards, 52 52
+ * ```
+ */
 export interface StackPreset {
   id: string;
   name: string;
@@ -24,8 +66,29 @@ export interface StackPreset {
   source: CardMaterialSource;
 }
 
-/** One thousandth of an inch ("pt" in card and paper trade talk) in millimetres. */
+/**
+ * One thousandth of an inch ("pt" in card and paper trade talk) in millimetres, 0.0254: a 13 pt card is 13 × 0.0254 mm.
+ *
+ * @example
+ * ```ts
+ * import { mmPerPoint } from "@johnmorrisdotca/fuda-cards";
+ *
+ * console.log(Math.round(13 * mmPerPoint * 1000) / 1000); // 0.33
+ * ```
+ */
 export const mmPerPoint = 0.0254;
+/**
+ * The thickness of a card that names no material or thickness: a playing card's black-core stock, 13 pt, 0.325 mm
+ * (Qin Printing, Black Core Paper 310 gsm, 0.325 mm).
+ *
+ * @example
+ * ```ts
+ * import { DEFAULT_CARD_THICKNESS_MM, stackHeightMm } from "@johnmorrisdotca/fuda-cards";
+ *
+ * console.log(stackHeightMm(52, DEFAULT_CARD_THICKNESS_MM)); // 16.9
+ * ```
+ */
+export const DEFAULT_CARD_THICKNESS_MM = 0.325;
 const pt = (points: number): number => Math.round(points * mmPerPoint * 1000) / 1000;
 
 const qin = {
@@ -46,6 +109,19 @@ const thick = (points: number, slug: string): CardMaterial => ({
   source: holder(points, slug),
 });
 
+/**
+ * Every material the package knows, each with a thickness and the page it was read from. `docs/materials.md` lists them with their sources.
+ *
+ * @example
+ * ```ts
+ * import { cardMaterials } from "@johnmorrisdotca/fuda-cards";
+ *
+ * for (const material of cardMaterials.slice(0, 3)) console.log(material.id, material.thicknessMm);
+ * // paper-250 0.28
+ * // paper-310-black-core 0.325
+ * // paper-350 0.405
+ * ```
+ */
 export const cardMaterials: readonly CardMaterial[] = [
   {
     id: "paper-250",
@@ -132,6 +208,16 @@ const wikiPokemon = {
   label: "Wikipedia, Pokémon Trading Card Game",
   url: "https://en.wikipedia.org/wiki/Pok%C3%A9mon_Trading_Card_Game",
 };
+/**
+ * The usual sizes of a stack of cards, each with where the number comes from.
+ *
+ * @example
+ * ```ts
+ * import { stackPresets } from "@johnmorrisdotca/fuda-cards";
+ *
+ * console.log(stackPresets.map((preset) => preset.count)); // [ 52, 54, 60, 10 ]
+ * ```
+ */
 export const stackPresets: readonly StackPreset[] = [
   {
     id: "deck-52",
@@ -162,11 +248,36 @@ export const stackPresets: readonly StackPreset[] = [
   },
 ];
 
-/** The material with this id, or undefined. */
+/**
+ * The material with this id.
+ *
+ * @param id - A material's id, such as `paper-310-black-core` (the `material` attribute's value).
+ * @returns The material, or `undefined` when there is none with that id (and for `null` and `undefined`).
+ * @example
+ * ```ts
+ * import { cardMaterial } from "@johnmorrisdotca/fuda-cards";
+ *
+ * console.log(cardMaterial("aluminium-0.8")?.thicknessMm); // 0.8
+ * console.log(cardMaterial("nothing")); // undefined
+ * ```
+ */
 export function cardMaterial(id: string | null | undefined): CardMaterial | undefined {
   return cardMaterials.find((material) => material.id === id);
 }
-/** Height of a stack of `count` cards `thicknessMm` thick, in millimetres. */
+/**
+ * The height of a stack of cards, in millimetres: the count times the thickness of one, to a thousandth of a millimetre.
+ *
+ * @param count - How many cards; a count under one is one card.
+ * @param thicknessMm - The thickness of one card in millimetres.
+ * @returns The height of the stack in millimetres.
+ * @example
+ * ```ts
+ * import { cardMaterial, stackHeightMm } from "@johnmorrisdotca/fuda-cards";
+ *
+ * const stock = cardMaterial("paper-310-black-core");
+ * console.log(stackHeightMm(52, stock?.thicknessMm ?? 0.325)); // 16.9
+ * ```
+ */
 export function stackHeightMm(count: number, thicknessMm: number): number {
   return Math.round(Math.max(1, Math.floor(count)) * thicknessMm * 1000) / 1000;
 }

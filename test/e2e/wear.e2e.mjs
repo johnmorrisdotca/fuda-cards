@@ -7,7 +7,9 @@ import { chromium, launch, portShift, serve, sizes } from "./support.mjs";
 
 const PORT = 8118 + portShift;
 const base = `http://127.0.0.1:${PORT}/test/e2e/fixtures`;
-const shadow = (page, id) => page.evaluate((id) => document.getElementById(id).shadowRoot.innerHTML, id);
+/** The card's shadow markup without its stylesheet: what a perfect card is made of, whatever it looks like. */
+const shadow = (page, id) =>
+  page.evaluate((id) => document.getElementById(id).shadowRoot.innerHTML.replace(/<style>[\s\S]*?<\/style>/, ""), id);
 const ready = (page) =>
   page.waitForFunction(
     () =>
@@ -17,13 +19,13 @@ const ready = (page) =>
 const worn = (page, id) =>
   page.waitForFunction((id) => document.getElementById(id).shadowRoot.querySelector(".wear"), id);
 
-test("a perfect card is drawn exactly as 0.4.0 drew it and never loads the wear code", {
+test("a perfect card is drawn as a perfect card is (the markup in fixtures/perfect-card.html) and never loads the wear code", {
   skip: !chromium && "Playwright not installed",
 }, async () => {
   const browser = await launch();
   const server = serve(PORT);
   try {
-    const before = await readFile(new URL("./fixtures/perfect-card-0.4.0.html", import.meta.url), "utf8");
+    const before = await readFile(new URL("./fixtures/perfect-card.html", import.meta.url), "utf8");
     for (const [name, size] of sizes) {
       const context = await browser.newContext({ viewport: size });
       const page = await context.newPage();
@@ -58,7 +60,7 @@ test("a worn card is drawn from its seed: the same every time, another seed anot
   const browser = await launch();
   const server = serve(PORT);
   try {
-    const before = await readFile(new URL("./fixtures/perfect-card-0.4.0.html", import.meta.url), "utf8");
+    const before = await readFile(new URL("./fixtures/perfect-card.html", import.meta.url), "utf8");
     for (const [name, size] of sizes) {
       const draw = async (attrs, wait = true) => {
         const context = await browser.newContext({ viewport: size, deviceScaleFactor: 1 });

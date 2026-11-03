@@ -1,20 +1,12 @@
 // Browser test: run with `pnpm test:e2e` (needs Playwright; skipped when missing).
 
 import { strict as assert } from "node:assert";
-import { readFile } from "node:fs/promises";
-import { createServer } from "node:http";
-import { extname, resolve } from "node:path";
+import { resolve } from "node:path";
 import { test } from "node:test";
-import { chromium, launch, portShift } from "./support.mjs";
+import { choose, chromium, launch, portShift, serve } from "./support.mjs";
 
 const PORT = 8111 + portShift;
-const root = resolve(import.meta.dirname, "../..");
-const choose = async (page, id, value) => {
-  const button = page.locator(`#${id}`).locator("xpath=..").locator(`button[data-value="${value}"]`);
-  if (await button.count()) await button.click();
-  else await page.selectOption(`#${id}`, value);
-};
-const types = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".jpg": "image/jpeg" };
+const _root = resolve(import.meta.dirname, "../..");
 
 const sizes = [
   ["desktop", { width: 1280, height: 800 }],
@@ -25,17 +17,7 @@ test("corner spin keeps the corner at the stage centre, full size, with zoom", {
   skip: !chromium && "Playwright not installed",
 }, async () => {
   const browser = await launch();
-  const server = createServer(async (req, res) => {
-    const url = req.url.split("?")[0];
-    const path = url === "/" ? "/index.html" : url;
-    try {
-      res
-        .writeHead(200, { "Content-Type": types[extname(path)] ?? "text/plain" })
-        .end(await readFile(resolve(root, `.${path}`)));
-    } catch {
-      res.writeHead(404).end();
-    }
-  }).listen(PORT, "127.0.0.1");
+  const server = serve(PORT);
   try {
     for (const [name, size] of sizes) {
       const p = await browser.newPage({ viewport: size });
@@ -179,16 +161,7 @@ test("corner spin by touch, in mobile mode: a drag turns the card about the corn
   skip: !chromium && "Playwright not installed",
 }, async () => {
   const browser = await launch();
-  const server = createServer(async (req, res) => {
-    const url = req.url.split("?")[0];
-    const path = url === "/" ? "/index.html" : url;
-    try {
-      const body = await readFile(resolve(root, `.${path}`));
-      res.writeHead(200, { "Content-Type": types[extname(path)] ?? "text/plain" }).end(body);
-    } catch {
-      res.writeHead(404).end();
-    }
-  }).listen(PORT, "127.0.0.1");
+  const server = serve(PORT);
   try {
     const context = await browser.newContext({
       viewport: { width: 390, height: 844 },

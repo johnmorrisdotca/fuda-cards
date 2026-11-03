@@ -11,18 +11,59 @@ import { stackLayout } from "./stack.js";
  * How a card taken off a pile lands on the pile at its side: still facing up, or turned over sideways (as a person turns a card, like a
  * page) to show its back. `upside-down` was a 0.6.0 value that spun the picture half way round in its plane; it is still accepted and
  * means `face-down`, so nothing breaks. A card never ends with its picture on its head.
+ *
+ * @example
+ * ```ts
+ * import { normalizeLanding, type DeckLanding } from "@johnmorrisdotca/fuda-cards/collection";
+ *
+ * const old: DeckLanding = "upside-down";
+ * console.log(normalizeLanding(old)); // face-down
+ * ```
  */
 export type DeckLanding = "face-up" | "face-down" | "upside-down";
+/**
+ * The two ways a card can land, with the label on each button: `face-up` (still facing up) and `face-down` (turned over sideways on the way).
+ *
+ * @example
+ * ```ts
+ * import { deckLandings } from "@johnmorrisdotca/fuda-cards/collection";
+ *
+ * console.log(deckLandings.map((landing) => landing.id)); // [ 'face-up', 'face-down' ]
+ * ```
+ */
 export const deckLandings: ReadonlyArray<{ id: "face-up" | "face-down"; label: string }> = [
   { id: "face-up", label: "Still facing up" },
   { id: "face-down", label: "Turned over" },
 ];
-/** The landing a value means: `face-down` (also `upside-down` and `turned-over`) is turned over; anything else is still facing up. */
+/**
+ * The landing a value means: `face-down` (also `upside-down` and `turned-over`) is turned over; anything else is still facing up.
+ *
+ * @param value - The `deck-land` attribute's value, or nothing.
+ * @returns `face-down` or `face-up`.
+ * @example
+ * ```ts
+ * import { normalizeLanding } from "@johnmorrisdotca/fuda-cards/collection";
+ *
+ * console.log(normalizeLanding("turned-over"), normalizeLanding(null), normalizeLanding("sideways")); // face-down face-up face-up
+ * ```
+ */
 export function normalizeLanding(value: string | null | undefined): "face-up" | "face-down" {
   return value === "face-down" || value === "upside-down" || value === "turned-over" ? "face-down" : "face-up";
 }
 
-/** Where the cards of a fan lie, first card on the left when open and on top when closed. `open` is the fan spread like a hand of playing cards; `closed` is the squared-up deck it starts from and closes back to. */
+/**
+ * Where one card of a fan lies, first card on the left when open and on top when closed. `angle`, `x` and `y` are the open fan, spread like a hand
+ * of playing cards (turn in degrees, across in card widths, down in card widths); the `closed` ones are the squared-up deck it starts from and
+ * closes back to.
+ *
+ * @example
+ * ```ts
+ * import { fanLayout, type FanPlace } from "@johnmorrisdotca/fuda-cards/collection";
+ *
+ * const first: FanPlace = fanLayout(5)[0];
+ * console.log(first.angle); // -22
+ * ```
+ */
 export interface FanPlace {
   angle: number;
   x: number;
@@ -31,7 +72,20 @@ export interface FanPlace {
   closedX: number;
   closedY: number;
 }
-/** `step` is how far apart neighbouring cards lie across, in card widths; the angle does the rest of the spreading. A phone uses a smaller one. */
+/**
+ * Where the cards of a fan lie: each card turns eleven degrees more than the one before, up to 110 degrees from the first to the last, centred on the pile.
+ *
+ * @param count - How many cards; none gives an empty fan.
+ * @param seed - The seed that nudges the squared-up deck the fan closes to. Unless said, 1.
+ * @param step - How far apart neighbouring cards lie across, in card widths; the angle does the rest of the spreading. A phone uses a smaller one. Unless said, 0.34.
+ * @returns The places of the cards, first card first.
+ * @example
+ * ```ts
+ * import { fanLayout } from "@johnmorrisdotca/fuda-cards/collection";
+ *
+ * console.log(fanLayout(3).map((place) => place.angle)); // [ -11, 0, 11 ]
+ * ```
+ */
 export function fanLayout(count: number, seed = 1, step = 0.34): FanPlace[] {
   const n = Math.max(0, Math.floor(count));
   if (!n) return [];
