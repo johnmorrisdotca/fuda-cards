@@ -676,8 +676,8 @@ const broken = [
         to: "return ratio;",
       },
     ],
-    { viewport: { width: 1600, height: 1200 }, scale: 2 },
-    ({ page }) => budgetCanvas(page, 1600),
+    { viewport: { width: 1900, height: 1400 }, scale: 2 },
+    ({ page }) => budgetCanvas(page, 1900),
     /BUDGET canvas/,
   ],
   [
