@@ -559,4 +559,4 @@ Fuda Cards is one of thirty-five packages, each made for the same site, each at
 
 ## Licence
 
-No licence file has been added to this repository yet, so nothing is granted beyond reading it and using the published package as npm describes. The card pictures in the demos belong to their owners: Pokémon card images and metadata are TCGdex's, the hockey and baseball pictures are public domain from Wikimedia Commons and The Met, and the Starship still carries the CC BY 4.0 credit in [assets/README.md](assets/README.md).
+MIT, Copyright (c) 2026 John Morris: see [LICENSE](LICENSE). The pictures the demos show belong to their owners and are credited in [NOTICE.md](NOTICE.md): the Starship still is CC BY 4.0 (Clarence365's model, see [assets/README.md](assets/README.md)), the hockey and baseball pictures are public domain from Wikimedia Commons and The Met, and the Pokémon card images come from TCGdex when the demo opens and are not licensed by this project.

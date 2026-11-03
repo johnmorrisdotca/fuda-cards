@@ -2,6 +2,8 @@
   "name": "@johnmorrisdotca/fuda-cards",
   "version": "0.10.1",
   "description": "Collectible card frames for the web: images and live 3D in a card with a true thickness, foil, stacks, wear and a binder.",
+  "license": "MIT",
+  "author": "John Morris",
   "type": "module",
   "sideEffects": [
     "./dist/element.js",
@@ -40,6 +42,7 @@
   "files": [
     "dist",
     "README.md",
+    "LICENSE",
     "docs/collection-displays.md",
     "docs/collection-input.md",
     "docs/framework-integration.md",
@@ -48,7 +51,8 @@
     "docs/wear.md",
     "assets/README.md",
     "docs/API.md",
-    "docs/guides"
+    "docs/guides",
+    "NOTICE.md"
   ],
   "engines": {
     "node": ">=22"
