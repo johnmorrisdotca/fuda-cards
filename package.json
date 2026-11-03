@@ -41,7 +41,9 @@
     "docs/live-3d.md",
     "docs/materials.md",
     "docs/wear.md",
-    "assets/README.md"
+    "assets/README.md",
+    "docs/API.md",
+    "docs/guides"
   ],
   "engines": {
     "node": ">=22"
@@ -54,7 +56,11 @@
     "test:e2e": "pnpm build && node scripts/e2e.mjs",
     "test:freeze": "pnpm build && node scripts/e2e.mjs live-3d",
     "dev": "pnpm build && node scripts/dev.mjs",
-    "site": "pnpm build && node scripts/site.mjs"
+    "site": "pnpm build && node scripts/site.mjs",
+    "screenshots:readme": "pnpm site && node scripts/readme-pictures.mjs",
+    "docs:api": "pnpm build && node scripts/docs.mjs api",
+    "docs:check": "pnpm build && node scripts/docs.mjs check",
+    "test:readme": "pnpm build && node scripts/check-readme-examples.mjs"
   },
   "dependencies": {
     "@johnmorrisdotca/kazoku-ui": "^0.10.0"

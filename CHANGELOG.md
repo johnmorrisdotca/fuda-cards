@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Docs: **the documentation is now a reference, thirteen guides and their Japanese twins.** `docs/API.md` is written from the built declarations (`pnpm docs:api`); `docs/guides/` has getting started, the card element, materials and stacks, wear, motion and rotation, collections, binders and piles, live 3D, frameworks and bundlers, accessibility and theming, architecture, troubleshooting and upgrading, each with a Japanese page of the same name in `docs/guides/ja/`. The README is rewritten into sections around the same material, with 24 pictures made by `pnpm screenshots:readme` (`docs/images/`, never by hand).
+- Docs: **every example runs.** `pnpm test:readme` runs each `ts`, `js` and `html` block of the README and the guides (Node for the scripts, headless Chromium in software for the HTML); `pnpm docs:check` fails when `docs/API.md` is out of date, a guide has no Japanese twin, a link or picture is missing, or an export is named nowhere. Both run in `.github/workflows/docs.yml`.
+- New demo: `demo/builder.html`, a page to build a card or a collection, see it live and copy the HTML, React or Vue code. `docs/API.md` and `docs/guides` are in the package's `files`.
+
 ## 0.10.0 - 2026-11-02
 
 - Tests (MODULES-40): the corner spin by touch in Chromium's mobile mode, at ratio 3 with real touch events: a drag turns the card about its corner, the corner stays at the stage centre, the page does not scroll, a pinch zooms. It found no fault.

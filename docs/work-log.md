@@ -304,3 +304,10 @@
 - To stop this session's own run I built a list of process ids with ps and awk and signalled it. The awk's `if (s[p[k]])` created a key for every parent it looked at, so the list was every process with a child on the Mac (71 ids), and it got SIGTERM. That stopped Docker Desktop and other sessions' work, among them another session's full check run. Written up in the owner's handoff for the day.
 - After it, `scripts/e2e.mjs` no longer signals a tree it worked out: it stops only the child it spawned, through `child.kill`, and reads `ps` only for memory. `test/e2e-safety.test.mjs` fails on `process.kill` in it. No process list is ever built to choose what to stop.
 
+
+
+## 2026-11-03: documentation (MODULES-247)
+
+- Changed: README rewritten into sections; added `docs/guides/` (13 guides) and `docs/guides/ja/` (their Japanese twins), `docs/API.md` (generated), `docs/images/` (24 pictures from `pnpm screenshots:readme`), `demo/builder.html`, `scripts/docs.mjs`, `scripts/check-readme-examples.mjs`, `scripts/readme-pictures.mjs` and `.github/workflows/docs.yml`. No source change and no version taken; the changelog line is under Unreleased.
+- Checks: `pnpm test:readme` (every example, in Node and in headless Chromium in software), `pnpm docs:check`, `pnpm check`.
+- Not done: the pictures were taken in headless Chromium only; the README's Licence section says no licence file exists, which is John's to decide.
