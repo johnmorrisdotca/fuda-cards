@@ -26,13 +26,14 @@ export interface ChoiceConfig {
   value: string;
   onChange(value: string): void;
   /** `tiles` stacks the icon over the label; `row` (the default) puts them side by side. */
-  layout?: 'tiles' | 'row';
+  layout?: "tiles" | "row";
 }
 
 /** The colours, for the dark theme (the default) and the light one. */
 export const CHOICE_VARS = {
-  dark: '--fc-surface:#20212c;--fc-text:#f6f4f1;--fc-muted:#b9b6c4;--fc-btn:#353747;--fc-btn-border:#79798c;--fc-accent:#ffd27e;--fc-on-accent:#241a05;--fc-stage-1:#52495a;--fc-stage-2:#222330;--fc-focus:#ffd27e;--fc-dialog:#242632',
-  light: '--fc-surface:#f3efe6;--fc-text:#231e18;--fc-muted:#5b5346;--fc-btn:#fffdf8;--fc-btn-border:#a99d86;--fc-accent:#6d4400;--fc-on-accent:#ffffff;--fc-stage-1:#ebe2d0;--fc-stage-2:#cdc1a9;--fc-focus:#6d4400;--fc-dialog:#fbf8f1'
+  dark: "--fc-surface:#20212c;--fc-text:#f6f4f1;--fc-muted:#b9b6c4;--fc-btn:#353747;--fc-btn-border:#79798c;--fc-accent:#ffd27e;--fc-on-accent:#241a05;--fc-stage-1:#52495a;--fc-stage-2:#222330;--fc-focus:#ffd27e;--fc-dialog:#242632",
+  light:
+    "--fc-surface:#f3efe6;--fc-text:#231e18;--fc-muted:#5b5346;--fc-btn:#fffdf8;--fc-btn-border:#a99d86;--fc-accent:#6d4400;--fc-on-accent:#ffffff;--fc-stage-1:#ebe2d0;--fc-stage-2:#cdc1a9;--fc-focus:#6d4400;--fc-dialog:#fbf8f1",
 } as const;
 
 export const CHOICE_CSS = `.choice{display:grid;gap:.4rem;min-width:0}.choice[hidden]{display:none}.choice-label{font:700 .75rem system-ui;letter-spacing:.08em;text-transform:uppercase;color:var(--fc-muted,#b9b6c4)}
@@ -44,29 +45,29 @@ export const CHOICE_CSS = `.choice{display:grid;gap:.4rem;min-width:0}.choice[hi
 
 /** Build the group. The caller puts `element` in the page and adds `CHOICE_CSS` once to the same root. */
 export function createChoice(config: ChoiceConfig): ChoiceHandle {
-  const element = document.createElement('div');
-  element.className = 'choice';
-  const label = document.createElement('span');
-  label.className = 'choice-label';
+  const element = document.createElement("div");
+  element.className = "choice";
+  const label = document.createElement("span");
+  label.className = "choice-label";
   label.textContent = config.label;
-  const list = document.createElement('div');
-  list.className = `choice-list${config.layout === 'tiles' ? ' tiles' : ''}`;
-  list.setAttribute('role', 'radiogroup');
-  list.setAttribute('aria-label', config.label);
+  const list = document.createElement("div");
+  list.className = `choice-list${config.layout === "tiles" ? " tiles" : ""}`;
+  list.setAttribute("role", "radiogroup");
+  list.setAttribute("aria-label", config.label);
   let current = config.value;
   const buttons = config.options.map((option) => {
-    const button = document.createElement('button');
-    button.type = 'button';
-    button.setAttribute('role', 'radio');
+    const button = document.createElement("button");
+    button.type = "button";
+    button.setAttribute("role", "radio");
     button.dataset.value = option.value;
-    button.innerHTML = `${option.icon ?? ''}<span>${option.label.replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[c] as string)}</span>`;
-    button.addEventListener('click', () => choose(option.value, true));
+    button.innerHTML = `${option.icon ?? ""}<span>${option.label.replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" })[c] as string)}</span>`;
+    button.addEventListener("click", () => choose(option.value, true));
     return button;
   });
   function mark() {
     buttons.forEach((button) => {
       const on = button.dataset.value === current;
-      button.setAttribute('aria-checked', String(on));
+      button.setAttribute("aria-checked", String(on));
       button.tabIndex = on ? 0 : -1;
     });
     if (!buttons.some((b) => b.tabIndex === 0) && buttons[0]) buttons[0].tabIndex = 0;
@@ -77,13 +78,13 @@ export function createChoice(config: ChoiceConfig): ChoiceHandle {
     mark();
     if (notify && changed) config.onChange(value);
   }
-  list.addEventListener('keydown', (event) => {
+  list.addEventListener("keydown", (event) => {
     const at = buttons.findIndex((b) => b.dataset.value === current);
     let next = -1;
-    if (event.key === 'ArrowRight' || event.key === 'ArrowDown') next = (at + 1) % buttons.length;
-    else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') next = (at - 1 + buttons.length) % buttons.length;
-    else if (event.key === 'Home') next = 0;
-    else if (event.key === 'End') next = buttons.length - 1;
+    if (event.key === "ArrowRight" || event.key === "ArrowDown") next = (at + 1) % buttons.length;
+    else if (event.key === "ArrowLeft" || event.key === "ArrowUp") next = (at - 1 + buttons.length) % buttons.length;
+    else if (event.key === "Home") next = 0;
+    else if (event.key === "End") next = buttons.length - 1;
     if (next < 0) return;
     event.preventDefault();
     event.stopPropagation();
@@ -97,7 +98,11 @@ export function createChoice(config: ChoiceConfig): ChoiceHandle {
     element,
     set: (value) => choose(value, false),
     get: () => current,
-    get hidden() { return element.hidden; },
-    set hidden(value: boolean) { element.hidden = value; }
+    get hidden() {
+      return element.hidden;
+    },
+    set hidden(value: boolean) {
+      element.hidden = value;
+    },
   };
 }

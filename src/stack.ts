@@ -57,7 +57,7 @@ export function stackLayout(count: number, options: StackLayoutOptions = {}): St
     places.push({
       x: round((random() * 2 - 1) * nudge),
       y: round((random() * 2 - 1) * nudge * 0.8),
-      rotate: round((random() * 2 - 1) * 14 * mess ** 1.3)
+      rotate: round((random() * 2 - 1) * 14 * mess ** 1.3),
     });
   }
   return places;

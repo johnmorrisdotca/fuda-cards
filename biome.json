@@ -1,0 +1,7 @@
+{
+  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+  "extends": ["./scripts/biome-family.json"],
+  "files": {
+    "includes": ["!rocket.svg", "!site", "!.readme-examples", "!demo/ui.css"]
+  }
+}

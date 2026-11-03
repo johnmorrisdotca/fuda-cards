@@ -6,25 +6,34 @@
  * A leaf has two sides, as a real one does: leaf k holds sides 2k (the right-hand page) and 2k+1 (the left-hand page of the next opening).
  * An opening (spread) j shows side 2j-1 on the left (none at the start) and side 2j on the right.
  */
-export type BinderStyle = 'ring' | 'zip';
-export type BinderSheet = 'clear' | 'black';
-export const binderCovers: ReadonlyArray<{id: string; label: string; color: string}> = [
-  {id: 'green', label: 'Green', color: '#1f7a4a'}, {id: 'black', label: 'Black', color: '#1d1d22'}, {id: 'teal', label: 'Teal', color: '#1a9d93'},
-  {id: 'navy', label: 'Navy', color: '#1f3a70'}, {id: 'red', label: 'Red', color: '#b0262d'}
+export type BinderStyle = "ring" | "zip";
+export type BinderSheet = "clear" | "black";
+export const binderCovers: ReadonlyArray<{ id: string; label: string; color: string }> = [
+  { id: "green", label: "Green", color: "#1f7a4a" },
+  { id: "black", label: "Black", color: "#1d1d22" },
+  { id: "teal", label: "Teal", color: "#1a9d93" },
+  { id: "navy", label: "Navy", color: "#1f3a70" },
+  { id: "red", label: "Red", color: "#b0262d" },
 ];
 /** The sheets a binder takes: how many pockets and how they lie (across by down). 9 is the usual page; 4 and 12 are the other common ones. */
-export const binderPockets: ReadonlyArray<{count: number; cols: number; rows: number}> = [
-  {count: 4, cols: 2, rows: 2}, {count: 9, cols: 3, rows: 3}, {count: 12, cols: 4, rows: 3}
+export const binderPockets: ReadonlyArray<{ count: number; cols: number; rows: number }> = [
+  { count: 4, cols: 2, rows: 2 },
+  { count: 9, cols: 3, rows: 3 },
+  { count: 12, cols: 4, rows: 3 },
 ];
-export interface BinderLayout { cols: number; rows: number; per: number }
+export interface BinderLayout {
+  cols: number;
+  rows: number;
+  per: number;
+}
 
 /** The pockets of a sheet: `pockets` (4, 9 or 12) if the page asks, else the older `columns` and `page-size`, else nine in three columns. */
 export function binderLayout(pockets: string | null, columns: string | null, pageSize: string | null): BinderLayout {
   const known = binderPockets.find((p) => String(p.count) === pockets);
-  if (known) return {cols: known.cols, rows: known.rows, per: known.count};
+  if (known) return { cols: known.cols, rows: known.rows, per: known.count };
   const size = Math.min(100, Math.max(1, Math.floor(Number(pageSize)) || 9));
   const cols = Math.min(10, Math.max(1, Math.floor(Number(columns)) || 3), size);
-  return {cols, rows: Math.ceil(size / cols), per: size};
+  return { cols, rows: Math.ceil(size / cols), per: size };
 }
 /** How many sides a collection of `cards` fills, and how many openings that makes. */
 export const sideCount = (cards: number, per: number): number => Math.max(1, Math.ceil(cards / per));
@@ -33,7 +42,8 @@ export const spreadCount = (sides: number): number => Math.ceil((sides + 1) / 2)
 export const spreadOf = (index: number, per: number): number => Math.ceil(Math.floor(index / per) / 2);
 /** The sides an opening shows (-1 where there is none), left then right, for `sides` sides in all. */
 export function spreadSides(spread: number, sides: number): [number, number] {
-  const left = 2 * spread - 1, right = 2 * spread;
+  const left = 2 * spread - 1;
+  const right = 2 * spread;
   return [left >= 0 && left < sides ? left : -1, right < sides ? right : -1];
 }
 
@@ -67,21 +77,34 @@ export const BINDER_CSS = `
 
 /** The cards a side holds, as indexes into the collection (or -1 for an empty pocket), in reading order. */
 export function sideCards(side: number, layout: BinderLayout, total: number): number[] {
-  return Array.from({length: layout.per}, (_, k) => (side * layout.per + k < total ? side * layout.per + k : -1));
+  return Array.from({ length: layout.per }, (_, k) => (side * layout.per + k < total ? side * layout.per + k : -1));
 }
 
-export interface PocketMaker { (index: number, live: boolean): HTMLElement }
+export type PocketMaker = (index: number, live: boolean) => HTMLElement;
 
 /** One side as it lies in the book: `left` or `right` of the spine, with its hole strip against the spine. `live` pockets hold the page's real card buttons; the rest hold pictures only. */
-export function buildSide(side: number, where: 'l' | 'r', sheet: BinderSheet, layout: BinderLayout, total: number, pocket: PocketMaker, live = true): HTMLElement {
-  const el = document.createElement('div');
+export function buildSide(
+  side: number,
+  where: "l" | "r",
+  sheet: BinderSheet,
+  layout: BinderLayout,
+  total: number,
+  pocket: PocketMaker,
+  live = true,
+): HTMLElement {
+  const el = document.createElement("div");
   el.className = `side ${where} ${sheet}`;
   el.dataset.side = String(side);
-  el.style.setProperty('--cols', String(layout.cols)); el.style.setProperty('--rows', String(layout.rows));
-  const holes = document.createElement('div'); holes.className = 'holes';
-  holes.innerHTML = '<i></i>'.repeat(9);
+  el.style.setProperty("--cols", String(layout.cols));
+  el.style.setProperty("--rows", String(layout.rows));
+  const holes = document.createElement("div");
+  holes.className = "holes";
+  holes.innerHTML = "<i></i>".repeat(9);
   el.append(holes);
-  for (const index of sideCards(side, layout, total)) el.append(index < 0 ? Object.assign(document.createElement('div'), {className: 'pocket empty'}) : pocket(index, live));
+  for (const index of sideCards(side, layout, total))
+    el.append(
+      index < 0 ? Object.assign(document.createElement("div"), { className: "pocket empty" }) : pocket(index, live),
+    );
   return el;
 }
 
@@ -90,28 +113,55 @@ export function buildSide(side: number, where: 'l' | 'r', sheet: BinderSheet, la
  * pockets), so that each can lean a little more than the one before it and the sheet bends. Each slice has the pockets of the front side on its
  * front and the matching column of the back side on its back. Returns the leaf and its slices.
  */
-export function buildLeaf(front: number, back: number, sheet: BinderSheet, layout: BinderLayout, total: number, pocket: PocketMaker, widthPx: number, strip: number): {leaf: HTMLElement; slices: HTMLElement[]} {
-  const leaf = document.createElement('div');
-  leaf.className = 'leaf';
-  const faces = (side: number, where: 'l' | 'r') => side < 0 ? null : buildSide(side, where, sheet, layout, total, pocket, false);
-  const rightSide = faces(front, 'r'), leftSide = faces(back, 'l');
-  const widths = [strip + 6, ...Array.from({length: layout.cols}, () => (widthPx - strip - 6) / layout.cols)];
+export function buildLeaf(
+  front: number,
+  back: number,
+  sheet: BinderSheet,
+  layout: BinderLayout,
+  total: number,
+  pocket: PocketMaker,
+  widthPx: number,
+  strip: number,
+): { leaf: HTMLElement; slices: HTMLElement[] } {
+  const leaf = document.createElement("div");
+  leaf.className = "leaf";
+  const faces = (side: number, where: "l" | "r") =>
+    side < 0 ? null : buildSide(side, where, sheet, layout, total, pocket, false);
+  const rightSide = faces(front, "r");
+  const leftSide = faces(back, "l");
+  const widths = [strip + 6, ...Array.from({ length: layout.cols }, () => (widthPx - strip - 6) / layout.cols)];
   const slices: HTMLElement[] = [];
-  let parent: HTMLElement = leaf, offset = 0;
+  let parent: HTMLElement = leaf;
+  let offset = 0;
   widths.forEach((w, k) => {
-    const slice = document.createElement('div');
-    slice.className = k === 0 ? 'slice first' : k === widths.length - 1 ? 'slice last' : 'slice';
+    const slice = document.createElement("div");
+    slice.className = k === 0 ? "slice first" : k === widths.length - 1 ? "slice last" : "slice";
     slice.style.width = `${w}px`;
-    slice.style.left = k === 0 ? '0' : '100%';
-    const f = document.createElement('div'), b = document.createElement('div');
-    f.className = 'f'; b.className = 'b';
+    slice.style.left = k === 0 ? "0" : "100%";
+    const f = document.createElement("div");
+    const b = document.createElement("div");
+    f.className = "f";
+    b.className = "b";
     // The whole side is placed inside each slice's face and shifted so that this slice shows its own part of it.
-    if (rightSide) { const copy = rightSide.cloneNode(true) as HTMLElement; copy.classList.add('sf'); copy.style.width = `${widthPx}px`; copy.style.left = `${-offset}px`; f.append(copy); }
-    if (leftSide) { const copy = leftSide.cloneNode(true) as HTMLElement; copy.classList.add('sf'); copy.style.width = `${widthPx}px`; copy.style.left = `${-(widthPx - offset - w)}px`; b.append(copy); }
+    if (rightSide) {
+      const copy = rightSide.cloneNode(true) as HTMLElement;
+      copy.classList.add("sf");
+      copy.style.width = `${widthPx}px`;
+      copy.style.left = `${-offset}px`;
+      f.append(copy);
+    }
+    if (leftSide) {
+      const copy = leftSide.cloneNode(true) as HTMLElement;
+      copy.classList.add("sf");
+      copy.style.width = `${widthPx}px`;
+      copy.style.left = `${-(widthPx - offset - w)}px`;
+      b.append(copy);
+    }
     slice.append(f, b);
     parent.append(slice);
-    parent = slice; offset += w;
+    parent = slice;
+    offset += w;
     slices.push(slice);
   });
-  return {leaf, slices};
+  return { leaf, slices };
 }

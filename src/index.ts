@@ -1,6 +1,6 @@
 /** A card's finish and visual family. */
-export type CardFinish = 'foil' | 'matte';
-export type CardVariant = 'classic' | 'sport' | 'cosmic';
+export type CardFinish = "foil" | "matte";
+export type CardVariant = "classic" | "sport" | "cosmic";
 export interface CardOptions {
   title?: string;
   category?: string;
@@ -32,21 +32,21 @@ export interface CardOptions {
   wearSurface?: number;
   wearCreases?: number;
   flipped?: boolean;
-  motion?: 'still' | 'pan';
+  motion?: "still" | "pan";
   playing?: boolean;
   /** `focus`: the card in focus animates its art (needs `motion: 'pan'`); never with reduced motion. */
-  autoplay?: 'focus';
-  panDirection?: 'down' | 'up';
-  panLoop?: 'alternate' | 'restart';
-  cardSpin?: 'center' | 'corner';
-  cardSpinDirection?: 'normal' | 'reverse';
+  autoplay?: "focus";
+  panDirection?: "down" | "up";
+  panLoop?: "alternate" | "restart";
+  cardSpin?: "center" | "corner";
+  cardSpinDirection?: "normal" | "reverse";
   cardSpinPaused?: boolean;
 }
-export const cardVariants: readonly CardVariant[] = ['classic', 'sport', 'cosmic'];
-export const cardFinishes: readonly CardFinish[] = ['foil', 'matte'];
-export { cardMaterials, cardMaterial, stackPresets, stackHeightMm, mmPerPoint } from './materials.js';
-export type { CardMaterial, CardMaterialGroup, CardMaterialSource, StackPreset } from './materials.js';
-export { stackLayout } from './stack.js';
-export type { StackPlace, StackLayoutOptions } from './stack.js';
-export { wearPresets, wearPreset, wearLevels, wearLayout, wearOutline, wearOverlaySvg } from './wear.js';
-export type { WearPreset, WearLevels, WearOptions, WearFeatures, WearCorner, CornerKind } from './wear.js';
+export const cardVariants: readonly CardVariant[] = ["classic", "sport", "cosmic"];
+export const cardFinishes: readonly CardFinish[] = ["foil", "matte"];
+export type { CardMaterial, CardMaterialGroup, CardMaterialSource, StackPreset } from "./materials.js";
+export { cardMaterial, cardMaterials, mmPerPoint, stackHeightMm, stackPresets } from "./materials.js";
+export type { StackLayoutOptions, StackPlace } from "./stack.js";
+export { stackLayout } from "./stack.js";
+export type { CornerKind, WearCorner, WearFeatures, WearLevels, WearOptions, WearPreset } from "./wear.js";
+export { wearLayout, wearLevels, wearOutline, wearOverlaySvg, wearPreset, wearPresets } from "./wear.js";

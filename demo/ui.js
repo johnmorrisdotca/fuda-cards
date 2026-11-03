@@ -1,6 +1,6 @@
 // Shared by the demo pages: light and dark colours, controls that are buttons rather than drop-downs, and choices kept in the address.
 // The choice buttons are the package's own (dist/choice.js), the same ones <fuda-collection> uses for its Display.
-import { CHOICE_CSS, CHOICE_VARS, createChoice } from '../dist/choice.js';
+import { CHOICE_CSS, CHOICE_VARS, createChoice } from "../dist/choice.js";
 
 /** The page's colours as custom properties (--fc-*), light or dark by the reader's setting, or by `?theme=light|dark`. */
 export const PAGE_CSS = `
@@ -18,50 +18,77 @@ ${CHOICE_CSS}`;
 /** `demo/ui.css` is PAGE_CSS as a file, linked from each page's head so nothing is restyled (and nothing shifts) when the script arrives; a test keeps the two equal. */
 export function setupPage() {
   if (!document.querySelector('link[href$="ui.css"]')) {
-    const style = document.createElement('style');
+    const style = document.createElement("style");
     style.textContent = PAGE_CSS;
     document.head.append(style);
   }
   try {
-    const theme = new URLSearchParams(location.search).get('theme');
-    if (theme === 'light' || theme === 'dark') document.documentElement.dataset.theme = theme;
-  } catch { /* an address that cannot be read leaves the reader's setting */ }
+    const theme = new URLSearchParams(location.search).get("theme");
+    if (theme === "light" || theme === "dark") document.documentElement.dataset.theme = theme;
+  } catch {
+    /* an address that cannot be read leaves the reader's setting */
+  }
 }
 
 export { createChoice };
 
 /** Turn a `<select>` into a row of buttons. The select stays in the page, hidden, so scripts and forms still read it; a change of either moves the other. */
-export function choiceFromSelect(select, { layout = 'row', label } = {}) {
-  const wrapper = select.closest('label');
-  const title = label ?? (wrapper ? [...wrapper.childNodes].find((n) => n.nodeType === 3)?.textContent.trim() : select.getAttribute('aria-label')) ?? '';
+export function choiceFromSelect(select, { layout = "row", label } = {}) {
+  const wrapper = select.closest("label");
+  const title =
+    label ??
+    (wrapper
+      ? [...wrapper.childNodes].find((n) => n.nodeType === 3)?.textContent.trim()
+      : select.getAttribute("aria-label")) ??
+    "";
   const options = [...select.options].map((o) => ({ value: o.value, label: o.textContent.trim() }));
   const handle = createChoice({
-    label: title, layout, value: select.value, options,
-    onChange: (value) => { select.value = value; select.dispatchEvent(new Event('input', { bubbles: true })); select.dispatchEvent(new Event('change', { bubbles: true })); }
+    label: title,
+    layout,
+    value: select.value,
+    options,
+    onChange: (value) => {
+      select.value = value;
+      select.dispatchEvent(new Event("input", { bubbles: true }));
+      select.dispatchEvent(new Event("change", { bubbles: true }));
+    },
   });
   select.hidden = true;
-  select.setAttribute('aria-hidden', 'true');
+  select.setAttribute("aria-hidden", "true");
   select.tabIndex = -1;
-  if (wrapper) { wrapper.replaceWith(handle.element); handle.element.append(select); } else select.after(handle.element);
+  if (wrapper) {
+    wrapper.replaceWith(handle.element);
+    handle.element.append(select);
+  } else select.after(handle.element);
   const sync = () => handle.set(select.value);
-  select.addEventListener('change', sync);
-  select.addEventListener('fuda-sync', sync);
+  select.addEventListener("change", sync);
+  select.addEventListener("fuda-sync", sync);
   return handle;
 }
 
 /** Keep the value of each control (found by id) in the address, as `?id=value`, and read it back when the page opens. Other parameters are left as they are. */
 export function keepInAddress(ids, { skip = {} } = {}) {
-  const read = () => { try { return new URLSearchParams(location.search); } catch { return new URLSearchParams(); } };
+  const read = () => {
+    try {
+      return new URLSearchParams(location.search);
+    } catch {
+      return new URLSearchParams();
+    }
+  };
   const initial = {};
-  for (const id of ids) { const el = document.getElementById(id); if (el) initial[id] = el.value; }
+  for (const id of ids) {
+    const el = document.getElementById(id);
+    if (el) initial[id] = el.value;
+  }
   const params = read();
   for (const id of ids) {
-    const el = document.getElementById(id), value = params.get(id);
+    const el = document.getElementById(id);
+    const value = params.get(id);
     if (el && value !== null && value !== el.value) {
       el.value = value;
       if (el.value !== value) continue;
-      el.dispatchEvent(new Event('input', { bubbles: true }));
-      el.dispatchEvent(new Event('change', { bubbles: true }));
+      el.dispatchEvent(new Event("input", { bubbles: true }));
+      el.dispatchEvent(new Event("change", { bubbles: true }));
     }
   }
   let timer = 0;
@@ -72,11 +99,14 @@ export function keepInAddress(ids, { skip = {} } = {}) {
         const url = new URL(location.href);
         for (const id of ids) {
           const el = document.getElementById(id);
-          if (!el || el.value === initial[id] || skip[id]?.(el.value)) url.searchParams.delete(id); else url.searchParams.set(id, el.value);
+          if (!el || el.value === initial[id] || skip[id]?.(el.value)) url.searchParams.delete(id);
+          else url.searchParams.set(id, el.value);
         }
-        history.replaceState(history.state, '', url);
-      } catch { /* a page that cannot change its address keeps working */ }
+        history.replaceState(history.state, "", url);
+      } catch {
+        /* a page that cannot change its address keeps working */
+      }
     }, 250);
   };
-  for (const id of ids) document.getElementById(id)?.addEventListener('input', write);
+  for (const id of ids) document.getElementById(id)?.addEventListener("input", write);
 }

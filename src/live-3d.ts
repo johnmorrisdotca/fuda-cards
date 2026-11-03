@@ -2,16 +2,27 @@
 // picture. A page that only shows pictures loads no 3D code at all: the renderer and three.js come in when the first card is focused, or when a card with no picture of its
 // own comes near the view and needs its still made. This module only decides WHICH card is live (the focus policy): the context, the assets, the stills, the frames and the
 // pixel budget are the shared renderer's (kazoku-ui docs/renderer.md).
-import type { BuildContext, RendererStats, Scene3D, SharedRenderer, SharedRendererOptions, ThreeLike, View } from '@johnmorrisdotca/kazoku-ui/renderer';
+import type {
+  BuildContext,
+  RendererStats,
+  Scene3D,
+  SharedRenderer,
+  SharedRendererOptions,
+  ThreeLike,
+  View,
+} from "@johnmorrisdotca/kazoku-ui/renderer";
 
 /** A scene for a card. `object` is what turns about its upright axis while the card is in focus. */
-export interface LiveScene extends Scene3D { object?: { rotation: { y: number } } }
+export interface LiveScene extends Scene3D {
+  object?: { rotation: { y: number } };
+}
 /** What a card shows in 3D: a key (items with the same key share their pictures) and a scene made from shared assets (`assets.acquire`). */
 export interface LiveItem<T extends ThreeLike = ThreeLike> {
   key: string;
   build(context: BuildContext<T>): LiveScene | Promise<LiveScene>;
 }
-export interface LiveCardsOptions<T extends ThreeLike = ThreeLike> extends Omit<SharedRendererOptions<T>, 'scheduler' | 'assets' | 'clock' | 'document'> {
+export interface LiveCardsOptions<T extends ThreeLike = ThreeLike>
+  extends Omit<SharedRendererOptions<T>, "scheduler" | "assets" | "clock" | "document"> {
   /** Seconds for one turn of the card in focus (12). 0 does not turn it. */
   turnSeconds?: number;
   /** How long the pointer has to rest on a card before it goes live, in milliseconds (150), so moving the pointer across a page of cards starts nothing. A press or the keyboard does not wait. */
@@ -41,13 +52,20 @@ export interface LiveCards<T extends ThreeLike = ThreeLike> {
 }
 
 interface Entry<T extends ThreeLike> {
-  card: HTMLElement; item: LiveItem<T>; host: HTMLElement; poster?: HTMLImageElement; posterSrc?: string;
-  angle: number; view?: View; making?: Promise<View | undefined>; off: () => void;
+  card: HTMLElement;
+  item: LiveItem<T>;
+  host: HTMLElement;
+  poster?: HTMLImageElement;
+  posterSrc?: string;
+  angle: number;
+  view?: View;
+  making?: Promise<View | undefined>;
+  off: () => void;
 }
 
 /** Stills are shared per this many degrees, so a card frozen at any angle shows a picture at its angle without one picture per degree. */
 const STILL_STEP = 5;
-const reducedMotion = () => typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+const reducedMotion = () => typeof matchMedia === "function" && matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 export function createLiveCards<T extends ThreeLike = ThreeLike>(options: LiveCardsOptions<T>): LiveCards<T> {
   const { turnSeconds = 12, dwellMs = 150, lookAheadPx = 300, ...rendererOptions } = options;
@@ -59,41 +77,68 @@ export function createLiveCards<T extends ThreeLike = ThreeLike>(options: LiveCa
   let asked = 0;
 
   /** The renderer's module comes in only when a card first needs it: a page of pictures never loads it. */
-  const needRenderer = () => (loading ??= import('@johnmorrisdotca/kazoku-ui/renderer').then(({ createSharedRenderer }) => (renderer = createSharedRenderer<T>(rendererOptions))));
+  const needRenderer = () =>
+    (loading ??= import("@johnmorrisdotca/kazoku-ui/renderer").then(
+      ({ createSharedRenderer }) => (renderer = createSharedRenderer<T>(rendererOptions)),
+    ));
 
   /** The view of a card, made when first needed. The item's key carries the card's angle, so its still shows the angle it stopped at. */
   const viewOf = (entry: Entry<T>): Promise<View | undefined> => {
     if (entry.view) return Promise.resolve(entry.view);
-    return (entry.making ??= needRenderer().then((shared) => {
+    entry.making ??= needRenderer().then((shared) => {
       if (disposed || !entries.has(entry.card)) return undefined;
       const turning = {
-        get key() { return `${entry.item.key}@${((Math.round(entry.angle / STILL_STEP) * STILL_STEP) % 360 + 360) % 360}`; },
+        get key() {
+          return `${entry.item.key}@${(((Math.round(entry.angle / STILL_STEP) * STILL_STEP) % 360) + 360) % 360}`;
+        },
         build: async (context: BuildContext<T>): Promise<Scene3D> => {
           const scene = await entry.item.build(context);
-          const turn = (): void => { if (scene.object) scene.object.rotation.y = (entry.angle * Math.PI) / 180; };
+          const turn = (): void => {
+            if (scene.object) scene.object.rotation.y = (entry.angle * Math.PI) / 180;
+          };
           turn();
-          return { ...scene, update(dt: number, now: number) {
-            const more = scene.update?.(dt, now) === true;
-            if (!turnSeconds || !scene.object || reducedMotion()) return more;
-            entry.angle += (360 * dt) / turnSeconds;
-            turn();
-            return true;
-          } };
+          return {
+            ...scene,
+            update(dt: number, now: number) {
+              const more = scene.update?.(dt, now) === true;
+              if (!turnSeconds || !scene.object || reducedMotion()) return more;
+              entry.angle += (360 * dt) / turnSeconds;
+              turn();
+              return true;
+            },
+          };
         },
       };
-      return (entry.view = shared.view(entry.host, turning, entry.poster ? { still: entry.poster } : {}));
-    }));
+      entry.view = shared.view(entry.host, turning, entry.poster ? { still: entry.poster } : {});
+      return entry.view;
+    });
+    return entry.making;
   };
 
-  const putPosterBack = (entry: Entry<T>) => { if (entry.poster && entry.posterSrc && !entry.poster.getAttribute('src')) entry.poster.src = entry.posterSrc; };
+  const putPosterBack = (entry: Entry<T>) => {
+    if (entry.poster && entry.posterSrc && !entry.poster.getAttribute("src")) entry.poster.src = entry.posterSrc;
+  };
   /** A card near the view shows its picture. One with a picture of its own needs nothing; the renderer makes the others', one at a time. */
   const prepare = (entry: Entry<T>) => {
-    if (entry.view) { if (entry.poster && !entry.poster.getAttribute('src') && !entry.view.live) putPosterBack(entry); if (!entry.poster) void entry.view.showStill(); return; }
+    if (entry.view) {
+      if (entry.poster && !entry.poster.getAttribute("src") && !entry.view.live) putPosterBack(entry);
+      if (!entry.poster) void entry.view.showStill();
+      return;
+    }
     if (!entry.poster) void viewOf(entry).then((view) => view?.showStill());
   };
-  const near = typeof IntersectionObserver === 'function' ? new IntersectionObserver((seen) => {
-    for (const { target, isIntersecting } of seen) { const entry = entries.get(target as HTMLElement); if (entry && isIntersecting) prepare(entry); }
-  }, { rootMargin: `${lookAheadPx}px` }) : undefined;
+  const near =
+    typeof IntersectionObserver === "function"
+      ? new IntersectionObserver(
+          (seen) => {
+            for (const { target, isIntersecting } of seen) {
+              const entry = entries.get(target as HTMLElement);
+              if (entry && isIntersecting) prepare(entry);
+            }
+          },
+          { rootMargin: `${lookAheadPx}px` },
+        )
+      : undefined;
 
   async function focus(card: HTMLElement): Promise<boolean> {
     const entry = entries.get(card);
@@ -113,43 +158,73 @@ export function createLiveCards<T extends ThreeLike = ThreeLike>(options: LiveCa
   }
 
   // Who is in focus: the card under the pointer after a short rest, the one holding keyboard focus, the one last pressed. A press elsewhere ends it.
-  document.addEventListener('pointerdown', onPressAnywhere, true);
+  document.addEventListener("pointerdown", onPressAnywhere, true);
   function onPressAnywhere(event: Event): void {
     if (focusedEntry && !event.composedPath().includes(focusedEntry.card)) blur();
   }
   function listen(entry: Entry<T>): () => void {
     const { card } = entry;
     let timer: ReturnType<typeof setTimeout> | undefined;
-    const wait = () => { clearTimeout(timer); timer = undefined; };
-    const enter = (e: PointerEvent) => { if (e.pointerType === 'touch') return; wait(); timer = setTimeout(() => { void focus(card); }, dwellMs); };
-    const leave = (e: PointerEvent) => { if (e.pointerType === 'touch') return; wait(); if (focusedEntry === entry && !card.matches(':focus-within')) blur(); };
-    const press = () => { wait(); void focus(card); };
-    const focusIn = () => { wait(); void focus(card); };
-    const focusOut = (e: FocusEvent) => { if (focusedEntry === entry && !card.contains(e.relatedTarget as Node | null) && !card.matches(':hover')) blur(); };
-    card.addEventListener('pointerenter', enter);
-    card.addEventListener('pointerleave', leave);
-    card.addEventListener('pointerdown', press);
-    card.addEventListener('focusin', focusIn);
-    card.addEventListener('focusout', focusOut);
+    const wait = () => {
+      clearTimeout(timer);
+      timer = undefined;
+    };
+    const enter = (e: PointerEvent) => {
+      if (e.pointerType === "touch") return;
+      wait();
+      timer = setTimeout(() => {
+        void focus(card);
+      }, dwellMs);
+    };
+    const leave = (e: PointerEvent) => {
+      if (e.pointerType === "touch") return;
+      wait();
+      if (focusedEntry === entry && !card.matches(":focus-within")) blur();
+    };
+    const press = () => {
+      wait();
+      void focus(card);
+    };
+    const focusIn = () => {
+      wait();
+      void focus(card);
+    };
+    const focusOut = (e: FocusEvent) => {
+      if (focusedEntry === entry && !card.contains(e.relatedTarget as Node | null) && !card.matches(":hover")) blur();
+    };
+    card.addEventListener("pointerenter", enter);
+    card.addEventListener("pointerleave", leave);
+    card.addEventListener("pointerdown", press);
+    card.addEventListener("focusin", focusIn);
+    card.addEventListener("focusout", focusOut);
     return () => {
       wait();
-      card.removeEventListener('pointerenter', enter);
-      card.removeEventListener('pointerleave', leave);
-      card.removeEventListener('pointerdown', press);
-      card.removeEventListener('focusin', focusIn);
-      card.removeEventListener('focusout', focusOut);
+      card.removeEventListener("pointerenter", enter);
+      card.removeEventListener("pointerleave", leave);
+      card.removeEventListener("pointerdown", press);
+      card.removeEventListener("focusin", focusIn);
+      card.removeEventListener("focusout", focusOut);
     };
   }
 
   function add(card: HTMLElement, item: LiveItem<T>, addOptions: AddOptions = {}): () => void {
     entries.get(card)?.off();
-    const host = document.createElement('div');
-    host.className = 'fuda-live';
+    const host = document.createElement("div");
+    host.className = "fuda-live";
     // It lies over the art and takes no press, so everything on the card still works. `.art ::slotted(*)` keeps it unseen until the card is ready.
-    host.style.cssText = 'position:absolute;inset:0;pointer-events:none';
-    if (getComputedStyle(card).position === 'static') card.style.position = 'relative';
+    host.style.cssText = "position:absolute;inset:0;pointer-events:none";
+    if (getComputedStyle(card).position === "static") card.style.position = "relative";
     card.append(host);
-    const entry: Entry<T> = { card, item, host, angle: 0, off: () => {}, ...(addOptions.still ? { poster: addOptions.still, posterSrc: addOptions.still.getAttribute('src') ?? undefined } : {}) };
+    const entry: Entry<T> = {
+      card,
+      item,
+      host,
+      angle: 0,
+      off: () => {},
+      ...(addOptions.still
+        ? { poster: addOptions.still, posterSrc: addOptions.still.getAttribute("src") ?? undefined }
+        : {}),
+    };
     const unlisten = listen(entry);
     entries.set(card, entry);
     near?.observe(card);
@@ -162,7 +237,7 @@ export function createLiveCards<T extends ThreeLike = ThreeLike>(options: LiveCa
       entries.delete(card);
       entry.view?.dispose();
       putPosterBack(entry);
-      if (entry.poster) entry.poster.style.visibility = '';
+      if (entry.poster) entry.poster.style.visibility = "";
       host.remove();
     };
     return entry.off;
@@ -172,13 +247,19 @@ export function createLiveCards<T extends ThreeLike = ThreeLike>(options: LiveCa
     add,
     focus,
     blur,
-    get focused() { return focusedEntry?.card; },
-    get stats() { return renderer?.stats; },
-    get renderer() { return renderer; },
+    get focused() {
+      return focusedEntry?.card;
+    },
+    get stats() {
+      return renderer?.stats;
+    },
+    get renderer() {
+      return renderer;
+    },
     dispose() {
       disposed = true;
       for (const entry of [...entries.values()]) entry.off();
-      document.removeEventListener('pointerdown', onPressAnywhere, true);
+      document.removeEventListener("pointerdown", onPressAnywhere, true);
       near?.disconnect();
       renderer?.dispose();
     },
