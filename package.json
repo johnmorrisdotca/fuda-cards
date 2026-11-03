@@ -1,6 +1,6 @@
 {
   "name": "@johnmorrisdotca/fuda-cards",
-  "version": "0.10.0",
+  "version": "0.10.1",
   "description": "Fuda Cards: collectible card frames for images and interactive 3D content.",
   "type": "module",
   "sideEffects": [
@@ -54,7 +54,7 @@
     "test": "pnpm build && node --test test/*.test.mjs test/*.test.ts",
     "check": "pnpm typecheck && pnpm build && pnpm test",
     "test:e2e": "pnpm build && node scripts/e2e.mjs",
-    "test:freeze": "pnpm build && node scripts/e2e.mjs live-3d",
+    "test:freeze": "pnpm site && node scripts/e2e.mjs live-3d",
     "dev": "pnpm build && node scripts/dev.mjs",
     "site": "pnpm build && node scripts/site.mjs",
     "screenshots:readme": "pnpm site && node scripts/readme-pictures.mjs",

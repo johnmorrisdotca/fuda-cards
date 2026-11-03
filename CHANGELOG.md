@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+## 0.10.1 - 2026-11-03
+
+- Fixed: **the release's freeze test builds the demo site first.** `pnpm test:freeze` ran `pnpm build` only, so on a clean machine `site/` did not exist and "the built demo site carries what the page needs" waited 30 s and failed; 0.10.0's release stopped there and was never published to npm. It now runs `pnpm site`, which builds the package and the site. 0.10.1 carries everything listed under 0.10.0.
 - Docs: **the documentation is now a reference, thirteen guides and their Japanese twins.** `docs/API.md` is written from the built declarations (`pnpm docs:api`); `docs/guides/` has getting started, the card element, materials and stacks, wear, motion and rotation, collections, binders and piles, live 3D, frameworks and bundlers, accessibility and theming, architecture, troubleshooting and upgrading, each with a Japanese page of the same name in `docs/guides/ja/`. The README is rewritten into sections around the same material, with 24 pictures made by `pnpm screenshots:readme` (`docs/images/`, never by hand).
 - Docs: **every example runs.** `pnpm test:readme` runs each `ts`, `js` and `html` block of the README and the guides (Node for the scripts, headless Chromium in software for the HTML); `pnpm docs:check` fails when `docs/API.md` is out of date, a guide has no Japanese twin, a link or picture is missing, or an export is named nowhere. Both run in `.github/workflows/docs.yml`.
 - New demo: `demo/builder.html`, a page to build a card or a collection, see it live and copy the HTML, React or Vue code. `docs/API.md` and `docs/guides` are in the package's `files`.
