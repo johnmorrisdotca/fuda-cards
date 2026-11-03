@@ -4,6 +4,7 @@
  * `<fuda-collection>` (the Overlapping Deck and the other displays that draw a pile) and `<fuda-card stack>` both use this one
  * piece, so a pile fans open and closed, and a card comes off it and goes back, the same way everywhere.
  */
+import { reducedMotion } from "./motion.js";
 import { stackLayout } from "./stack.js";
 
 /**
@@ -85,7 +86,7 @@ export function fanBounds(places: FanPlace[]): { left: number; right: number; to
       y1 = Math.max(y1, y);
     }
   }
-  const r = (v: number) => Math.round(v * 1000) / 1000;
+  const r = (v: number) => Math.round(v * 1000) / 1000 || 0;
   return { left: r(-x0), right: r(x1 - 1), top: r(-y0), bottom: r(y1 - CARD_RATIO) };
 }
 
@@ -98,7 +99,7 @@ export function fanRelative(places: FanPlace[]): Array<{ angle: number; x: numbe
   const a0 = (places[0].angle * Math.PI) / 180;
   const c = Math.cos(a0);
   const s = Math.sin(a0);
-  const r = (v: number) => Math.round(v * 1000) / 1000;
+  const r = (v: number) => Math.round(v * 1000) / 1000 || 0;
   return places.map((p) => {
     const dx = p.x - places[0].x;
     return { angle: r(p.angle - places[0].angle), x: r(dx * c), y: r(-dx * s) };
@@ -120,9 +121,6 @@ export interface Timing {
 export const SPEEDS: Record<string, number> = { slow: 1.6, normal: 1, quick: 0.6 };
 /** The base length of a move, 600 ms; `speed` stretches or shortens every move at once. */
 export const BASE_MS = 600;
-export function reducedMotion(): boolean {
-  return typeof matchMedia === "function" && matchMedia("(prefers-reduced-motion: reduce)").matches;
-}
 /**
  * `animate="off"` turns every move off; `animate="on"` turns them on; with no `animate` a move is on only where `dflt` says (the pieces that
  * already moved before the option existed). The reader's reduced-motion setting always wins.

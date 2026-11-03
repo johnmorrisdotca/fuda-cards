@@ -11,6 +11,7 @@ import type {
   ThreeLike,
   View,
 } from "@johnmorrisdotca/kazoku-ui/renderer";
+import { reducedMotion } from "./motion.js";
 
 /** A scene for a card. `object` is what turns about its upright axis while the card is in focus. */
 export interface LiveScene extends Scene3D {
@@ -65,7 +66,6 @@ interface Entry<T extends ThreeLike> {
 
 /** Stills are shared per this many degrees, so a card frozen at any angle shows a picture at its angle without one picture per degree. */
 const STILL_STEP = 5;
-const reducedMotion = () => typeof matchMedia === "function" && matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 export function createLiveCards<T extends ThreeLike = ThreeLike>(options: LiveCardsOptions<T>): LiveCards<T> {
   const { turnSeconds = 12, dwellMs = 150, lookAheadPx = 300, ...rendererOptions } = options;
