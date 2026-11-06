@@ -8,4 +8,4 @@
  * console.log(/^\d+\.\d+\.\d+$/.test(VERSION)); // true
  * ```
  */
-export const VERSION = "0.10.1";
+export const VERSION = "0.11.0";

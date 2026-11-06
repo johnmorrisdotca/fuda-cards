@@ -1,6 +1,6 @@
 {
   "name": "@johnmorrisdotca/fuda-cards",
-  "version": "0.10.1",
+  "version": "0.11.0",
   "description": "Collectible card frames for the web: images and live 3D in a card with a true thickness, foil, stacks, wear and a binder.",
   "license": "MIT",
   "author": "John Morris",

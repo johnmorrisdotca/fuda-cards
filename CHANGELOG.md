@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.11.0 - 2026-11-06
+
 - Fixed: **the Studio check for Auto-turn waits until the card has turned.** Auto-turn stays at 12 degrees a second, the same way a drag right goes (the angle rises, and the front moves right). At that speed the front only moves about two pixels in the first second when frames are scarce, so the check waits until the front has moved, and gives up at six seconds.
 - Licence: **MIT.** A `LICENSE` file (Copyright (c) 2026 John Morris), `"license": "MIT"` and `"author"` in `package.json`, `LICENSE` and `NOTICE.md` in the published files, and a `NOTICE.md` that credits each picture and fact the repository and its demos use, with its source and licence. The README's Licence section says MIT.
 - Changed (MODULES-62): **a card is 0.325 mm thick by default** (a playing card's black-core stock, 13 pt; was 0.3), exported as `DEFAULT_CARD_THICKNESS_MM`. The cards under the top card of a stack are now the top card's own frame (the same variant, finish, panel and light), no longer a gold one, and the edge is in the material's colour. The Studio's "60 thick 130 pt" comparison is gone from the README. Move: set `thickness="0.3"` to keep the old thickness.
