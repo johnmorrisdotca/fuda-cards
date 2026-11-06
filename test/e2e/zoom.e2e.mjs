@@ -3,7 +3,7 @@
 
 import { strict as assert } from "node:assert";
 import { test } from "node:test";
-import { choose, chromium, launch, offline, portShift, serve, sizes } from "./support.mjs";
+import { choose, chromium, launch, offline, portShift, pressFit, serve, sizes } from "./support.mjs";
 
 const PORT = 8113 + portShift;
 const origin = `http://127.0.0.1:${PORT}`;
@@ -75,7 +75,7 @@ async function exercise(p, name, spec) {
     here(`the page is ${opening.scrollWidth}px wide in a ${opening.innerWidth}px window`),
   );
 
-  await bar("Fit").click();
+  await pressFit(p);
   const fit = await geo();
   assert.equal(fit.zoom, 1, here("Fit must return to zoom 1"));
   assert.ok(fit.outside <= 2, here(`at Fit a card is ${fit.outside}px outside the view`));
@@ -108,7 +108,7 @@ async function exercise(p, name, spec) {
   );
   assert.equal(await spec.clicked(p), idle, here("a drag over a card must not click it"));
 
-  await bar("Fit").click();
+  await pressFit(p);
   const back = await geo();
   assert.equal(back.zoom, 1, here("Fit after + must return to zoom 1"));
   assert.equal(Math.round(back.width), Math.round(fit.width), here("Fit after + must show the cards as before"));
@@ -119,10 +119,10 @@ async function exercise(p, name, spec) {
   await p.mouse.wheel(0, -300);
   await p.keyboard.up("Control");
   assert.ok((await geo()).zoom > 1, here("Ctrl+wheel must zoom"));
-  await bar("Fit").click();
+  await pressFit(p);
   await pinch(p, stage);
   assert.ok((await geo()).zoom > 1, here("a pinch over a card must zoom"));
-  await bar("Fit").click();
+  await pressFit(p);
   await p.locator(stage).focus();
   await p.keyboard.press("+");
   assert.ok((await geo()).zoom > 1, here("the + key must zoom"));
@@ -154,7 +154,7 @@ async function exercise(p, name, spec) {
     await spec.advance(p);
     assert.ok((await geo()).zoom > zoomed, here("moving on must keep the zoom"));
   }
-  await bar("Fit").click();
+  await pressFit(p);
   await p.waitForFunction(
     ({ stage, find }) =>
       new Function("stage", `${find} return q(stage).getAnimations({ subtree: true }).length === 0;`)(stage),
@@ -299,7 +299,7 @@ test("the zoom is kept in the address, and a card opens from the keyboard", {
         () => document.querySelector("fuda-collection").shadowRoot.querySelector("kazoku-view-controls").state.zoom,
       );
     assert.equal(await state(), 2, "a zoom in the address must win over the opening view");
-    await p.getByRole("button", { name: "Fit", exact: true }).click();
+    await pressFit(p);
     await p.getByRole("button", { name: "Zoom in", exact: true }).click();
     await p.waitForTimeout(500);
     assert.match(new URL(p.url()).search, /zoom=1\.4/);

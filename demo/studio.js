@@ -81,8 +81,17 @@ const controls = mountControls({
   settings,
   lang: () => page.lang,
   say,
-  onChange: () => {
+  onChange: (option) => {
     apply();
+    // Corner spin opens at the card's own size. Fit is the smaller picture that stays on the stage while it turns.
+    if (
+      option?.id === "card-spin" &&
+      card.getAttribute("card-spin") === "corner" &&
+      fit > 0 &&
+      fit < 1 &&
+      view.state.zoom === 1
+    )
+      view.set({ zoom: 1 / fit });
     spin();
     notes();
     keep();
@@ -138,11 +147,7 @@ new ResizeObserver(measure).observe(stage);
 new ResizeObserver(measure).observe(card);
 customElements.whenDefined("fuda-card").then(() => requestAnimationFrame(measure));
 
-// The controls sit in one row at a desk and in the compact row on a phone, where the rest is behind More.
-const narrow = matchMedia("(max-width: 560px)");
-const layout = () => view.setAttribute("layout", narrow.matches ? "compact" : "horizontal");
-narrow.addEventListener("change", layout);
-layout();
+// One bar on a desk and a phone. The compact bar hides the speed, and the speed stays in sight while the card turns.
 
 // A fan or a pile at the side changes what has to fit: the view glides to the new fit (not with reduced motion or Animate off).
 card.addEventListener("fuda-pile", () => {

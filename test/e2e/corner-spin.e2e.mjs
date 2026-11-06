@@ -3,7 +3,7 @@
 import { strict as assert } from "node:assert";
 import { resolve } from "node:path";
 import { test } from "node:test";
-import { choose, chromium, launch, portShift, serve } from "./support.mjs";
+import { choose, chromium, launch, portShift, pressFit, serve } from "./support.mjs";
 
 const PORT = 8111 + portShift;
 const _root = resolve(import.meta.dirname, "../..");
@@ -72,7 +72,7 @@ test("corner spin keeps the corner at the stage centre, full size, with zoom", {
         Math.abs(opening.width - 300) <= 1,
         `${name}: the card must open at full size, not ${opening.width}px wide`,
       );
-      await p.getByRole("button", { name: "Fit", exact: true }).click();
+      await pressFit(p);
       const fit = await sweep();
       assert.ok(Math.max(...fit.off) <= 1, `${name}: the corner is ${Math.max(...fit.off)}px from the stage centre`);
       assert.equal(fit.width, 300, `${name}: the card must stay full size`);
@@ -98,7 +98,7 @@ test("corner spin keeps the corner at the stage centre, full size, with zoom", {
         "2×",
         `${name}: the readout says 2×`,
       );
-      await p.getByRole("button", { name: "Fit", exact: true }).click();
+      await pressFit(p);
       assert.equal(await zoom(), 1, `${name}: Fit must return to 1`);
       const box = await p.locator("#stage").boundingBox();
       await p.keyboard.down("Control");
@@ -106,7 +106,7 @@ test("corner spin keeps the corner at the stage centre, full size, with zoom", {
       await p.mouse.wheel(0, -300);
       await p.keyboard.up("Control");
       assert.ok((await zoom()) > 1, `${name}: Ctrl+wheel must zoom`);
-      await p.getByRole("button", { name: "Fit", exact: true }).click();
+      await pressFit(p);
 
       await p.getByRole("button", { name: /Animate/ }).click();
       assert.equal(
@@ -178,7 +178,7 @@ test("corner spin by touch, in mobile mode: a drag turns the card about the corn
         document.querySelector("#view").state,
     );
     await choose(p, "card-spin", "corner");
-    await p.locator("#view").getByRole("button", { name: "Fit", exact: true }).tap();
+    await pressFit(p.locator("#view"));
     const corner = () =>
       p.evaluate(() => {
         const stage = document.querySelector("#stage");

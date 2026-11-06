@@ -215,6 +215,7 @@ test("the Studio offers every material and preset, sets the stack and tells its 
         0,
         `${name}: a count that is no preset presses none`,
       );
+      await page.locator("#opt-tab-material").click();
       await page.fill("#opt-thickness", "0");
       assert.match(await page.textContent("#note"), /7 cards × 0 mm = 0 mm high/);
       assert.ok(

@@ -4,7 +4,7 @@
 import { strict as assert } from "node:assert";
 import { test } from "node:test";
 import { COUNT_SCRIPT, readCounts } from "@johnmorrisdotca/kazoku-ui/testing";
-import { chromium, launch, offline, portShift, serve, sizes } from "./support.mjs";
+import { chromium, launch, offline, portShift, pressFit, serve, sizes } from "./support.mjs";
 
 const PORT = 8116 + portShift;
 const origin = `http://127.0.0.1:${PORT}`;
@@ -81,7 +81,7 @@ test("the bar has one zoom number, in sight on a desk and a phone, and it is the
         };
         await check("at opening");
         if (SHOTS) await p.screenshot({ path: `${SHOTS}/zoom-readout-${name}-${device}-opening.png` });
-        await bar("Fit").click();
+        await pressFit(p.locator("kazoku-view-controls"));
         const fit = await check("Fit");
         assert.equal(fit.text, "1×", `${where}: Fit reads 1×`);
         await bar("Zoom in").click();
@@ -114,7 +114,7 @@ test("the number is what is drawn: the card is that many times its size at Fit",
       await p.goto(`${origin}/index.html`);
       await p.waitForFunction(pages[0][2]);
       const width = () => p.evaluate(() => document.querySelector("#card").getBoundingClientRect().width);
-      await p.locator("#view").getByRole("button", { name: "Fit", exact: true }).click();
+      await pressFit(p.locator("#view"));
       const atFit = await width();
       for (const zoom of [0.5, 1.5, 2, 3.2]) {
         await p.evaluate((z) => document.querySelector("#view").set({ zoom: z }), zoom);

@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Fixed: **the back of a turned card stays the back.** Near edge-on, the host's shadow let the front's letters paint through the back; the front is not drawn while the back faces the reader.
+- Fixed: **the Studio opens a corner spin at the card's own size,** and the zoom number stays on the first screen of a desk and a phone. The same bar is used on a phone as on a desk, so the speed stays in sight while the card turns. The setting tabs are rounded, and the page does not jump when the header's words and choosers appear.
+
 ## 0.11.0 - 2026-11-06
 
 - Fixed: **the Studio check for Auto-turn waits until the card has turned.** Auto-turn stays at 12 degrees a second, the same way a drag right goes (the angle rises, and the front moves right). At that speed the front only moves about two pixels in the first second when frames are scarce, so the check waits until the front has moved, and gives up at six seconds.

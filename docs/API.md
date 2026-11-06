@@ -95,7 +95,7 @@ const stackPresets: readonly StackPreset[];
 *constant*. The version of this package, the same as `package.json`'s (a test holds the two together).
 
 ```ts
-const VERSION = "0.10.1";
+const VERSION = "0.11.0";
 ```
 
 ### wearLayout
@@ -427,6 +427,8 @@ class FudaCard extends HTMLElement {
     private toggleMotion;
     /** The art stays invisible until the card has a size on screen and every slotted image has loaded, so it never shows outside the frame. */
     private watchArt;
+    /** The front is hidden while `--fuda-yaw` has turned the back toward the reader. */
+    private watchFacing;
     connectedCallback(): void;
     disconnectedCallback(): void;
     attributeChangedCallback(name: string): void;

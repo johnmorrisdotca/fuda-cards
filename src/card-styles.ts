@@ -109,6 +109,8 @@ const FACE_CSS = `
   border: calc(2 * var(--u)) solid var(--frame-line);
 }
 .front { transform: translateZ(calc(var(--t) / 2)); }
+/* A filter on the host flattens a back-facing face near edge-on, and its glyphs paint through the back. The front is not drawn while the back is toward the reader. */
+:host([data-back]) .front { display: none; }
 .inner {
   height: 100%;
   padding: calc(12 * var(--u));
@@ -242,6 +244,8 @@ const SHEEN_CSS = `
   to { background-position: 100% 80%, 0 0; }
 }
 :host([finish=matte]) .shine { display: none; }
+/* The reader is holding the angle, so the foil stays where the light is instead of sweeping on its own. */
+:host([card-view]) .shine, :host([card-view]) :is(.front, .still) { animation: none; }
 @media (prefers-reduced-motion: reduce) {
   :host([card-spin]) .shine, :host([card-spin]) :is(.front, .still) { animation: none; }
 }

@@ -114,6 +114,13 @@ export const sizes = [
   ["mobile", { width: 390, height: 844 }],
 ];
 
+/** The control that returns the view to Fit. The horizontal and compact bars hide the button named Fit; the zoom readout does it. */
+export async function pressFit(scope) {
+  const named = scope.getByRole("button", { name: "Fit", exact: true });
+  if ((await named.count()) > 0 && (await named.first().isVisible())) await named.first().click();
+  else await scope.getByRole("button", { name: /^Zoom level/ }).click();
+}
+
 /**
  * A static server for the repository. The Card Studio and the Builder are written from their templates with the family's header and footer, by the same
  * function that `pnpm site` uses, so a test opens the page the site publishes; everything else is a file of the repository.

@@ -77,6 +77,7 @@ export class FudaCard extends HTMLElement {
     const button = root.querySelector("button");
     button?.addEventListener("click", () => this.toggleMotion());
     this.watchArt(root);
+    this.watchFacing();
     this.watchFocus(button);
     this.watchLight();
   }
@@ -168,6 +169,17 @@ export class FudaCard extends HTMLElement {
     slot.addEventListener("error", update, true);
     if (typeof ResizeObserver !== "undefined") new ResizeObserver(update).observe(this);
     else requestAnimationFrame(update);
+  }
+  /** The front is hidden while `--fuda-yaw` has turned the back toward the reader. */
+  private watchFacing(): void {
+    const sync = () => {
+      const raw = this.style.getPropertyValue("--fuda-yaw");
+      const yaw = Number.parseFloat(raw);
+      const turned = ((yaw % 360) + 360) % 360;
+      this.toggleAttribute("data-back", raw !== "" && Number.isFinite(yaw) && turned > 90 && turned < 270);
+    };
+    new MutationObserver(sync).observe(this, { attributes: true, attributeFilter: ["style"] });
+    sync();
   }
   connectedCallback(): void {
     this.render();

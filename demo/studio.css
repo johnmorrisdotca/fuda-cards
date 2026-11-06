@@ -13,7 +13,7 @@
 .studio-stage {
   position: relative;
   overflow: hidden;
-  height: clamp(320px, 52svh, 560px);
+  height: clamp(300px, calc(52svh - 48px), 512px);
   border-radius: 12px;
   background: radial-gradient(ellipse at 50% 40%, rgba(255, 255, 255, 0.1), rgba(0, 0, 0, 0.18) 70%);
 }
@@ -43,6 +43,9 @@
   display: grid;
   gap: 14px;
   min-width: 0;
+}
+#controls {
+  min-height: 404px;
 }
 .bld-options {
   gap: 16px;
@@ -93,13 +96,89 @@
 }
 .fam-tabs button {
   min-width: 5rem;
+  border-radius: 8px;
+}
+/* The choosers have no size until they are defined, and the nav's words arrive after the page. Reserve both so the studio does not jump when they appear. The pill widths are the Japanese ones, the wider of the two languages. */
+header nav {
+  min-height: 6.5rem;
+}
+header nav a[data-say="toStudio"] {
+  min-width: 131px;
+}
+header nav a[data-say="toBuilder"] {
+  min-width: 87px;
+}
+header nav a[data-say="toCollections"] {
+  min-width: 160px;
+}
+header nav a[data-say="toBinder"] {
+  min-width: 173px;
+}
+header nav a[data-say="toVintage"] {
+  min-width: 159px;
+}
+header nav a[data-say="toLive"] {
+  min-width: 93px;
+}
+header nav a[data-say="pageDocs"] {
+  min-width: 116px;
+}
+kazoku-language-picker:where(:not(:defined)) {
+  display: inline-block;
+  width: 158px;
+  height: 48px;
+  vertical-align: middle;
+}
+kazoku-theme-switch:where(:not(:defined)) {
+  display: inline-block;
+  width: 270px;
+  height: 48px;
+  vertical-align: middle;
+}
+@media (max-width: 700px) {
+  header nav {
+    min-height: 264px;
+  }
+  /* The wider Japanese pills add a row here, and the zoom number leaves the first screen. The phone reserves the English pills. */
+  header nav a[data-say="toStudio"] {
+    min-width: 114px;
+  }
+  header nav a[data-say="toBuilder"] {
+    min-width: 79px;
+  }
+  header nav a[data-say="toCollections"] {
+    min-width: 143px;
+  }
+  header nav a[data-say="toBinder"] {
+    min-width: 142px;
+  }
+  header nav a[data-say="toVintage"] {
+    min-width: 126px;
+  }
+  header nav a[data-say="toLive"] {
+    min-width: 81px;
+  }
+  header nav a[data-say="pageDocs"] {
+    min-width: 65px;
+  }
+  kazoku-theme-switch:where(:not(:defined)) {
+    width: 152px;
+  }
 }
 @media (max-width: 860px) {
   .studio {
     grid-template-columns: minmax(0, 1fr);
   }
+  /* The bar sits under the stage, and its zoom number has to be on the first screen of a phone. */
+  header {
+    margin-bottom: 0;
+  }
+  .studio-felt {
+    padding: 0 12px;
+    gap: 4px;
+  }
   .studio-stage {
-    height: clamp(340px, calc(100svh - 520px), 480px);
+    height: 230px;
   }
 }
 .builder-stage {
