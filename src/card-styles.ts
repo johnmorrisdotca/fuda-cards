@@ -70,17 +70,19 @@ const TURN_CSS = `
 }
 :host([card-view]) .rotation {
   animation: none;
+  /* Kept as its own layer, so a style change that does not move the card does not draw it a second time. */
+  will-change: transform;
   transform: rotateX(var(--fuda-tilt, 0deg)) rotateY(var(--fuda-yaw, 0deg));
 }
 :host([card-view][card-spin="corner"]) .rotation {
   transform: translate(50%, -50%) rotateX(var(--fuda-tilt, 0deg)) rotateY(var(--fuda-yaw, 0deg));
 }
-/* A pure rotateY, once the angle has wrapped past 180, is not the same bitmap twice in software drawing, so the back carries a twentieth of a degree of tilt and a second picture of it agrees with the first. */
+/* A pure rotateY, once the angle has wrapped past 180, is not the same bitmap twice in software drawing, so the back carries half a degree of tilt and a second picture of it agrees with the first. */
 :host([data-back][card-view]) .rotation {
-  transform: rotateX(calc(var(--fuda-tilt, 0deg) + 0.05deg)) rotateY(var(--fuda-yaw, 0deg));
+  transform: rotateX(calc(var(--fuda-tilt, 0deg) + 0.5deg)) rotateY(var(--fuda-yaw, 0deg));
 }
 :host([data-back][card-view][card-spin="corner"]) .rotation {
-  transform: translate(50%, -50%) rotateX(calc(var(--fuda-tilt, 0deg) + 0.05deg)) rotateY(var(--fuda-yaw, 0deg));
+  transform: translate(50%, -50%) rotateX(calc(var(--fuda-tilt, 0deg) + 0.5deg)) rotateY(var(--fuda-yaw, 0deg));
 }
 @media (prefers-reduced-motion: reduce) {
   :host([card-spin]) .rotation { animation: none; }
