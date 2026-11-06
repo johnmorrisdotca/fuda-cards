@@ -159,8 +159,8 @@ card.addEventListener("fuda-pile", () => {
   pile();
 });
 
-/** The way Auto-turn goes: the view's own button turns the card, forward or in reverse as the setting says (its speeds are the view's own). */
-const AUTO_TURN_DEGREES_A_SECOND = 12;
+/** The way Auto-turn goes: the view's own button turns the card, forward or in reverse as the setting says (its speeds are the view's own). A positive speed raises yaw, which is the same way a drag right moves the front. 12 degrees a second only moves that front about two pixels in the first second when frames are scarce, so the turn is 36: still a calm spin, and the front has clearly moved. */
+const AUTO_TURN_DEGREES_A_SECOND = 36;
 function spin() {
   view.setAttribute(
     "speed",
