@@ -177,16 +177,18 @@ export class FudaCard extends HTMLElement {
       const yaw = Number.parseFloat(raw);
       const turned = ((yaw % 360) + 360) % 360;
       const back = raw !== "" && Number.isFinite(yaw) && turned > 90 && turned < 270;
-      const was = this.hasAttribute("data-back");
       this.toggleAttribute("data-back", back);
-      const front = this.shadowRoot?.querySelector(".front");
+      const root = this.shadowRoot;
+      const front = root?.querySelector(".front");
       if (front instanceof HTMLElement) front.style.display = back ? "none" : "";
-      // The host's drop-shadow keeps a flattened copy of the front until the filter is rebuilt.
-      if (back && !was) {
-        this.style.setProperty("filter", "none");
-        void this.offsetWidth;
-        this.style.removeProperty("filter");
-      }
+      // The host's drop-shadow keeps a copy of the front until a style element in the shadow root hides it.
+      let hide = root?.getElementById("back-hide");
+      if (back && root && !hide) {
+        hide = document.createElement("style");
+        hide.id = "back-hide";
+        hide.textContent = ".front{display:none}";
+        root.append(hide);
+      } else if (!back) hide?.remove();
     };
     new MutationObserver(sync).observe(this, { attributes: true, attributeFilter: ["style"] });
     sync();
