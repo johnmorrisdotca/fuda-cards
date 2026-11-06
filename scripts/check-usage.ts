@@ -163,11 +163,14 @@ await step("readme", () => {
   mkdirSync(folder, { recursive: true });
   const blocks = [...readFileSync(at("README.md"), "utf8").matchAll(/^```(ts|js|mjs)( [^\n]*)?\n([\s\S]*?)^```$/gm)];
   if (blocks.length < 3) throw new Error("the README has no code blocks to check");
-  const names = blocks.map((block, index) => {
+  const names = blocks.flatMap((block, index) => {
+    const info = block[2] ?? "";
+    // `no-check` is a fragment (it names things the page already has), so it is neither type-checked nor run.
+    if (info.includes("no-check")) return [];
     const name = `block-${index + 1}.${block[1] === "ts" ? "ts" : "mjs"}`;
     // A block that only shows a call leaves its value unused; making it a module keeps the files apart.
     writeFileSync(join(folder, name), `${block[3]}\nexport {};\n`);
-    return { name, run: !(block[2] ?? "").includes("no-run") };
+    return [{ name, run: !info.includes("no-run") }];
   });
   writeFileSync(
     join(folder, "tsconfig.json"),
@@ -298,7 +301,13 @@ const viteApp = async (name: string, plugins: unknown[] = []): Promise<void> => 
 
 await step("vite", () => viteApp("vite"));
 await step("react", () => viteApp("react"));
-await step("vue", async () => viteApp("vue", [(await import("@vitejs/plugin-vue")).default()]));
+await step("vue", async () =>
+  viteApp("vue", [
+    (await import("@vitejs/plugin-vue")).default({
+      template: { compilerOptions: { isCustomElement: (tag) => tag.includes("-") } },
+    }),
+  ]),
+);
 await step("svelte", async () => viteApp("svelte", [(await import("@sveltejs/vite-plugin-svelte")).svelte()]));
 
 await step("react-ssr", async () => {
@@ -383,17 +392,19 @@ await step("angular", async () => {
 
 await browser.close();
 
-// 4. The guides and the README hold what was tested, word for word.
+// 4. The guides hold what was tested, word for word. The README points at the guide for the two it does not paste.
 const everything = only.length === 0;
 const FILES: Record<string, string[]> = {
-  "cdn-jsdelivr.html": ["README.md", "docs/guides/html-and-cdn.md", "docs/guides/ja/html-and-cdn.md"],
+  // The README points at the HTML and CDN guide for this page, rather than pasting it.
+  "cdn-jsdelivr.html": ["docs/guides/html-and-cdn.md", "docs/guides/ja/html-and-cdn.md"],
   "cdn-unpkg.html": ["docs/guides/html-and-cdn.md", "docs/guides/ja/html-and-cdn.md"],
   "iframe.html": ["docs/guides/embed-in-an-iframe.md", "docs/guides/ja/embed-in-an-iframe.md"],
   "vite/main.ts": ["docs/guides/bundlers.md", "docs/guides/ja/bundlers.md"],
   "vite/index.html": ["docs/guides/bundlers.md", "docs/guides/ja/bundlers.md"],
   "webpack/src/index.js": ["docs/guides/bundlers.md", "docs/guides/ja/bundlers.md"],
   "webpack/webpack.config.mjs": ["docs/guides/bundlers.md", "docs/guides/ja/bundlers.md"],
-  "react/FudaCard.tsx": ["README.md", "docs/guides/frameworks.md", "docs/guides/ja/frameworks.md"],
+  // The README's React block is the collection, and it points at the Frameworks guide for this card.
+  "react/FudaCard.tsx": ["docs/guides/frameworks.md", "docs/guides/ja/frameworks.md"],
   "react/fuda-card.d.ts": ["docs/guides/frameworks.md", "docs/guides/ja/frameworks.md"],
   "vue/FudaCard.vue": ["docs/guides/frameworks.md", "docs/guides/ja/frameworks.md"],
   "vue/main.ts": ["docs/guides/frameworks.md", "docs/guides/ja/frameworks.md"],
