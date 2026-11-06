@@ -3,6 +3,7 @@
 ## Unreleased
 
 - Fixed: **the back of a turned card stays the back.** Near edge-on, the host's shadow let the front's letters paint through the back; the front is not drawn while the back faces the reader.
+- Fixed: **a binder card keeps its picture inside the frame** while the page is still loading.
 - Fixed: **the Studio opens a corner spin at the card's own size,** and the zoom number stays on the first screen of a desk and a phone. The same bar is used on a phone as on a desk, so the speed stays in sight while the card turns. The setting tabs are rounded, and the page does not jump when the header's words and choosers appear.
 
 ## 0.11.0 - 2026-11-06

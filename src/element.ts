@@ -176,7 +176,12 @@ export class FudaCard extends HTMLElement {
       const raw = this.style.getPropertyValue("--fuda-yaw");
       const yaw = Number.parseFloat(raw);
       const turned = ((yaw % 360) + 360) % 360;
-      this.toggleAttribute("data-back", raw !== "" && Number.isFinite(yaw) && turned > 90 && turned < 270);
+      const back = raw !== "" && Number.isFinite(yaw) && turned > 90 && turned < 270;
+      this.toggleAttribute("data-back", back);
+      const front = this.shadowRoot?.querySelector(".front");
+      if (front instanceof HTMLElement) front.style.display = back ? "none" : "";
+      // The host's shadow flattens the faces, so the front can stay in that layer until the style is read back.
+      void this.getBoundingClientRect();
     };
     new MutationObserver(sync).observe(this, { attributes: true, attributeFilter: ["style"] });
     sync();
