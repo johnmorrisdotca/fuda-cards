@@ -75,6 +75,13 @@ const TURN_CSS = `
 :host([card-view][card-spin="corner"]) .rotation {
   transform: translate(50%, -50%) rotateX(var(--fuda-tilt, 0deg)) rotateY(var(--fuda-yaw, 0deg));
 }
+/* A pure rotateY, once the angle has wrapped past 180, is not the same bitmap twice in software drawing, so the back carries a twentieth of a degree of tilt and a second picture of it agrees with the first. */
+:host([data-back][card-view]) .rotation {
+  transform: rotateX(calc(var(--fuda-tilt, 0deg) + 0.05deg)) rotateY(var(--fuda-yaw, 0deg));
+}
+:host([data-back][card-view][card-spin="corner"]) .rotation {
+  transform: translate(50%, -50%) rotateX(calc(var(--fuda-tilt, 0deg) + 0.05deg)) rotateY(var(--fuda-yaw, 0deg));
+}
 @media (prefers-reduced-motion: reduce) {
   :host([card-spin]) .rotation { animation: none; }
   :host .card { transition: none; }
