@@ -215,8 +215,19 @@ test.describe("the Card Studio", () => {
       .getByRole("button", { name: /Auto-turn|自動回転/ })
       .first()
       .click();
-    await page.waitForTimeout(900);
-    expect((await front()).x - rest.x, "Auto-turn turns it the way a drag right does").toBeGreaterThan(2);
+    // 12 degrees a second only moves the front a couple of pixels in the first second when frames are scarce, so wait until it has clearly gone, and not past six seconds.
+    await page.waitForFunction(
+      (startX) => {
+        const box = document.getElementById("card").shadowRoot.querySelector(".card > .front").getBoundingClientRect();
+        const yaw = document.getElementById("view").state.yaw;
+        return yaw > 0 && box.x + box.width / 2 - startX > 10;
+      },
+      rest.x,
+      { timeout: 6000 },
+    );
+    const yaw = await page.locator("#view").evaluate((view) => view.state.yaw);
+    expect(yaw, "Auto-turn raises the angle, the same way a drag right does").toBeGreaterThan(0);
+    expect((await front()).x - rest.x, "and the front has moved right").toBeGreaterThan(10);
   });
 });
 
