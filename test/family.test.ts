@@ -29,8 +29,8 @@ const id = pkg.name.replace(/^@[^/]+\//, "");
 
 // The template of 2026-11-02d is the one of 2026-11-02c (Wakusei Planets) with this package added to the list (thirty-five packages, the cards group), and the README
 // writer's number words reaching thirty-five. The other packages take the same two files when they are next touched.
-const TEMPLATE = { version: "2026-11-02d", sha256: "732379cd33c26d20af8de733669d070ca22f8d13e47cc18cf96dc46478b471d3" };
-const WRITER = "af861c6e19e721f8b1be8fec08905b7d8de6b1364900735acde56e2275b17759";
+const TEMPLATE = { version: "2026-11-09", sha256: "75ca7e7da99092f360e5a539e34b109b14c92e9c04e7ad98f9e4b1e715c9240e" };
+const WRITER = "dfd4c27b70fe5d7d5f82724180cc739812f0dd13d209c41c053dbdc61bf90188";
 const FAMILY_CSS = "31df0a58f422070ca4023d5498566b26bc55a5f9a0751f1520d36c61bbb562c9";
 
 test("the family template, the README writer and family.css are the recorded files, byte for byte", () => {
@@ -41,7 +41,7 @@ test("the family template, the README writer and family.css are the recorded fil
 });
 
 test("it lists every package of the family, in order, each with its Japanese name and a line on it", () => {
-  assert.equal(template.FAMILY.length, 35);
+  assert.equal(template.FAMILY.length, 41);
   assert.deepEqual(
     template.FAMILY_GROUPS.flatMap((group) => group.members),
     template.FAMILY.map((one) => one.id),
