@@ -227,9 +227,10 @@ test("the speed is in sight while the view turns and the basic bar stays small",
       await p.waitForFunction(() => document.querySelector("#view").state.turning);
       assert.equal(await pace.isVisible(), true, `${device}: the speed shows while it turns`);
       if (SHOTS) await p.screenshot({ path: `${SHOTS}/bar-turning-${device}.png` });
-      assert.match(await pace.textContent(), /Medium/);
+      const first = await pace.textContent();
+      assert.match(first, /30 s/, `${device}: the speed names what the turn takes`);
       await pace.click();
-      assert.match(await pace.textContent(), /Fast/, `${device}: a press steps to the next speed`);
+      assert.notEqual(await pace.textContent(), first, `${device}: a press steps to the next speed`);
       await p.locator("#view").getByRole("button", { name: "Auto-turn", exact: true }).click();
       await p.locator("#view").getByRole("button", { name: "More", exact: true }).click();
       assert.equal(

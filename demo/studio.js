@@ -99,6 +99,8 @@ const controls = mountControls({
 });
 
 // The stage: the card turns, tips and zooms with the shared view controls, which also put it back in the middle (Centre) once it has been moved away.
+// A press on the card's picture would start the browser's own picture drag and end the turn after one step.
+stage.addEventListener("dragstart", (e) => e.preventDefault());
 const PERSPECTIVE = 2400;
 let fit = 1;
 let hull = { x: 0, y: 0 };
@@ -137,7 +139,7 @@ function measure() {
 
 function draw(state) {
   last = state;
-  zoomer.style.transform = `translate(${state.panX - hull.x * fit * state.zoom}px,${state.panY - hull.y * fit * state.zoom}px) scale(${fit * state.zoom})`;
+  zoomer.style.transform = `translate(${state.panX - hull.x * fit * state.zoom}px,${state.panY - hull.y * fit * state.zoom}px) scale(${fit * state.zoom}) rotate(${state.roll ?? 0}deg)`;
   card.style.setProperty("--fuda-yaw", `${state.yaw}deg`);
   card.style.setProperty("--fuda-tilt", `${state.tilt}deg`);
 }

@@ -311,3 +311,11 @@
 - Changed: README rewritten into sections; added `docs/guides/` (13 guides) and `docs/guides/ja/` (their Japanese twins), `docs/API.md` (generated), `docs/images/` (24 pictures from `pnpm screenshots:readme`), `demo/builder.html`, `scripts/docs.mjs`, `scripts/check-readme-examples.mjs`, `scripts/readme-pictures.mjs` and `.github/workflows/docs.yml`. No source change and no version taken; the changelog line is under Unreleased.
 - Checks: `pnpm test:readme` (every example, in Node and in headless Chromium in software), `pnpm docs:check`, `pnpm check`.
 - Not done: the pictures were taken in headless Chromium only; the README's Licence section says no licence file exists, which is John's to decide.
+
+## 2026-11-17: kazoku-ui 0.53 and the gesture check (MODULES-1505)
+
+- Changed: `@johnmorrisdotca/kazoku-ui` `^0.12.0` to `^0.53.0`; new `e2e/gestures.demo.mjs` runs `checkGestures` on the Studio's stage (desk only, with a 240 s budget: 78 s measured, a picture takes about a second in software GL). The Studio stage now stops the browser's own picture drag (`dragstart`), which ended a drag that began on the card's picture after one step, and draws the roll (`rotate` on the zoomer).
+- Checks: `pnpm check`, `pnpm test:e2e`, `pnpm test:demo` (see the ticket's note for the results).
+- Not done: on a phone the Studio's bar is 104 px taller than with kazoku-ui 0.12 (the Angle, Tilt, Roll and All chips are a row of their own), so `view-bar.e2e.mjs` "the bar has one zoom number" fails on the phone's first screen of the Studio (the number is at 896 to 944 of 844); the page's header alone is 496 px there. The compact layout would fit but hides the speed while the card turns. Needs a decision. `card-back`, `no-reveal` (slow network) and the Studio's auto-turn check in `view-bar` fail the same way on origin/main in this session's Chromium.
+- Not done: the deck's roll is not drawn (the bar offers it); the collection views (`<fuda-collection>`) are flat zoom views with their own bar and have no gesture check of their own; the check covers the Studio card only.
+

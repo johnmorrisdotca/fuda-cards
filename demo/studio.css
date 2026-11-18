@@ -13,7 +13,7 @@
 .studio-stage {
   position: relative;
   overflow: hidden;
-  height: clamp(300px, calc(52svh - 48px), 512px);
+  height: clamp(300px, calc(52svh - 64px), 512px);
   border-radius: 12px;
   background: radial-gradient(ellipse at 50% 40%, rgba(255, 255, 255, 0.1), rgba(0, 0, 0, 0.18) 70%);
 }

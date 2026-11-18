@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Changed (MODULES-1505): **kazoku-ui 0.53.** The plain wheel no longer zooms a view (Ctrl or Command with the wheel does, and the plain wheel moves a zoomed one); a drag turns, Shift and a drag rolls, Ctrl or Command and a drag moves. The Studio's card now rolls in its plane with Shift and a drag, which the bar already offered, and the Studio's check runs kazoku-ui's `checkGestures` on the card (`e2e/gestures.demo.mjs`). The bar is a row taller, so the Studio's stage is 16 px shorter on a desk and the collection page's is 20 px shorter on a phone. The browser tests follow: Ctrl and a drag moves a collection view that turns, and the speed button reads "One turn in 30 s".
+- Fixed: **a drag that starts on the Studio card's picture turns the card.** The browser began its own picture drag after the first step, so the turn stopped at once; the stage now holds the browser's picture drag back, as the collection views already did.
+
 ## 0.11.0 - 2026-11-17
 
 - Fixed: **the back of a turned card stays the back.** While the back faces the reader the front is not drawn, and the shadow that flattened the card is off, so the front's letters cannot paint through.

@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@johnmorrisdotca/kazoku-ui':
-        specifier: ^0.12.0
-        version: 0.12.0(three@0.186.1)
+        specifier: ^0.53.0
+        version: 0.53.0(three@0.186.1)
     devDependencies:
       '@angular/common':
         specifier: ^22.2.4
@@ -376,9 +376,10 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@johnmorrisdotca/kazoku-ui@0.12.0':
-    resolution: {integrity: sha512-1lwzvgUfV+D5UsvR+swBGQHyQ3YO7zt/9se+fMck9gflO7NB0Ele+dFsbi9y0V4M2g7OhVgub8sifaEFd32iHQ==}
+  '@johnmorrisdotca/kazoku-ui@0.53.0':
+    resolution: {integrity: sha512-E9tCAg80ZKpxJgAKKyy0qnTwNNlej4siME8CtIGYax3ey0c791zwtf6oa8+IKWHatXpUCrnrcnQAWcWcMAgbEA==}
     engines: {node: '>=22'}
+    hasBin: true
     peerDependencies:
       three: '>=0.160.0'
     peerDependenciesMeta:
@@ -1419,7 +1420,7 @@ snapshots:
   '@esbuild/win32-x64@0.25.12':
     optional: true
 
-  '@johnmorrisdotca/kazoku-ui@0.12.0(three@0.186.1)':
+  '@johnmorrisdotca/kazoku-ui@0.53.0(three@0.186.1)':
     optionalDependencies:
       three: 0.186.1
 

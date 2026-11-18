@@ -28,16 +28,16 @@ const geometry = (p, stage) =>
     { stage, find },
   );
 
-// The middle of the card that shows most inside the stage, as page coordinates.
+// The middle of the card that shows most inside the stage and the window, as page coordinates.
 const aim = (p, stage, cards = ".card") =>
   p.evaluate(
     ({ stage, cards, find }) =>
       new Function(
         "stage",
         "cards",
-        `${find} const st = q(stage), b = st.getBoundingClientRect(); let best = null, area = 0;
+        `${find} const st = q(stage), s = st.getBoundingClientRect(), b = { left: Math.max(s.left, 0), right: Math.min(s.right, innerWidth), top: Math.max(s.top, 0), bottom: Math.min(s.bottom, innerHeight) }; let best = null, area = 0;
   for (const c of all(cards)) { const r = c.getBoundingClientRect(), w = Math.min(r.right, b.right) - Math.max(r.left, b.left), h = Math.min(r.bottom, b.bottom) - Math.max(r.top, b.top); if (w > 0 && h > 0 && w * h > area) { area = w * h; best = { x: Math.max(r.left, b.left) + w / 2, y: Math.max(r.top, b.top) + h / 2 }; } }
-  return best ?? { x: b.left + b.width / 2, y: b.top + b.height / 2 };`,
+  return best ?? { x: (b.left + b.right) / 2, y: (b.top + b.bottom) / 2 };`,
       )(stage, cards),
     { stage, cards, find },
   );
@@ -97,10 +97,17 @@ async function exercise(p, name, spec) {
 
   const grab = await aim(p, stage, spec.cards);
   const before = await geo();
+  // A view that turns takes a plain drag for the turn; Ctrl and a drag moves it (kazoku-ui 0.53). A flat view moves on a plain drag.
+  const turns = await p.evaluate(
+    ({ find }) => new Function(`${find} return !q('kazoku-view-controls').hasAttribute('flat');`)(),
+    { find },
+  );
   await p.mouse.move(grab.x, grab.y);
+  if (turns) await p.keyboard.down("Control");
   await p.mouse.down();
   await p.mouse.move(grab.x + 40, grab.y + 30, { steps: 4 });
   await p.mouse.up();
+  if (turns) await p.keyboard.up("Control");
   const moved = await geo();
   assert.ok(
     Math.hypot(moved.panX - before.panX, moved.panY - before.panY) > 20,
